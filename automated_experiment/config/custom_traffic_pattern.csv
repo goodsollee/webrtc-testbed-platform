@@ -1,4 +1,5 @@
-0,5000         # Absolute time,File size (KB)
+time_ms,size_bytes
+0,5000         
 1000,1000 0      
 2000,10000
 3000,50000       
