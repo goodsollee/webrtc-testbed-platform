@@ -515,6 +515,18 @@ void Conductor::DeletePeerConnection() {
   if (bulk_receiver_)
     bulk_receiver_->Detach();
 
+  for (auto& sender : file_senders_) {
+    if (sender)
+      sender->Stop();
+  }
+  file_senders_.clear();
+
+  for (auto& receiver : file_receivers_) {
+    if (receiver)
+      receiver->Detach();
+  }
+  file_receivers_.clear();
+
   main_wnd_->StopLocalRenderer();
   main_wnd_->StopRemoteRenderer();
   peer_connection_ = nullptr;
@@ -1314,6 +1326,11 @@ void Conductor::AddSCTPs() {
     TrafficKind kind = static_cast<TrafficKind>(next_kind++);
 
     AddSctpFlow(kind, profile.traffic_name, cfg);
+
+    auto receiver = std::make_unique<sctp::file::Receiver>(
+        static_cast<int>(kind), profile.traffic_name, log_dir_);
+    receiver->Attach(*this);
+    file_receivers_.push_back(std::move(receiver));
 
     if (profile.pattern == "Periodic") {
       auto sender = std::make_unique<sctp::file::Sender>(
