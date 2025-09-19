@@ -37,6 +37,8 @@ ABSL_FLAG(std::string, network_interface, "",
     "Network interface to use (empty for default)");
 ABSL_FLAG(std::string, y4m_path, "", 
     "Path to Y4M file to use as video source (empty for test pattern)");
+  ABSL_FLAG(std::string, sctp_csv, "",
+        "Path to SCTP traffic CSV to drive traffic");
 // In flag_defs.h, add:
 ABSL_FLAG(std::string, log_date, "", "Date for log folder (YYYY-MM-DD)");
 
@@ -104,15 +106,20 @@ Video Source Options:
   --y4m_path=<path>         Path to Y4M file to use as video source
                             If not specified, uses test pattern
 
+SCTP Traffic Options:
+  --sctp_csv=<path>         Path to SCTP traffic CSV to drive traffic
+
 Example Commands:
   # Run as video sender using Y4M file:
   ./peerconnection_client --experiment_mode=emulation --is_sender=true \
-      --network_interface=eth0 --y4m_path=/path/to/video.y4m \
-      --server=localhost --port=8888
+    --network_interface=eth0 --y4m_path=/path/to/video.y4m \
+    --sctp_csv=/path/to/traffic.csv \
+    --server=localhost --port=8888
 
   # Run as video receiver:
   ./peerconnection_client --experiment_mode=emulation --is_sender=false \
-      --network_interface=eth0 --server=localhost --port=8888
+      --sctp_csv=/path/to/traffic.csv \
+      --network_interface=eth0 --server=localhost --port=8888 
 )";
 
   // Set the usage message
@@ -176,10 +183,12 @@ Example Commands:
   rtc::InitializeSSL();
   PeerConnectionClient client;
   auto conductor = rtc::make_ref_counted<Conductor>(&client, &wnd, absl::GetFlag(FLAGS_headless));
-  std::string traffic_csv = absl::GetFlag(FLAGS_traffic_csv);
-  if (!traffic_csv.empty()) {
-    conductor->SetTrafficProfile(traffic_csv);
-  }
+
+  std::string sctp_csv = absl::GetFlag(FLAGS_sctp_csv);
+  if (!sctp_csv.empty()) {
+    conductor->SetTrafficProfile(sctp_csv);
+  } 
+
   conductor->SetRoomId(absl::GetFlag(FLAGS_room_id));
 
   // Get log date - if empty, use current date
