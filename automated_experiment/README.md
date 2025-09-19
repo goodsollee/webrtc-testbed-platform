@@ -40,7 +40,7 @@ This repository provides a helper script to run the `peerconnection_client` with
    ```bash
    ./run_peerconnection.sh room123 true --y4m samples/video.y4m
    ```
-5. **Sender with SCTP traffic**
+5. **Sender with SCTP traffic (Receiver needs same traffic config)**
    ```bash
    ./run_peerconnection.sh room123 true --sctp configs/traffic_config.csv
    ```
