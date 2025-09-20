@@ -111,7 +111,6 @@ class Conductor : public webrtc::PeerConnectionObserver,
 
   bool IsFlowOpen(TrafficKind kind) const;
   uint64_t BufferedAmount(TrafficKind kind) const;
-
   rtc::Thread* signaling_thread() const { return signaling_thread_.get(); }
 
  protected:
@@ -140,7 +139,7 @@ class Conductor : public webrtc::PeerConnectionObserver,
       rtc::scoped_refptr<webrtc::DataChannelInterface> channel) override;
   void OnRenegotiationNeeded() override {}
   void OnIceConnectionChange(
-      webrtc::PeerConnectionInterface::IceConnectionState new_state) override {}
+      webrtc::PeerConnectionInterface::IceConnectionState new_state) override;
   void OnIceGatheringChange(
       webrtc::PeerConnectionInterface::IceGatheringState new_state) override {}
   void OnIceCandidate(const webrtc::IceCandidateInterface* candidate) override;
@@ -186,6 +185,7 @@ class Conductor : public webrtc::PeerConnectionObserver,
   void OnFailure(webrtc::RTCError error) override;
 
   std::string GetLogFolder() const override {return log_dir_;}
+  void DumpActiveRtpParameters();
 
  protected:
   // Send a message to the remote peer.
@@ -275,6 +275,7 @@ class Conductor : public webrtc::PeerConnectionObserver,
 
    // juheon added
    bool headless_ = false;
+   bool logged_codecs_ = false;
 
    void StopStats();
    void GetReceiverVideoStats();

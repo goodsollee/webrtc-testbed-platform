@@ -375,9 +375,11 @@ bool Conductor::InitializePeerConnection() {
   std::vector<webrtc::SdpVideoFormat> supported_formats = 
       video_encoder_factory->GetSupportedFormats();
   for (const auto& format : supported_formats) {
+    std::cout << "  " << format.name;
     RTC_LOG(LS_INFO) << "  " << format.name;
     for (const auto& param : format.parameters) {
       RTC_LOG(LS_INFO) << "    " << param.first << ": " << param.second;
+      std::cout << "  " << param.first << ": " << param.second;
     }
   }
 
@@ -1134,6 +1136,10 @@ void Conductor::AddTracks() {
   init.direction = webrtc::RtpTransceiverDirection::kSendRecv;
   init.stream_ids.push_back(kStreamId);
 
+  webrtc::RtpEncodingParameters svc;
+  svc.scalability_mode = "L1T3";  // pick the mode you need
+  init.send_encodings.push_back(svc);
+
   // Add transceiver first to configure extensions
   auto transceiver_result = peer_connection_->AddTransceiver(
       cricket::MEDIA_TYPE_VIDEO,
@@ -1141,16 +1147,43 @@ void Conductor::AddTracks() {
 
   if (transceiver_result.ok()) {
     auto transceiver = transceiver_result.value();
+
+    auto caps = peer_connection_factory_->GetRtpSenderCapabilities(
+      cricket::MEDIA_TYPE_VIDEO);
+    std::vector<webrtc::RtpCodecCapability> av1_codecs;
+    for (const auto& cap : caps.codecs) {
+      if (absl::EqualsIgnoreCase(cap.name, cricket::kAv1CodecName))
+        av1_codecs.push_back(cap);
+    }
+    //transceiver->SetCodecPreferences(av1_codecs);
+
+    std::vector<webrtc::RtpCodecCapability> vp9_prefs;
+    for (const auto& c : caps.codecs) {
+      if (absl::EqualsIgnoreCase(c.name, cricket::kVp9CodecName)) {
+        // If you want profile 0 first:
+        // if (c.parameters.find("profile-id") == c.parameters.end() ||
+        //     c.parameters.at("profile-id") == "0") vp9_prefs.insert(vp9_prefs.begin(), c);
+        // else vp9_prefs.push_back(c);
+        vp9_prefs.push_back(c);
+      }
+    }
+    // (Optional) fall back codecs after VP9 if you want:
+    // for (const auto& c : caps.codecs) if (!absl::EqualsIgnoreCase(c.name, cricket::kVp9CodecName)) vp9_prefs.push_back(c);
+
+    auto err = transceiver->SetCodecPreferences(vp9_prefs);
     
     // Get and modify extensions
     auto extensions = transceiver->GetHeaderExtensionsToNegotiate();
 
     for (auto& ext : extensions) {
       // Enable timing-related extensions
-      if (ext.uri == webrtc::RtpExtension::kAbsoluteCaptureTimeUri ||
+      if (ext.uri == webrtc::RtpExtension::kTransportSequenceNumberUri ||
+          ext.uri == webrtc::RtpExtension::kAbsoluteCaptureTimeUri ||
           ext.uri == webrtc::RtpExtension::kVideoTimingUri ||
           ext.uri == webrtc::RtpExtension::kTimestampOffsetUri ||
-          ext.uri == webrtc::RtpExtension::kPlayoutDelayUri) {
+          ext.uri == webrtc::RtpExtension::kPlayoutDelayUri ||
+          ext.uri == webrtc::RtpExtension::kVideoLayersAllocationUri ||
+          ext.uri == webrtc::RtpExtension::kDependencyDescriptorUri) {
         ext.direction = webrtc::RtpTransceiverDirection::kSendRecv;
       }
     }
@@ -1245,13 +1278,32 @@ void Conductor::AddTracks() {
           }
         }
         // Set high bitrate for encoding
-        parameters.encodings.clear();
+        //parameters.encodings.clear();
+        if (!parameters.encodings.empty()) {
+          for (auto& e : parameters.encodings) {
+            if (!e.scalability_mode.has_value()) {
+              e.scalability_mode = "L1T3";  // 또는 "L3T3_KEY" 등 원하는 모드
+            }
+            e.max_bitrate_bps = 25000000;
+            e.max_framerate   = 30;
+            e.scale_resolution_down_by = 1.0;
+          }
+        } else {
+          // 부득이 새로 만들 경우에도 scalability_mode 반드시 설정
+          webrtc::RtpEncodingParameters e;
+          e.scalability_mode = "L1T3";
+          e.max_bitrate_bps = 25000000;
+          e.max_framerate   = 30;
+          e.scale_resolution_down_by = 1.0;
+          parameters.encodings.push_back(e);
+        }
+        /*
         webrtc::RtpEncodingParameters encoding;
         encoding.active = true;
         encoding.max_bitrate_bps = std::optional<int>(25000000);  // 25 Mbps for 1080p/60fps
         encoding.max_framerate = std::optional<int>(60);          // Up to 60fps
         encoding.scale_resolution_down_by = std::optional<double>(1.0);  // No downscaling
-        parameters.encodings.push_back(encoding);
+        parameters.encodings.push_back(encoding);*/
 
         // Set the parameters
         webrtc::RTCError error = sender->SetParameters(parameters);
@@ -1343,6 +1395,21 @@ void Conductor::AddSCTPs() {
       sender->Start(*this);
       file_senders_.push_back(std::move(sender));
     }
+  }
+}
+
+void Conductor::OnIceConnectionChange(
+    webrtc::PeerConnectionInterface::IceConnectionState new_state) {
+  if ((new_state == webrtc::PeerConnectionInterface::kIceConnectionConnected ||
+       new_state == webrtc::PeerConnectionInterface::kIceConnectionCompleted) &&
+      !logged_codecs_) {
+    DumpActiveRtpParameters();
+    logged_codecs_ = true;
+  }
+  if (new_state == webrtc::PeerConnectionInterface::kIceConnectionDisconnected ||
+      new_state == webrtc::PeerConnectionInterface::kIceConnectionFailed ||
+      new_state == webrtc::PeerConnectionInterface::kIceConnectionClosed) {
+    logged_codecs_ = false;
   }
 }
 
@@ -1675,4 +1742,52 @@ uint64_t Conductor::BufferedAmount(TrafficKind kind) const {
   auto it = flows_.find(kind);
   if (it == flows_.end() || !it->second.channel) return 0;
   return it->second.channel->buffered_amount();
+}
+
+void Conductor::DumpActiveRtpParameters() {
+  if (!peer_connection_) return;
+
+  std::cout << "\n=== Negotiated RTP parameters ===\n";
+
+  for (const auto& transceiver : peer_connection_->GetTransceivers()) {
+    if (!transceiver) continue;
+
+    if (auto receiver = transceiver->receiver()) {
+      auto track = receiver->track();
+      std::cout << "[Recv] " << receiver->id()
+                << " kind=" << (track ? track->kind() : "none") << "\n";
+
+      auto params = receiver->GetParameters();
+      for (const auto& codec : params.codecs) {
+        std::cout << "  codec pt=" << codec.payload_type
+                  << " name=" << codec.name << "\n";
+      }
+    }
+
+    if (auto sender = transceiver->sender()) {
+      auto track = sender->track();
+      if (!track) {
+        // Skip this sender gracefully — no segfault
+        continue;
+      }
+
+      std::cout << "[Send] " << sender->id()
+                << " kind=" << track->kind() << "\n";
+
+      auto params = sender->GetParameters();
+      for (const auto& codec : params.codecs) {
+        std::cout << "  codec pt=" << codec.payload_type
+                  << " name=" << codec.name << "\n";
+        for (const auto& kv : codec.parameters) {
+          std::cout << "    " << kv.first << "=" << kv.second << "\n";
+        }
+      }
+      for (const auto& enc : params.encodings) {
+        std::cout << "  encoding rid=" << enc.rid
+                  << " scalability=" << enc.scalability_mode.value_or("n/a")
+                  << " max_bps=" << enc.max_bitrate_bps.value_or(-1)
+                  << " active=" << enc.active << "\n";
+      }
+    }
+  }
 }

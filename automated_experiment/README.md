@@ -57,7 +57,8 @@ This repository provides a helper script to run the `peerconnection_client` with
 The script forwards the `--sctp PATH` argument as `--sctp_csv=PATH` to `peerconnection_client`. Example `configs/traffic_config.csv`:
 
 ```
-csvTraffic name,Protocol,Pattern,File size,Periodicity,Custom traffic traces,Max bitrate,Frame rate,Video file name
+csv
+Traffic name,Protocol,Pattern,File size,Periodicity,Custom traffic traces,Max bitrate,Frame rate,Video file name
 file_send,SCTP,Custom,,,traces/file_traffic.csv,,,,
 video_stream,RTP,Periodic,5000,33,,,30,sample_video.y4m
 ```
