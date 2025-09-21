@@ -851,6 +851,7 @@ void Conductor::OnMessageFromPeer(int peer_id, const std::string& message) {
     bitrate_settings.max_bitrate_bps =  50000000;    // 50 Mbps max
     peer_connection_->SetBitrate(bitrate_settings);
 
+
     return;
   }
 
@@ -1138,6 +1139,9 @@ void Conductor::AddTracks() {
 
   webrtc::RtpEncodingParameters svc;
   svc.scalability_mode = "L1T3";  // pick the mode you need
+  svc.max_bitrate_bps = 25000000;
+  svc.max_framerate   = 30;
+  svc.scale_resolution_down_by = 1.0;
   init.send_encodings.push_back(svc);
 
   // Add transceiver first to configure extensions
@@ -1155,8 +1159,9 @@ void Conductor::AddTracks() {
       if (absl::EqualsIgnoreCase(cap.name, cricket::kAv1CodecName))
         av1_codecs.push_back(cap);
     }
-    //transceiver->SetCodecPreferences(av1_codecs);
+    transceiver->SetCodecPreferences(av1_codecs);
 
+    /*
     std::vector<webrtc::RtpCodecCapability> vp9_prefs;
     for (const auto& c : caps.codecs) {
       if (absl::EqualsIgnoreCase(c.name, cricket::kVp9CodecName)) {
@@ -1170,7 +1175,7 @@ void Conductor::AddTracks() {
     // (Optional) fall back codecs after VP9 if you want:
     // for (const auto& c : caps.codecs) if (!absl::EqualsIgnoreCase(c.name, cricket::kVp9CodecName)) vp9_prefs.push_back(c);
 
-    auto err = transceiver->SetCodecPreferences(vp9_prefs);
+    auto err = transceiver->SetCodecPreferences(vp9_prefs);*/
     
     // Get and modify extensions
     auto extensions = transceiver->GetHeaderExtensionsToNegotiate();
@@ -1297,6 +1302,7 @@ void Conductor::AddTracks() {
           e.scale_resolution_down_by = 1.0;
           parameters.encodings.push_back(e);
         }
+
         /*
         webrtc::RtpEncodingParameters encoding;
         encoding.active = true;
@@ -1787,6 +1793,42 @@ void Conductor::DumpActiveRtpParameters() {
                   << " scalability=" << enc.scalability_mode.value_or("n/a")
                   << " max_bps=" << enc.max_bitrate_bps.value_or(-1)
                   << " active=" << enc.active << "\n";
+      }
+    }
+  }
+}
+
+void Conductor::ApplyVideoEncodingParams(int max_bps, absl::string_view scalability) {
+  if (!peer_connection_) return;
+
+  for (const auto& t : peer_connection_->GetTransceivers()) {
+    if (!t) continue;
+    auto sender = t->sender();
+    if (!sender) continue;
+
+    auto track = sender->track();
+    if (!track || track->kind() != webrtc::MediaStreamTrackInterface::kVideoKind)
+      continue;
+
+    auto p = sender->GetParameters();
+    if (p.encodings.empty())
+      p.encodings.emplace_back();
+
+    p.encodings[0].scalability_mode = std::string(scalability);
+  
+    p.encodings[0].max_bitrate_bps = max_bps;       
+    p.encodings[0].max_framerate   = 30;            
+    p.encodings[0].active          = true;
+
+    auto err = sender->SetParameters(p);
+    if (!err.ok()) {
+      RTC_LOG(LS_ERROR) << "SetParameters failed: " << err.message();
+    } else {
+      auto after = sender->GetParameters();
+      for (const auto& e : after.encodings) {
+        RTC_LOG(LS_INFO) << "[ApplyVideoEncodingParams] "
+                         << "scalability=" << e.scalability_mode.value_or("n/a")
+                         << " max_bps=" << e.max_bitrate_bps.value_or(-1);
       }
     }
   }
