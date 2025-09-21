@@ -2,6 +2,10 @@
 #include "rtc_base/logging.h"
 #include "rtc_base/time_utils.h"
 
+namespace {
+constexpr int kAverageStatsIntervalMs = 200;
+}  // namespace
+
 RTCStatsCollectorCallback::RTCStatsCollectorCallback(
     std::ofstream& per_frame_stats_file,
     std::ofstream& average_stats_file,
@@ -197,6 +201,8 @@ void RTCStatsCollectorCallback::ProcessInboundRTPStats(const webrtc::RTCStats& s
 
     int64_t retx_pkts_recv  = static_cast<int64_t>(get_numeric("retransmittedPacketsReceived"));
     int64_t retx_bytes_recv = static_cast<int64_t>(get_numeric("retransmittedBytesReceived"));
+    int64_t freeze_count = static_cast<int64_t>(get_numeric("freezeCount"));
+    double total_freezes_duration_ms = get_numeric("totalFreezesDuration") * 1000.0;
 
     int64_t current_time_ms = rtc::TimeMillis();
 
@@ -218,7 +224,9 @@ void RTCStatsCollectorCallback::ProcessInboundRTPStats(const webrtc::RTCStats& s
     persistent_stats_.acc_total_decode_time_ += total_decode_time;
     persistent_stats_.acc_count_++;
 
-    bool should_write = (current_time_ms - persistent_stats_.last_average_time_ms_) >= 1000;  // 1 second interval
+    bool should_write =
+        (current_time_ms - persistent_stats_.last_average_time_ms_) >=
+        kAverageStatsIntervalMs;
 
     if (should_write && persistent_stats_.acc_count_ > 0) {
 
@@ -270,7 +278,7 @@ void RTCStatsCollectorCallback::ProcessInboundRTPStats(const webrtc::RTCStats& s
         double avg_jitter_buffer_delay = persistent_stats_.acc_jitter_buffer_delay_ / persistent_stats_.acc_count_;
         double avg_total_decode_time = persistent_stats_.acc_total_decode_time_ / persistent_stats_.acc_count_;
 
-        /* ─── compute 1-second deltas ─── */
+        /* ─── compute per-interval deltas ─── */
         int64_t period_packets_received      = 0;
         int64_t period_packets_lost          = 0;
         int64_t period_packets_discarded     = 0;
@@ -314,7 +322,7 @@ void RTCStatsCollectorCallback::ProcessInboundRTPStats(const webrtc::RTCStats& s
             period_fec_bytes_sent = persistent_stats_.last_remote_fec_bytes_sent_ -
                                     persistent_stats_.period_remote_start_fec_bytes_sent_;
 
-        // receiver-side FEC share of total traffic this second
+        // receiver-side FEC share of total traffic this interval
         double fec_byte_ratio = 0.0;
         if (period_bytes_delta > 0)                       // already computed bytes Δ
             fec_byte_ratio = static_cast<double>(period_fec_bytes_recv) /
@@ -348,6 +356,30 @@ void RTCStatsCollectorCallback::ProcessInboundRTPStats(const webrtc::RTCStats& s
         if (period_packets_received + period_packets_lost > 0) {
             retransmission_ratio = static_cast<double>(period_retx_pkts_recv) /
                                 static_cast<double>(period_packets_received + period_packets_lost);
+        }
+
+        int64_t period_freeze_count = 0;
+        if (persistent_stats_.last_freeze_count_ != -1) {
+            period_freeze_count = freeze_count - persistent_stats_.last_freeze_count_;
+            if (period_freeze_count < 0)
+                period_freeze_count = 0;
+        }
+        persistent_stats_.last_freeze_count_ = freeze_count;
+
+        double period_freeze_duration_ms = 0.0;
+        if (persistent_stats_.last_total_freezes_duration_ms_ >= 0.0) {
+            period_freeze_duration_ms =
+                total_freezes_duration_ms -
+                persistent_stats_.last_total_freezes_duration_ms_;
+            if (period_freeze_duration_ms < 0.0)
+                period_freeze_duration_ms = 0.0;
+        }
+        persistent_stats_.last_total_freezes_duration_ms_ = total_freezes_duration_ms;
+
+        double freeze_time_ratio = 0.0;
+        if (period_time_sec > 0) {
+            freeze_time_ratio =
+                (period_freeze_duration_ms / 1000.0) / period_time_sec;
         }
 
         // Handle decoder implementation
@@ -390,7 +422,10 @@ void RTCStatsCollectorCallback::ProcessInboundRTPStats(const webrtc::RTCStats& s
                 << period_retx_bytes_recv << ","
                 << period_retx_pkts_sent << ","
                 << period_retx_bytes_sent << ","
-                << retransmission_ratio << "\n";
+                << retransmission_ratio << ","
+                << period_freeze_count << ","
+                << period_freeze_duration_ms << ","
+                << freeze_time_ratio << "\n";
                 average_stats_file_.flush();
         }
 
@@ -605,7 +640,9 @@ bool RTCStatsCollector::OpenStatsFile(const std::string& foldername) {
                        "period_fec_bytes_recv,period_fec_bytes_sent,fec_byte_ratio,"
                        "period_retx_pkts_recv,period_retx_bytes_recv,"
                        "period_retx_pkts_sent,period_retx_bytes_sent,"
-                       "retransmission_ratio\n";
+                       "retransmission_ratio,"
+                       "period_freeze_count,period_freeze_duration_ms,"
+                       "freeze_time_ratio\n";
     average_stats_file_.flush();
 
     return true;

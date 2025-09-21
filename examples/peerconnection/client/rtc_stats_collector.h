@@ -64,6 +64,10 @@ struct PersistentStats {
     int64_t last_remote_bytes_sent_      = 0;   // 최신 remote-outbound bytesSent
     int64_t first_remote_stats_time_ms_  = -1;  // 최초 도착 시각
     int64_t period_remote_start_bytes_   = 0;   // 직전 구간 시작 값
+
+    // Freeze statistics
+    int64_t last_freeze_count_ = -1;
+    double  last_total_freezes_duration_ms_ = -1.0;
 };
 
 class RTCStatsCollectorCallback : public webrtc::RTCStatsCollectorCallback {
