@@ -1,0 +1,13 @@
+prefix="/home/home/goodsol/workspace/QCON/webrtc/libwebsockets/install"
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libwebsockets_static
+Description: Websockets server and client static library
+Version: 4.3.3-v4.3.3
+
+Libs: -L${libdir} -l:libwebsockets.a
+Libs.private:
+Cflags: -I${includedir}
+Requires: libcap

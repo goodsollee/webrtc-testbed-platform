@@ -1,0 +1,2047 @@
+The system is: Linux - 6.8.0-79-generic - x86_64
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /usr/bin/clang 
+Build flags: 
+Id flags:  
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+
+The C compiler identification is Clang, found in "/tmp/libwebsockets/build/CMakeFiles/3.22.1/CompilerIdC/a.out"
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_a9be3/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_a9be3.dir/build.make CMakeFiles/cmTC_a9be3.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_a9be3.dir/CMakeCCompilerABI.c.o
+/usr/bin/clang   -v -MD -MT CMakeFiles/cmTC_a9be3.dir/CMakeCCompilerABI.c.o -MF CMakeFiles/cmTC_a9be3.dir/CMakeCCompilerABI.c.o.d -o CMakeFiles/cmTC_a9be3.dir/CMakeCCompilerABI.c.o -c /usr/share/cmake-3.22/Modules/CMakeCCompilerABI.c
+Ubuntu clang version 14.0.0-1ubuntu1.1
+Target: x86_64-pc-linux-gnu
+Thread model: posix
+InstalledDir: /usr/bin
+Found candidate GCC installation: /usr/bin/../lib/gcc/x86_64-linux-gnu/11
+Selected GCC installation: /usr/bin/../lib/gcc/x86_64-linux-gnu/11
+Candidate multilib: .;@m64
+Selected multilib: .;@m64
+ (in-process)
+ "/usr/lib/llvm-14/bin/clang" -cc1 -triple x86_64-pc-linux-gnu -emit-obj -mrelax-all --mrelax-relocations -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCCompilerABI.c -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -tune-cpu generic -mllvm -treat-scalable-fixed-error-as-warning -debugger-tuning=gdb -v -fcoverage-compilation-dir=/tmp/libwebsockets/build/CMakeFiles/CMakeTmp -resource-dir /usr/lib/llvm-14/lib/clang/14.0.0 -dependency-file CMakeFiles/cmTC_a9be3.dir/CMakeCCompilerABI.c.o.d -MT CMakeFiles/cmTC_a9be3.dir/CMakeCCompilerABI.c.o -sys-header-deps -internal-isystem /usr/lib/llvm-14/lib/clang/14.0.0/include -internal-isystem /usr/local/include -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../x86_64-linux-gnu/include -internal-externc-isystem /usr/include/x86_64-linux-gnu -internal-externc-isystem /include -internal-externc-isystem /usr/include -fdebug-compilation-dir=/tmp/libwebsockets/build/CMakeFiles/CMakeTmp -ferror-limit 19 -fgnuc-version=4.2.1 -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_a9be3.dir/CMakeCCompilerABI.c.o -x c /usr/share/cmake-3.22/Modules/CMakeCCompilerABI.c
+clang -cc1 version 14.0.0 based upon LLVM 14.0.0 default target x86_64-pc-linux-gnu
+ignoring nonexistent directory "/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../x86_64-linux-gnu/include"
+ignoring nonexistent directory "/include"
+#include "..." search starts here:
+#include <...> search starts here:
+ /usr/lib/llvm-14/lib/clang/14.0.0/include
+ /usr/local/include
+ /usr/include/x86_64-linux-gnu
+ /usr/include
+End of search list.
+Linking C executable cmTC_a9be3
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a9be3.dir/link.txt --verbose=1
+/usr/bin/clang  -v CMakeFiles/cmTC_a9be3.dir/CMakeCCompilerABI.c.o -o cmTC_a9be3 
+Ubuntu clang version 14.0.0-1ubuntu1.1
+Target: x86_64-pc-linux-gnu
+Thread model: posix
+InstalledDir: /usr/bin
+Found candidate GCC installation: /usr/bin/../lib/gcc/x86_64-linux-gnu/11
+Selected GCC installation: /usr/bin/../lib/gcc/x86_64-linux-gnu/11
+Candidate multilib: .;@m64
+Selected multilib: .;@m64
+ "/usr/bin/ld" -pie -z relro --hash-style=gnu --build-id --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_a9be3 /lib/x86_64-linux-gnu/Scrt1.o /lib/x86_64-linux-gnu/crti.o /usr/bin/../lib/gcc/x86_64-linux-gnu/11/crtbeginS.o -L/usr/bin/../lib/gcc/x86_64-linux-gnu/11 -L/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../lib64 -L/lib/x86_64-linux-gnu -L/lib/../lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib64 -L/usr/lib/llvm-14/bin/../lib -L/lib -L/usr/lib CMakeFiles/cmTC_a9be3.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/bin/../lib/gcc/x86_64-linux-gnu/11/crtendS.o /lib/x86_64-linux-gnu/crtn.o
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Parsed C implicit include dir info from above output: rv=done
+  found start of include info
+  found start of implicit include info
+    add: [/usr/lib/llvm-14/lib/clang/14.0.0/include]
+    add: [/usr/local/include]
+    add: [/usr/include/x86_64-linux-gnu]
+    add: [/usr/include]
+  end of search list found
+  collapse include dir [/usr/lib/llvm-14/lib/clang/14.0.0/include] ==> [/usr/lib/llvm-14/lib/clang/14.0.0/include]
+  collapse include dir [/usr/local/include] ==> [/usr/local/include]
+  collapse include dir [/usr/include/x86_64-linux-gnu] ==> [/usr/include/x86_64-linux-gnu]
+  collapse include dir [/usr/include] ==> [/usr/include]
+  implicit include dirs: [/usr/lib/llvm-14/lib/clang/14.0.0/include;/usr/local/include;/usr/include/x86_64-linux-gnu;/usr/include]
+
+
+Parsed C implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld\.lld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_a9be3/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_a9be3.dir/build.make CMakeFiles/cmTC_a9be3.dir/build]
+  ignore line: [gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp']
+  ignore line: [Building C object CMakeFiles/cmTC_a9be3.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/usr/bin/clang   -v -MD -MT CMakeFiles/cmTC_a9be3.dir/CMakeCCompilerABI.c.o -MF CMakeFiles/cmTC_a9be3.dir/CMakeCCompilerABI.c.o.d -o CMakeFiles/cmTC_a9be3.dir/CMakeCCompilerABI.c.o -c /usr/share/cmake-3.22/Modules/CMakeCCompilerABI.c]
+  ignore line: [Ubuntu clang version 14.0.0-1ubuntu1.1]
+  ignore line: [Target: x86_64-pc-linux-gnu]
+  ignore line: [Thread model: posix]
+  ignore line: [InstalledDir: /usr/bin]
+  ignore line: [Found candidate GCC installation: /usr/bin/../lib/gcc/x86_64-linux-gnu/11]
+  ignore line: [Selected GCC installation: /usr/bin/../lib/gcc/x86_64-linux-gnu/11]
+  ignore line: [Candidate multilib: .]
+  ignore line: [@m64]
+  ignore line: [Selected multilib: .]
+  ignore line: [@m64]
+  ignore line: [ (in-process)]
+  ignore line: [ "/usr/lib/llvm-14/bin/clang" -cc1 -triple x86_64-pc-linux-gnu -emit-obj -mrelax-all --mrelax-relocations -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCCompilerABI.c -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -tune-cpu generic -mllvm -treat-scalable-fixed-error-as-warning -debugger-tuning=gdb -v -fcoverage-compilation-dir=/tmp/libwebsockets/build/CMakeFiles/CMakeTmp -resource-dir /usr/lib/llvm-14/lib/clang/14.0.0 -dependency-file CMakeFiles/cmTC_a9be3.dir/CMakeCCompilerABI.c.o.d -MT CMakeFiles/cmTC_a9be3.dir/CMakeCCompilerABI.c.o -sys-header-deps -internal-isystem /usr/lib/llvm-14/lib/clang/14.0.0/include -internal-isystem /usr/local/include -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../x86_64-linux-gnu/include -internal-externc-isystem /usr/include/x86_64-linux-gnu -internal-externc-isystem /include -internal-externc-isystem /usr/include -fdebug-compilation-dir=/tmp/libwebsockets/build/CMakeFiles/CMakeTmp -ferror-limit 19 -fgnuc-version=4.2.1 -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_a9be3.dir/CMakeCCompilerABI.c.o -x c /usr/share/cmake-3.22/Modules/CMakeCCompilerABI.c]
+  ignore line: [clang -cc1 version 14.0.0 based upon LLVM 14.0.0 default target x86_64-pc-linux-gnu]
+  ignore line: [ignoring nonexistent directory "/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../x86_64-linux-gnu/include"]
+  ignore line: [ignoring nonexistent directory "/include"]
+  ignore line: [#include "..." search starts here:]
+  ignore line: [#include <...> search starts here:]
+  ignore line: [ /usr/lib/llvm-14/lib/clang/14.0.0/include]
+  ignore line: [ /usr/local/include]
+  ignore line: [ /usr/include/x86_64-linux-gnu]
+  ignore line: [ /usr/include]
+  ignore line: [End of search list.]
+  ignore line: [Linking C executable cmTC_a9be3]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a9be3.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/clang  -v CMakeFiles/cmTC_a9be3.dir/CMakeCCompilerABI.c.o -o cmTC_a9be3 ]
+  ignore line: [Ubuntu clang version 14.0.0-1ubuntu1.1]
+  ignore line: [Target: x86_64-pc-linux-gnu]
+  ignore line: [Thread model: posix]
+  ignore line: [InstalledDir: /usr/bin]
+  ignore line: [Found candidate GCC installation: /usr/bin/../lib/gcc/x86_64-linux-gnu/11]
+  ignore line: [Selected GCC installation: /usr/bin/../lib/gcc/x86_64-linux-gnu/11]
+  ignore line: [Candidate multilib: .]
+  ignore line: [@m64]
+  ignore line: [Selected multilib: .]
+  ignore line: [@m64]
+  link line: [ "/usr/bin/ld" -pie -z relro --hash-style=gnu --build-id --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_a9be3 /lib/x86_64-linux-gnu/Scrt1.o /lib/x86_64-linux-gnu/crti.o /usr/bin/../lib/gcc/x86_64-linux-gnu/11/crtbeginS.o -L/usr/bin/../lib/gcc/x86_64-linux-gnu/11 -L/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../lib64 -L/lib/x86_64-linux-gnu -L/lib/../lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib64 -L/usr/lib/llvm-14/bin/../lib -L/lib -L/usr/lib CMakeFiles/cmTC_a9be3.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/bin/../lib/gcc/x86_64-linux-gnu/11/crtendS.o /lib/x86_64-linux-gnu/crtn.o]
+    arg [/usr/bin/ld] ==> ignore
+    arg [-pie] ==> ignore
+    arg [-zrelro] ==> ignore
+    arg [--hash-style=gnu] ==> ignore
+    arg [--build-id] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-m] ==> ignore
+    arg [elf_x86_64] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_a9be3] ==> ignore
+    arg [/lib/x86_64-linux-gnu/Scrt1.o] ==> obj [/lib/x86_64-linux-gnu/Scrt1.o]
+    arg [/lib/x86_64-linux-gnu/crti.o] ==> obj [/lib/x86_64-linux-gnu/crti.o]
+    arg [/usr/bin/../lib/gcc/x86_64-linux-gnu/11/crtbeginS.o] ==> obj [/usr/bin/../lib/gcc/x86_64-linux-gnu/11/crtbeginS.o]
+    arg [-L/usr/bin/../lib/gcc/x86_64-linux-gnu/11] ==> dir [/usr/bin/../lib/gcc/x86_64-linux-gnu/11]
+    arg [-L/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../lib64] ==> dir [/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../lib64]
+    arg [-L/lib/x86_64-linux-gnu] ==> dir [/lib/x86_64-linux-gnu]
+    arg [-L/lib/../lib64] ==> dir [/lib/../lib64]
+    arg [-L/usr/lib/x86_64-linux-gnu] ==> dir [/usr/lib/x86_64-linux-gnu]
+    arg [-L/usr/lib/../lib64] ==> dir [/usr/lib/../lib64]
+    arg [-L/usr/lib/llvm-14/bin/../lib] ==> dir [/usr/lib/llvm-14/bin/../lib]
+    arg [-L/lib] ==> dir [/lib]
+    arg [-L/usr/lib] ==> dir [/usr/lib]
+    arg [CMakeFiles/cmTC_a9be3.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [-lgcc] ==> lib [gcc]
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--no-as-needed] ==> ignore
+    arg [-lc] ==> lib [c]
+    arg [-lgcc] ==> lib [gcc]
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--no-as-needed] ==> ignore
+    arg [/usr/bin/../lib/gcc/x86_64-linux-gnu/11/crtendS.o] ==> obj [/usr/bin/../lib/gcc/x86_64-linux-gnu/11/crtendS.o]
+    arg [/lib/x86_64-linux-gnu/crtn.o] ==> obj [/lib/x86_64-linux-gnu/crtn.o]
+  collapse obj [/usr/bin/../lib/gcc/x86_64-linux-gnu/11/crtbeginS.o] ==> [/usr/lib/gcc/x86_64-linux-gnu/11/crtbeginS.o]
+  collapse obj [/usr/bin/../lib/gcc/x86_64-linux-gnu/11/crtendS.o] ==> [/usr/lib/gcc/x86_64-linux-gnu/11/crtendS.o]
+  collapse library dir [/usr/bin/../lib/gcc/x86_64-linux-gnu/11] ==> [/usr/lib/gcc/x86_64-linux-gnu/11]
+  collapse library dir [/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../lib64] ==> [/usr/lib64]
+  collapse library dir [/lib/x86_64-linux-gnu] ==> [/lib/x86_64-linux-gnu]
+  collapse library dir [/lib/../lib64] ==> [/lib64]
+  collapse library dir [/usr/lib/x86_64-linux-gnu] ==> [/usr/lib/x86_64-linux-gnu]
+  collapse library dir [/usr/lib/../lib64] ==> [/usr/lib64]
+  collapse library dir [/usr/lib/llvm-14/bin/../lib] ==> [/usr/lib/llvm-14/lib]
+  collapse library dir [/lib] ==> [/lib]
+  collapse library dir [/usr/lib] ==> [/usr/lib]
+  implicit libs: [gcc;gcc_s;c;gcc;gcc_s]
+  implicit objs: [/lib/x86_64-linux-gnu/Scrt1.o;/lib/x86_64-linux-gnu/crti.o;/usr/lib/gcc/x86_64-linux-gnu/11/crtbeginS.o;/usr/lib/gcc/x86_64-linux-gnu/11/crtendS.o;/lib/x86_64-linux-gnu/crtn.o]
+  implicit dirs: [/usr/lib/gcc/x86_64-linux-gnu/11;/usr/lib64;/lib/x86_64-linux-gnu;/lib64;/usr/lib/x86_64-linux-gnu;/usr/lib/llvm-14/lib;/lib;/usr/lib]
+  implicit fwks: []
+
+
+Performing C SOURCE FILE Test LWS_HAVE_inline succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_fc102/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_fc102.dir/build.make CMakeFiles/cmTC_fc102.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_fc102.dir/src.c.o
+/usr/bin/clang -DKEYWORD=inline -DLWS_HAVE_inline   -MD -MT CMakeFiles/cmTC_fc102.dir/src.c.o -MF CMakeFiles/cmTC_fc102.dir/src.c.o.d -o CMakeFiles/cmTC_fc102.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_fc102
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_fc102.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_fc102.dir/src.c.o -o cmTC_fc102 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+
+		#include <stdio.h>
+		static KEYWORD void a() {}
+		int main(int argc, char **argv) { a(); return 0; }
+		
+Performing C SOURCE FILE Test LWS_HAVE___inline__ succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_87bd8/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_87bd8.dir/build.make CMakeFiles/cmTC_87bd8.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_87bd8.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline__ -DLWS_HAVE___inline__   -MD -MT CMakeFiles/cmTC_87bd8.dir/src.c.o -MF CMakeFiles/cmTC_87bd8.dir/src.c.o.d -o CMakeFiles/cmTC_87bd8.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_87bd8
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_87bd8.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_87bd8.dir/src.c.o -o cmTC_87bd8 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+
+		#include <stdio.h>
+		static KEYWORD void a() {}
+		int main(int argc, char **argv) { a(); return 0; }
+		
+Performing C SOURCE FILE Test LWS_HAVE___inline succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_affa6/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_affa6.dir/build.make CMakeFiles/cmTC_affa6.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_affa6.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE___inline   -MD -MT CMakeFiles/cmTC_affa6.dir/src.c.o -MF CMakeFiles/cmTC_affa6.dir/src.c.o.d -o CMakeFiles/cmTC_affa6.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_affa6
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_affa6.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_affa6.dir/src.c.o -o cmTC_affa6 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+
+		#include <stdio.h>
+		static KEYWORD void a() {}
+		int main(int argc, char **argv) { a(); return 0; }
+		
+Performing C SOURCE FILE Test LWS_HAVE_MALLOC_TRIM succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_ebe61/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_ebe61.dir/build.make CMakeFiles/cmTC_ebe61.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_ebe61.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_MALLOC_TRIM   -MD -MT CMakeFiles/cmTC_ebe61.dir/src.c.o -MF CMakeFiles/cmTC_ebe61.dir/src.c.o.d -o CMakeFiles/cmTC_ebe61.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_ebe61
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ebe61.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_ebe61.dir/src.c.o -o cmTC_ebe61 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <malloc.h>
+	int main(int argc, char **argv) { return malloc_trim(0); }
+	
+Performing C SOURCE FILE Test LWS_HAVE_MALLOC_USABLE_SIZE succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_90777/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_90777.dir/build.make CMakeFiles/cmTC_90777.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_90777.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_MALLOC_USABLE_SIZE   -MD -MT CMakeFiles/cmTC_90777.dir/src.c.o -MF CMakeFiles/cmTC_90777.dir/src.c.o.d -o CMakeFiles/cmTC_90777.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_90777
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_90777.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_90777.dir/src.c.o -o cmTC_90777 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <malloc.h>
+	int main(int argc, char **argv) { return (int)malloc_usable_size((void *)0); }
+	
+Determining if the function fork exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_e13c6/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_e13c6.dir/build.make CMakeFiles/cmTC_e13c6.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_e13c6.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline  -DCHECK_FUNCTION_EXISTS=fork -MD -MT CMakeFiles/cmTC_e13c6.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_e13c6.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_e13c6.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_e13c6
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e13c6.dir/link.txt --verbose=1
+/usr/bin/clang  -DCHECK_FUNCTION_EXISTS=fork CMakeFiles/cmTC_e13c6.dir/CheckFunctionExists.c.o -o cmTC_e13c6 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function getenv exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_65658/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_65658.dir/build.make CMakeFiles/cmTC_65658.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_65658.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline  -DCHECK_FUNCTION_EXISTS=getenv -MD -MT CMakeFiles/cmTC_65658.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_65658.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_65658.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_65658
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_65658.dir/link.txt --verbose=1
+/usr/bin/clang  -DCHECK_FUNCTION_EXISTS=getenv CMakeFiles/cmTC_65658.dir/CheckFunctionExists.c.o -o cmTC_65658 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function malloc exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_65deb/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_65deb.dir/build.make CMakeFiles/cmTC_65deb.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_65deb.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline  -DCHECK_FUNCTION_EXISTS=malloc -MD -MT CMakeFiles/cmTC_65deb.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_65deb.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_65deb.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+/usr/share/cmake-3.22/Modules/CheckFunctionExists.c:7:3: warning: incompatible redeclaration of library function 'malloc' [-Wincompatible-library-redeclaration]
+  CHECK_FUNCTION_EXISTS(void);
+  ^
+<command line>:2:31: note: expanded from here
+#define CHECK_FUNCTION_EXISTS malloc
+                              ^
+/usr/share/cmake-3.22/Modules/CheckFunctionExists.c:7:3: note: 'malloc' is a builtin with type 'void *(unsigned long)'
+<command line>:2:31: note: expanded from here
+#define CHECK_FUNCTION_EXISTS malloc
+                              ^
+1 warning generated.
+Linking C executable cmTC_65deb
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_65deb.dir/link.txt --verbose=1
+/usr/bin/clang  -DCHECK_FUNCTION_EXISTS=malloc CMakeFiles/cmTC_65deb.dir/CheckFunctionExists.c.o -o cmTC_65deb 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function memset exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_140f3/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_140f3.dir/build.make CMakeFiles/cmTC_140f3.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_140f3.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline  -DCHECK_FUNCTION_EXISTS=memset -MD -MT CMakeFiles/cmTC_140f3.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_140f3.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_140f3.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+/usr/share/cmake-3.22/Modules/CheckFunctionExists.c:7:3: warning: incompatible redeclaration of library function 'memset' [-Wincompatible-library-redeclaration]
+  CHECK_FUNCTION_EXISTS(void);
+  ^
+<command line>:2:31: note: expanded from here
+#define CHECK_FUNCTION_EXISTS memset
+                              ^
+/usr/share/cmake-3.22/Modules/CheckFunctionExists.c:7:3: note: 'memset' is a builtin with type 'void *(void *, int, unsigned long)'
+<command line>:2:31: note: expanded from here
+#define CHECK_FUNCTION_EXISTS memset
+                              ^
+1 warning generated.
+Linking C executable cmTC_140f3
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_140f3.dir/link.txt --verbose=1
+/usr/bin/clang  -DCHECK_FUNCTION_EXISTS=memset CMakeFiles/cmTC_140f3.dir/CheckFunctionExists.c.o -o cmTC_140f3 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function realloc exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_53ad1/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_53ad1.dir/build.make CMakeFiles/cmTC_53ad1.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_53ad1.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline  -DCHECK_FUNCTION_EXISTS=realloc -MD -MT CMakeFiles/cmTC_53ad1.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_53ad1.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_53ad1.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+/usr/share/cmake-3.22/Modules/CheckFunctionExists.c:7:3: warning: incompatible redeclaration of library function 'realloc' [-Wincompatible-library-redeclaration]
+  CHECK_FUNCTION_EXISTS(void);
+  ^
+<command line>:2:31: note: expanded from here
+#define CHECK_FUNCTION_EXISTS realloc
+                              ^
+/usr/share/cmake-3.22/Modules/CheckFunctionExists.c:7:3: note: 'realloc' is a builtin with type 'void *(void *, unsigned long)'
+<command line>:2:31: note: expanded from here
+#define CHECK_FUNCTION_EXISTS realloc
+                              ^
+1 warning generated.
+Linking C executable cmTC_53ad1
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_53ad1.dir/link.txt --verbose=1
+/usr/bin/clang  -DCHECK_FUNCTION_EXISTS=realloc CMakeFiles/cmTC_53ad1.dir/CheckFunctionExists.c.o -o cmTC_53ad1 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function socket exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_b7659/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_b7659.dir/build.make CMakeFiles/cmTC_b7659.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_b7659.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline  -DCHECK_FUNCTION_EXISTS=socket -MD -MT CMakeFiles/cmTC_b7659.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_b7659.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_b7659.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_b7659
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b7659.dir/link.txt --verbose=1
+/usr/bin/clang  -DCHECK_FUNCTION_EXISTS=socket CMakeFiles/cmTC_b7659.dir/CheckFunctionExists.c.o -o cmTC_b7659 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function strerror exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_5f2eb/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_5f2eb.dir/build.make CMakeFiles/cmTC_5f2eb.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_5f2eb.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline  -DCHECK_FUNCTION_EXISTS=strerror -MD -MT CMakeFiles/cmTC_5f2eb.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_5f2eb.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_5f2eb.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+/usr/share/cmake-3.22/Modules/CheckFunctionExists.c:7:3: warning: incompatible redeclaration of library function 'strerror' [-Wincompatible-library-redeclaration]
+  CHECK_FUNCTION_EXISTS(void);
+  ^
+<command line>:2:31: note: expanded from here
+#define CHECK_FUNCTION_EXISTS strerror
+                              ^
+/usr/share/cmake-3.22/Modules/CheckFunctionExists.c:7:3: note: 'strerror' is a builtin with type 'char *(int)'
+<command line>:2:31: note: expanded from here
+#define CHECK_FUNCTION_EXISTS strerror
+                              ^
+1 warning generated.
+Linking C executable cmTC_5f2eb
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_5f2eb.dir/link.txt --verbose=1
+/usr/bin/clang  -DCHECK_FUNCTION_EXISTS=strerror CMakeFiles/cmTC_5f2eb.dir/CheckFunctionExists.c.o -o cmTC_5f2eb 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function vfork exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_4f463/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_4f463.dir/build.make CMakeFiles/cmTC_4f463.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_4f463.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline  -DCHECK_FUNCTION_EXISTS=vfork -MD -MT CMakeFiles/cmTC_4f463.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_4f463.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_4f463.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+/usr/share/cmake-3.22/Modules/CheckFunctionExists.c:7:3: warning: incompatible redeclaration of library function 'vfork' [-Wincompatible-library-redeclaration]
+  CHECK_FUNCTION_EXISTS(void);
+  ^
+<command line>:2:31: note: expanded from here
+#define CHECK_FUNCTION_EXISTS vfork
+                              ^
+/usr/share/cmake-3.22/Modules/CheckFunctionExists.c:7:3: note: 'vfork' is a builtin with type 'int (void)'
+<command line>:2:31: note: expanded from here
+#define CHECK_FUNCTION_EXISTS vfork
+                              ^
+1 warning generated.
+Linking C executable cmTC_4f463
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4f463.dir/link.txt --verbose=1
+/usr/bin/clang  -DCHECK_FUNCTION_EXISTS=vfork CMakeFiles/cmTC_4f463.dir/CheckFunctionExists.c.o -o cmTC_4f463 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function execvpe exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_13d8f/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_13d8f.dir/build.make CMakeFiles/cmTC_13d8f.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_13d8f.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline  -DCHECK_FUNCTION_EXISTS=execvpe -MD -MT CMakeFiles/cmTC_13d8f.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_13d8f.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_13d8f.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_13d8f
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_13d8f.dir/link.txt --verbose=1
+/usr/bin/clang  -DCHECK_FUNCTION_EXISTS=execvpe CMakeFiles/cmTC_13d8f.dir/CheckFunctionExists.c.o -o cmTC_13d8f 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function getifaddrs exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_4e0cb/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_4e0cb.dir/build.make CMakeFiles/cmTC_4e0cb.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_4e0cb.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline  -DCHECK_FUNCTION_EXISTS=getifaddrs -MD -MT CMakeFiles/cmTC_4e0cb.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_4e0cb.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_4e0cb.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_4e0cb
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4e0cb.dir/link.txt --verbose=1
+/usr/bin/clang  -DCHECK_FUNCTION_EXISTS=getifaddrs CMakeFiles/cmTC_4e0cb.dir/CheckFunctionExists.c.o -o cmTC_4e0cb 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function snprintf exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_36780/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_36780.dir/build.make CMakeFiles/cmTC_36780.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_36780.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline  -DCHECK_FUNCTION_EXISTS=snprintf -MD -MT CMakeFiles/cmTC_36780.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_36780.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_36780.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+/usr/share/cmake-3.22/Modules/CheckFunctionExists.c:7:3: warning: incompatible redeclaration of library function 'snprintf' [-Wincompatible-library-redeclaration]
+  CHECK_FUNCTION_EXISTS(void);
+  ^
+<command line>:2:31: note: expanded from here
+#define CHECK_FUNCTION_EXISTS snprintf
+                              ^
+/usr/share/cmake-3.22/Modules/CheckFunctionExists.c:7:3: note: 'snprintf' is a builtin with type 'int (char *, unsigned long, const char *, ...)'
+<command line>:2:31: note: expanded from here
+#define CHECK_FUNCTION_EXISTS snprintf
+                              ^
+1 warning generated.
+Linking C executable cmTC_36780
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_36780.dir/link.txt --verbose=1
+/usr/bin/clang  -DCHECK_FUNCTION_EXISTS=snprintf CMakeFiles/cmTC_36780.dir/CheckFunctionExists.c.o -o cmTC_36780 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function getloadavg exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_df1cc/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_df1cc.dir/build.make CMakeFiles/cmTC_df1cc.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_df1cc.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline  -DCHECK_FUNCTION_EXISTS=getloadavg -MD -MT CMakeFiles/cmTC_df1cc.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_df1cc.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_df1cc.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_df1cc
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_df1cc.dir/link.txt --verbose=1
+/usr/bin/clang  -DCHECK_FUNCTION_EXISTS=getloadavg CMakeFiles/cmTC_df1cc.dir/CheckFunctionExists.c.o -o cmTC_df1cc 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function atoll exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_59770/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_59770.dir/build.make CMakeFiles/cmTC_59770.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_59770.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline  -DCHECK_FUNCTION_EXISTS=atoll -MD -MT CMakeFiles/cmTC_59770.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_59770.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_59770.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_59770
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_59770.dir/link.txt --verbose=1
+/usr/bin/clang  -DCHECK_FUNCTION_EXISTS=atoll CMakeFiles/cmTC_59770.dir/CheckFunctionExists.c.o -o cmTC_59770 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function clock_gettime exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_cb419/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_cb419.dir/build.make CMakeFiles/cmTC_cb419.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_cb419.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline  -DCHECK_FUNCTION_EXISTS=clock_gettime -MD -MT CMakeFiles/cmTC_cb419.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_cb419.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_cb419.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_cb419
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_cb419.dir/link.txt --verbose=1
+/usr/bin/clang  -DCHECK_FUNCTION_EXISTS=clock_gettime CMakeFiles/cmTC_cb419.dir/CheckFunctionExists.c.o -o cmTC_cb419 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function localtime_r exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_d3e34/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_d3e34.dir/build.make CMakeFiles/cmTC_d3e34.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_d3e34.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline  -DCHECK_FUNCTION_EXISTS=localtime_r -MD -MT CMakeFiles/cmTC_d3e34.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_d3e34.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_d3e34.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_d3e34
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d3e34.dir/link.txt --verbose=1
+/usr/bin/clang  -DCHECK_FUNCTION_EXISTS=localtime_r CMakeFiles/cmTC_d3e34.dir/CheckFunctionExists.c.o -o cmTC_d3e34 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function gmtime_r exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_5b360/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_5b360.dir/build.make CMakeFiles/cmTC_5b360.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_5b360.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline  -DCHECK_FUNCTION_EXISTS=gmtime_r -MD -MT CMakeFiles/cmTC_5b360.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_5b360.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_5b360.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_5b360
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_5b360.dir/link.txt --verbose=1
+/usr/bin/clang  -DCHECK_FUNCTION_EXISTS=gmtime_r CMakeFiles/cmTC_5b360.dir/CheckFunctionExists.c.o -o cmTC_5b360 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function ctime_r exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_7a911/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_7a911.dir/build.make CMakeFiles/cmTC_7a911.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_7a911.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline  -DCHECK_FUNCTION_EXISTS=ctime_r -MD -MT CMakeFiles/cmTC_7a911.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_7a911.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_7a911.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_7a911
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_7a911.dir/link.txt --verbose=1
+/usr/bin/clang  -DCHECK_FUNCTION_EXISTS=ctime_r CMakeFiles/cmTC_7a911.dir/CheckFunctionExists.c.o -o cmTC_7a911 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function getgrgid_r exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_77ace/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_77ace.dir/build.make CMakeFiles/cmTC_77ace.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_77ace.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline  -DCHECK_FUNCTION_EXISTS=getgrgid_r -MD -MT CMakeFiles/cmTC_77ace.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_77ace.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_77ace.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_77ace
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_77ace.dir/link.txt --verbose=1
+/usr/bin/clang  -DCHECK_FUNCTION_EXISTS=getgrgid_r CMakeFiles/cmTC_77ace.dir/CheckFunctionExists.c.o -o cmTC_77ace 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function getgrnam_r exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_09cc9/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_09cc9.dir/build.make CMakeFiles/cmTC_09cc9.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_09cc9.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline  -DCHECK_FUNCTION_EXISTS=getgrnam_r -MD -MT CMakeFiles/cmTC_09cc9.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_09cc9.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_09cc9.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_09cc9
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_09cc9.dir/link.txt --verbose=1
+/usr/bin/clang  -DCHECK_FUNCTION_EXISTS=getgrnam_r CMakeFiles/cmTC_09cc9.dir/CheckFunctionExists.c.o -o cmTC_09cc9 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function getpwuid_r exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_d532d/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_d532d.dir/build.make CMakeFiles/cmTC_d532d.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_d532d.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline  -DCHECK_FUNCTION_EXISTS=getpwuid_r -MD -MT CMakeFiles/cmTC_d532d.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_d532d.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_d532d.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_d532d
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d532d.dir/link.txt --verbose=1
+/usr/bin/clang  -DCHECK_FUNCTION_EXISTS=getpwuid_r CMakeFiles/cmTC_d532d.dir/CheckFunctionExists.c.o -o cmTC_d532d 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function getpwnam_r exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_f98f1/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_f98f1.dir/build.make CMakeFiles/cmTC_f98f1.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_f98f1.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline  -DCHECK_FUNCTION_EXISTS=getpwnam_r -MD -MT CMakeFiles/cmTC_f98f1.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_f98f1.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_f98f1.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_f98f1
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f98f1.dir/link.txt --verbose=1
+/usr/bin/clang  -DCHECK_FUNCTION_EXISTS=getpwnam_r CMakeFiles/cmTC_f98f1.dir/CheckFunctionExists.c.o -o cmTC_f98f1 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function timegm exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_1896f/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_1896f.dir/build.make CMakeFiles/cmTC_1896f.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_1896f.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline  -DCHECK_FUNCTION_EXISTS=timegm -MD -MT CMakeFiles/cmTC_1896f.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_1896f.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_1896f.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_1896f
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1896f.dir/link.txt --verbose=1
+/usr/bin/clang  -DCHECK_FUNCTION_EXISTS=timegm CMakeFiles/cmTC_1896f.dir/CheckFunctionExists.c.o -o cmTC_1896f 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Performing C SOURCE FILE Test LWS_HAVE_IN6ADDR_H succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_05a64/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_05a64.dir/build.make CMakeFiles/cmTC_05a64.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_05a64.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_IN6ADDR_H   -MD -MT CMakeFiles/cmTC_05a64.dir/src.c.o -MF CMakeFiles/cmTC_05a64.dir/src.c.o.d -o CMakeFiles/cmTC_05a64.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: warning: return type of 'main' is not 'int' [-Wmain-return-type]
+void main(void) { while(1) ; } void xxexit(void){}
+^
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: note: change return type to 'int'
+void main(void) { while(1) ; } void xxexit(void){}
+^~~~
+int
+1 warning generated.
+Linking C executable cmTC_05a64
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_05a64.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_05a64.dir/src.c.o -o cmTC_05a64 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <malloc.h>
+void main(void) { while(1) ; } void xxexit(void){}
+Performing C SOURCE FILE Test LWS_HAVE_MEMORY_H succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_2570b/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_2570b.dir/build.make CMakeFiles/cmTC_2570b.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_2570b.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_MEMORY_H   -MD -MT CMakeFiles/cmTC_2570b.dir/src.c.o -MF CMakeFiles/cmTC_2570b.dir/src.c.o.d -o CMakeFiles/cmTC_2570b.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: warning: return type of 'main' is not 'int' [-Wmain-return-type]
+void main(void) { while(1) ; } void xxexit(void){}
+^
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: note: change return type to 'int'
+void main(void) { while(1) ; } void xxexit(void){}
+^~~~
+int
+1 warning generated.
+Linking C executable cmTC_2570b
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_2570b.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_2570b.dir/src.c.o -o cmTC_2570b 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <memory.h>
+void main(void) { while(1) ; } void xxexit(void){}
+Performing C SOURCE FILE Test LWS_HAVE_NETINET_IN_H succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_d5563/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_d5563.dir/build.make CMakeFiles/cmTC_d5563.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_d5563.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_NETINET_IN_H   -MD -MT CMakeFiles/cmTC_d5563.dir/src.c.o -MF CMakeFiles/cmTC_d5563.dir/src.c.o.d -o CMakeFiles/cmTC_d5563.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: warning: return type of 'main' is not 'int' [-Wmain-return-type]
+void main(void) { while(1) ; } void xxexit(void){}
+^
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: note: change return type to 'int'
+void main(void) { while(1) ; } void xxexit(void){}
+^~~~
+int
+1 warning generated.
+Linking C executable cmTC_d5563
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d5563.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_d5563.dir/src.c.o -o cmTC_d5563 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <netinet/in.h>
+void main(void) { while(1) ; } void xxexit(void){}
+Performing C SOURCE FILE Test LWS_HAVE_STDINT_H succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_b4d85/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_b4d85.dir/build.make CMakeFiles/cmTC_b4d85.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_b4d85.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_STDINT_H   -MD -MT CMakeFiles/cmTC_b4d85.dir/src.c.o -MF CMakeFiles/cmTC_b4d85.dir/src.c.o.d -o CMakeFiles/cmTC_b4d85.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: warning: return type of 'main' is not 'int' [-Wmain-return-type]
+void main(void) { while(1) ; } void xxexit(void){}
+^
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: note: change return type to 'int'
+void main(void) { while(1) ; } void xxexit(void){}
+^~~~
+int
+1 warning generated.
+Linking C executable cmTC_b4d85
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b4d85.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_b4d85.dir/src.c.o -o cmTC_b4d85 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <stdint.h>
+void main(void) { while(1) ; } void xxexit(void){}
+Performing C SOURCE FILE Test LWS_HAVE_STDLIB_H succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_59b69/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_59b69.dir/build.make CMakeFiles/cmTC_59b69.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_59b69.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_STDLIB_H   -MD -MT CMakeFiles/cmTC_59b69.dir/src.c.o -MF CMakeFiles/cmTC_59b69.dir/src.c.o.d -o CMakeFiles/cmTC_59b69.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: warning: return type of 'main' is not 'int' [-Wmain-return-type]
+void main(void) { while(1) ; } void xxexit(void){}
+^
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: note: change return type to 'int'
+void main(void) { while(1) ; } void xxexit(void){}
+^~~~
+int
+1 warning generated.
+Linking C executable cmTC_59b69
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_59b69.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_59b69.dir/src.c.o -o cmTC_59b69 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <stdlib.h>
+void main(void) { while(1) ; } void xxexit(void){}
+Performing C SOURCE FILE Test LWS_HAVE_STRINGS_H succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_a2240/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_a2240.dir/build.make CMakeFiles/cmTC_a2240.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_a2240.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_STRINGS_H   -MD -MT CMakeFiles/cmTC_a2240.dir/src.c.o -MF CMakeFiles/cmTC_a2240.dir/src.c.o.d -o CMakeFiles/cmTC_a2240.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: warning: return type of 'main' is not 'int' [-Wmain-return-type]
+void main(void) { while(1) ; } void xxexit(void){}
+^
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: note: change return type to 'int'
+void main(void) { while(1) ; } void xxexit(void){}
+^~~~
+int
+1 warning generated.
+Linking C executable cmTC_a2240
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a2240.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_a2240.dir/src.c.o -o cmTC_a2240 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <strings.h>
+void main(void) { while(1) ; } void xxexit(void){}
+Performing C SOURCE FILE Test LWS_HAVE_STRING_H succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_66451/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_66451.dir/build.make CMakeFiles/cmTC_66451.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_66451.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_STRING_H   -MD -MT CMakeFiles/cmTC_66451.dir/src.c.o -MF CMakeFiles/cmTC_66451.dir/src.c.o.d -o CMakeFiles/cmTC_66451.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: warning: return type of 'main' is not 'int' [-Wmain-return-type]
+void main(void) { while(1) ; } void xxexit(void){}
+^
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: note: change return type to 'int'
+void main(void) { while(1) ; } void xxexit(void){}
+^~~~
+int
+1 warning generated.
+Linking C executable cmTC_66451
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_66451.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_66451.dir/src.c.o -o cmTC_66451 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <string.h>
+void main(void) { while(1) ; } void xxexit(void){}
+Performing C SOURCE FILE Test LWS_HAVE_SYS_PRCTL_H succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_b3c41/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_b3c41.dir/build.make CMakeFiles/cmTC_b3c41.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_b3c41.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_SYS_PRCTL_H   -MD -MT CMakeFiles/cmTC_b3c41.dir/src.c.o -MF CMakeFiles/cmTC_b3c41.dir/src.c.o.d -o CMakeFiles/cmTC_b3c41.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: warning: return type of 'main' is not 'int' [-Wmain-return-type]
+void main(void) { while(1) ; } void xxexit(void){}
+^
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: note: change return type to 'int'
+void main(void) { while(1) ; } void xxexit(void){}
+^~~~
+int
+1 warning generated.
+Linking C executable cmTC_b3c41
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b3c41.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_b3c41.dir/src.c.o -o cmTC_b3c41 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <sys/prctl.h>
+void main(void) { while(1) ; } void xxexit(void){}
+Performing C SOURCE FILE Test LWS_HAVE_SYS_SOCKET_H succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_4adcc/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_4adcc.dir/build.make CMakeFiles/cmTC_4adcc.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_4adcc.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_SYS_SOCKET_H   -MD -MT CMakeFiles/cmTC_4adcc.dir/src.c.o -MF CMakeFiles/cmTC_4adcc.dir/src.c.o.d -o CMakeFiles/cmTC_4adcc.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: warning: return type of 'main' is not 'int' [-Wmain-return-type]
+void main(void) { while(1) ; } void xxexit(void){}
+^
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: note: change return type to 'int'
+void main(void) { while(1) ; } void xxexit(void){}
+^~~~
+int
+1 warning generated.
+Linking C executable cmTC_4adcc
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4adcc.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_4adcc.dir/src.c.o -o cmTC_4adcc 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <sys/socket.h>
+void main(void) { while(1) ; } void xxexit(void){}
+Performing C SOURCE FILE Test LWS_HAVE_SYS_STAT_H succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_60351/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_60351.dir/build.make CMakeFiles/cmTC_60351.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_60351.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_SYS_STAT_H   -MD -MT CMakeFiles/cmTC_60351.dir/src.c.o -MF CMakeFiles/cmTC_60351.dir/src.c.o.d -o CMakeFiles/cmTC_60351.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: warning: return type of 'main' is not 'int' [-Wmain-return-type]
+void main(void) { while(1) ; } void xxexit(void){}
+^
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: note: change return type to 'int'
+void main(void) { while(1) ; } void xxexit(void){}
+^~~~
+int
+1 warning generated.
+Linking C executable cmTC_60351
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_60351.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_60351.dir/src.c.o -o cmTC_60351 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <sys/stat.h>
+void main(void) { while(1) ; } void xxexit(void){}
+Performing C SOURCE FILE Test LWS_HAVE_SYS_TYPES_H succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_1f46b/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_1f46b.dir/build.make CMakeFiles/cmTC_1f46b.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_1f46b.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_SYS_TYPES_H   -MD -MT CMakeFiles/cmTC_1f46b.dir/src.c.o -MF CMakeFiles/cmTC_1f46b.dir/src.c.o.d -o CMakeFiles/cmTC_1f46b.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: warning: return type of 'main' is not 'int' [-Wmain-return-type]
+void main(void) { while(1) ; } void xxexit(void){}
+^
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: note: change return type to 'int'
+void main(void) { while(1) ; } void xxexit(void){}
+^~~~
+int
+1 warning generated.
+Linking C executable cmTC_1f46b
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1f46b.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_1f46b.dir/src.c.o -o cmTC_1f46b 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <sys/types.h>
+void main(void) { while(1) ; } void xxexit(void){}
+Performing C SOURCE FILE Test LWS_HAVE_UNISTD_H succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_a8ba8/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_a8ba8.dir/build.make CMakeFiles/cmTC_a8ba8.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_a8ba8.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_UNISTD_H   -MD -MT CMakeFiles/cmTC_a8ba8.dir/src.c.o -MF CMakeFiles/cmTC_a8ba8.dir/src.c.o.d -o CMakeFiles/cmTC_a8ba8.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: warning: return type of 'main' is not 'int' [-Wmain-return-type]
+void main(void) { while(1) ; } void xxexit(void){}
+^
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: note: change return type to 'int'
+void main(void) { while(1) ; } void xxexit(void){}
+^~~~
+int
+1 warning generated.
+Linking C executable cmTC_a8ba8
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a8ba8.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_a8ba8.dir/src.c.o -o cmTC_a8ba8 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <unistd.h>
+void main(void) { while(1) ; } void xxexit(void){}
+Performing C SOURCE FILE Test LWS_HAVE_SYS_CAPABILITY_H succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_549f4/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_549f4.dir/build.make CMakeFiles/cmTC_549f4.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_549f4.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_SYS_CAPABILITY_H   -MD -MT CMakeFiles/cmTC_549f4.dir/src.c.o -MF CMakeFiles/cmTC_549f4.dir/src.c.o.d -o CMakeFiles/cmTC_549f4.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: warning: return type of 'main' is not 'int' [-Wmain-return-type]
+void main(void) { while(1) ; } void xxexit(void){}
+^
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: note: change return type to 'int'
+void main(void) { while(1) ; } void xxexit(void){}
+^~~~
+int
+1 warning generated.
+Linking C executable cmTC_549f4
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_549f4.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_549f4.dir/src.c.o -o cmTC_549f4 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <sys/capability.h>
+void main(void) { while(1) ; } void xxexit(void){}
+Performing C SOURCE FILE Test LWS_HAVE_MALLOC_H succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_01f32/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_01f32.dir/build.make CMakeFiles/cmTC_01f32.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_01f32.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_MALLOC_H   -MD -MT CMakeFiles/cmTC_01f32.dir/src.c.o -MF CMakeFiles/cmTC_01f32.dir/src.c.o.d -o CMakeFiles/cmTC_01f32.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: warning: return type of 'main' is not 'int' [-Wmain-return-type]
+void main(void) { while(1) ; } void xxexit(void){}
+^
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: note: change return type to 'int'
+void main(void) { while(1) ; } void xxexit(void){}
+^~~~
+int
+1 warning generated.
+Linking C executable cmTC_01f32
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_01f32.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_01f32.dir/src.c.o -o cmTC_01f32 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <malloc.h>
+void main(void) { while(1) ; } void xxexit(void){}
+Performing C SOURCE FILE Test LWS_HAVE_PTHREAD_H succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_00c82/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_00c82.dir/build.make CMakeFiles/cmTC_00c82.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_00c82.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_PTHREAD_H   -MD -MT CMakeFiles/cmTC_00c82.dir/src.c.o -MF CMakeFiles/cmTC_00c82.dir/src.c.o.d -o CMakeFiles/cmTC_00c82.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: warning: return type of 'main' is not 'int' [-Wmain-return-type]
+void main(void) { while(1) ; } void xxexit(void){}
+^
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: note: change return type to 'int'
+void main(void) { while(1) ; } void xxexit(void){}
+^~~~
+int
+1 warning generated.
+Linking C executable cmTC_00c82
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_00c82.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_00c82.dir/src.c.o -o cmTC_00c82 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <pthread.h>
+void main(void) { while(1) ; } void xxexit(void){}
+Performing C SOURCE FILE Test LWS_HAVE_INTTYPES_H succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_961ed/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_961ed.dir/build.make CMakeFiles/cmTC_961ed.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_961ed.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_INTTYPES_H   -MD -MT CMakeFiles/cmTC_961ed.dir/src.c.o -MF CMakeFiles/cmTC_961ed.dir/src.c.o.d -o CMakeFiles/cmTC_961ed.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: warning: return type of 'main' is not 'int' [-Wmain-return-type]
+void main(void) { while(1) ; } void xxexit(void){}
+^
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: note: change return type to 'int'
+void main(void) { while(1) ; } void xxexit(void){}
+^~~~
+int
+1 warning generated.
+Linking C executable cmTC_961ed
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_961ed.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_961ed.dir/src.c.o -o cmTC_961ed 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <inttypes.h>
+void main(void) { while(1) ; } void xxexit(void){}
+Performing C SOURCE FILE Test LWS_HAVE_SYS_RESOURCE_H succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_81448/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_81448.dir/build.make CMakeFiles/cmTC_81448.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_81448.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_SYS_RESOURCE_H   -MD -MT CMakeFiles/cmTC_81448.dir/src.c.o -MF CMakeFiles/cmTC_81448.dir/src.c.o.d -o CMakeFiles/cmTC_81448.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: warning: return type of 'main' is not 'int' [-Wmain-return-type]
+void main(void) { while(1) ; } void xxexit(void){}
+^
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: note: change return type to 'int'
+void main(void) { while(1) ; } void xxexit(void){}
+^~~~
+int
+1 warning generated.
+Linking C executable cmTC_81448
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_81448.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_81448.dir/src.c.o -o cmTC_81448 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <sys/resource.h>
+void main(void) { while(1) ; } void xxexit(void){}
+Performing C SOURCE FILE Test LWS_HAVE_LINUX_IPV6_H succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_f9f9f/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_f9f9f.dir/build.make CMakeFiles/cmTC_f9f9f.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_f9f9f.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_LINUX_IPV6_H   -MD -MT CMakeFiles/cmTC_f9f9f.dir/src.c.o -MF CMakeFiles/cmTC_f9f9f.dir/src.c.o.d -o CMakeFiles/cmTC_f9f9f.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: warning: return type of 'main' is not 'int' [-Wmain-return-type]
+void main(void) { while(1) ; } void xxexit(void){}
+^
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:2:1: note: change return type to 'int'
+void main(void) { while(1) ; } void xxexit(void){}
+^~~~
+int
+1 warning generated.
+Linking C executable cmTC_f9f9f
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f9f9f.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_f9f9f.dir/src.c.o -o cmTC_f9f9f 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <linux/ipv6.h>
+void main(void) { while(1) ; } void xxexit(void){}
+Performing C SOURCE FILE Test LWS_HAVE_NET_ETHERNET_H succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_a71a7/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_a71a7.dir/build.make CMakeFiles/cmTC_a71a7.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_a71a7.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_NET_ETHERNET_H   -MD -MT CMakeFiles/cmTC_a71a7.dir/src.c.o -MF CMakeFiles/cmTC_a71a7.dir/src.c.o.d -o CMakeFiles/cmTC_a71a7.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:3:2: warning: return type of 'main' is not 'int' [-Wmain-return-type]
+ void main(void) { while (1) ; } void xxexit(void){}
+ ^
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:3:2: note: change return type to 'int'
+ void main(void) { while (1) ; } void xxexit(void){}
+ ^~~~
+ int
+1 warning generated.
+Linking C executable cmTC_a71a7
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a71a7.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_a71a7.dir/src.c.o -o cmTC_a71a7 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <sys/types.h>
+#include <net/ethernet.h>
+ void main(void) { while (1) ; } void xxexit(void){}
+Determining if the function cap_set_flag exists in the cap passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_3e169/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_3e169.dir/build.make CMakeFiles/cmTC_3e169.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_3e169.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline  -DCHECK_FUNCTION_EXISTS=cap_set_flag -MD -MT CMakeFiles/cmTC_3e169.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_3e169.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_3e169.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_3e169
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3e169.dir/link.txt --verbose=1
+/usr/bin/clang  -DCHECK_FUNCTION_EXISTS=cap_set_flag CMakeFiles/cmTC_3e169.dir/CheckFunctionExists.c.o -o cmTC_3e169  -lcap 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if files stdlib.h;stdarg.h;string.h exist passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_f2211/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_f2211.dir/build.make CMakeFiles/cmTC_f2211.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_f2211.dir/STDC_HEADERS.c.o
+/usr/bin/clang -DKEYWORD=__inline   -MD -MT CMakeFiles/cmTC_f2211.dir/STDC_HEADERS.c.o -MF CMakeFiles/cmTC_f2211.dir/STDC_HEADERS.c.o.d -o CMakeFiles/cmTC_f2211.dir/STDC_HEADERS.c.o -c /tmp/libwebsockets/build/CMakeFiles/CheckIncludeFiles/STDC_HEADERS.c
+Linking C executable cmTC_f2211
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f2211.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_f2211.dir/STDC_HEADERS.c.o -o cmTC_f2211 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Performing C SOURCE FILE Test LWS_HAS_INTPTR_T succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_2f9bf/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_2f9bf.dir/build.make CMakeFiles/cmTC_2f9bf.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_2f9bf.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAS_INTPTR_T   -MD -MT CMakeFiles/cmTC_2f9bf.dir/src.c.o -MF CMakeFiles/cmTC_2f9bf.dir/src.c.o.d -o CMakeFiles/cmTC_2f9bf.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_2f9bf
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_2f9bf.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_2f9bf.dir/src.c.o -o cmTC_2f9bf 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <stdint.h> 
+	int main(void) {
+		intptr_t test = 1;
+		return 0;
+	}
+Performing C SOURCE FILE Test LWS_HAS_PTHREAD_SETNAME_NP succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_352cf/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_352cf.dir/build.make CMakeFiles/cmTC_352cf.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_352cf.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAS_PTHREAD_SETNAME_NP   -MD -MT CMakeFiles/cmTC_352cf.dir/src.c.o -MF CMakeFiles/cmTC_352cf.dir/src.c.o.d -o CMakeFiles/cmTC_352cf.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+/tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c:12:31: warning: null passed to a callee that requires a non-null argument [-Wnonnull]
+                        pthread_setname_np(th, NULL);
+                                               ~~~~^
+1 warning generated.
+Linking C executable cmTC_352cf
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_352cf.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_352cf.dir/src.c.o -o cmTC_352cf 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+
+		#ifndef _GNU_SOURCE
+		#define _GNU_SOURCE
+		#endif
+		#include <pthread.h>
+		int main(void) {
+		#ifdef __PTW32_H
+			pthread_t th = {0,0};
+		#else
+			pthread_t th = 0;
+		#endif
+			pthread_setname_np(th, NULL);
+			return 0;
+		}
+Performing C SOURCE FILE Test LWS_HAS_GETOPT_LONG succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_70f62/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_70f62.dir/build.make CMakeFiles/cmTC_70f62.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_70f62.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAS_GETOPT_LONG   -MD -MT CMakeFiles/cmTC_70f62.dir/src.c.o -MF CMakeFiles/cmTC_70f62.dir/src.c.o.d -o CMakeFiles/cmTC_70f62.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_70f62
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_70f62.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_70f62.dir/src.c.o -o cmTC_70f62 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <stddef.h>
+	#include <getopt.h>
+	int main(void) {
+		void *p = (void *)getopt_long;
+		return p != NULL;
+	}
+Performing C SOURCE FILE Test LWS_HAVE_RTA_PREF succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_2b44e/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_2b44e.dir/build.make CMakeFiles/cmTC_2b44e.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_2b44e.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_RTA_PREF   -MD -MT CMakeFiles/cmTC_2b44e.dir/src.c.o -MF CMakeFiles/cmTC_2b44e.dir/src.c.o.d -o CMakeFiles/cmTC_2b44e.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_2b44e
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_2b44e.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_2b44e.dir/src.c.o -o cmTC_2b44e 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <linux/rtnetlink.h>
+	int main(void) {
+		int test = RTA_PREF;
+		return 0;
+	}
+Performing C SOURCE FILE Test LWS_HAVE_SUSECONDS_T succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_bb7e8/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_bb7e8.dir/build.make CMakeFiles/cmTC_bb7e8.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_bb7e8.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_SUSECONDS_T   -MD -MT CMakeFiles/cmTC_bb7e8.dir/src.c.o -MF CMakeFiles/cmTC_bb7e8.dir/src.c.o.d -o CMakeFiles/cmTC_bb7e8.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_bb7e8
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_bb7e8.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_bb7e8.dir/src.c.o -o cmTC_bb7e8 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <sys/types.h>
+	int main(void) {
+		suseconds_t x = 0;
+		return (int)x;
+	}
+Performing C SOURCE FILE Test LWS_HAVE_VISIBILITY succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_b6393/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_b6393.dir/build.make CMakeFiles/cmTC_b6393.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_b6393.dir/src.c.o
+/usr/bin/clang -DLWS_HAVE_VISIBILITY  -fvisibility=hidden -MD -MT CMakeFiles/cmTC_b6393.dir/src.c.o -MF CMakeFiles/cmTC_b6393.dir/src.c.o.d -o CMakeFiles/cmTC_b6393.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_b6393
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b6393.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_b6393.dir/src.c.o -o cmTC_b6393 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test LWS_GCC_HAS_IGNORED_QUALIFIERS succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_efe26/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_efe26.dir/build.make CMakeFiles/cmTC_efe26.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_efe26.dir/src.c.o
+/usr/bin/clang -DLWS_GCC_HAS_IGNORED_QUALIFIERS  -Wignored-qualifiers -MD -MT CMakeFiles/cmTC_efe26.dir/src.c.o -MF CMakeFiles/cmTC_efe26.dir/src.c.o.d -o CMakeFiles/cmTC_efe26.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_efe26
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_efe26.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_efe26.dir/src.c.o -o cmTC_efe26 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test LWS_GCC_HAS_TYPE_LIMITS succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_38c18/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_38c18.dir/build.make CMakeFiles/cmTC_38c18.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_38c18.dir/src.c.o
+/usr/bin/clang -DLWS_GCC_HAS_TYPE_LIMITS  -Wtype-limits -MD -MT CMakeFiles/cmTC_38c18.dir/src.c.o -MF CMakeFiles/cmTC_38c18.dir/src.c.o.d -o CMakeFiles/cmTC_38c18.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_38c18
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_38c18.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_38c18.dir/src.c.o -o cmTC_38c18 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test LWS_GCC_HAS_NO_DEPRECATED_DECLARATIONS succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_b8aa2/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_b8aa2.dir/build.make CMakeFiles/cmTC_b8aa2.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_b8aa2.dir/src.c.o
+/usr/bin/clang -DLWS_GCC_HAS_NO_DEPRECATED_DECLARATIONS  -Wno-deprecated-declarations -MD -MT CMakeFiles/cmTC_b8aa2.dir/src.c.o -MF CMakeFiles/cmTC_b8aa2.dir/src.c.o.d -o CMakeFiles/cmTC_b8aa2.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_b8aa2
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b8aa2.dir/link.txt --verbose=1
+/usr/bin/clang CMakeFiles/cmTC_b8aa2.dir/src.c.o -o cmTC_b8aa2 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+int main(void) { return 0; }
+Determining if the function eventfd_read exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_74f34/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_74f34.dir/build.make CMakeFiles/cmTC_74f34.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_74f34.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline  -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=eventfd_read -MD -MT CMakeFiles/cmTC_74f34.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_74f34.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_74f34.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_74f34
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_74f34.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=eventfd_read CMakeFiles/cmTC_74f34.dir/CheckFunctionExists.c.o -o cmTC_74f34 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Performing C SOURCE FILE Test LWS_HAVE_PIPE2 succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_f9a64/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_f9a64.dir/build.make CMakeFiles/cmTC_f9a64.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_f9a64.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_PIPE2  -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument  -MD -MT CMakeFiles/cmTC_f9a64.dir/src.c.o -MF CMakeFiles/cmTC_f9a64.dir/src.c.o.d -o CMakeFiles/cmTC_f9a64.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_f9a64
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f9a64.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument  CMakeFiles/cmTC_f9a64.dir/src.c.o -o cmTC_f9a64  /usr/lib/x86_64-linux-gnu/libcap.so 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+
+	#ifndef _GNU_SOURCE
+	#define _GNU_SOURCE
+	#endif
+	#include <unistd.h>
+	int main(void) {
+		int fd[2];
+		return pipe2(fd, 0);
+	}
+Performing C SOURCE FILE Test LWS_HAVE_TCP_USER_TIMEOUT succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_9e82e/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_9e82e.dir/build.make CMakeFiles/cmTC_9e82e.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_9e82e.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_TCP_USER_TIMEOUT  -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument  -MD -MT CMakeFiles/cmTC_9e82e.dir/src.c.o -MF CMakeFiles/cmTC_9e82e.dir/src.c.o.d -o CMakeFiles/cmTC_9e82e.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_9e82e
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9e82e.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument  CMakeFiles/cmTC_9e82e.dir/src.c.o -o cmTC_9e82e  /usr/lib/x86_64-linux-gnu/libcap.so 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <netinet/tcp.h>
+int main(void) { return TCP_USER_TIMEOUT; }
+
+Determining if the include file openssl/ecdh.h exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_bc89f/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_bc89f.dir/build.make CMakeFiles/cmTC_bc89f.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_bc89f.dir/CheckIncludeFile.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument  -MD -MT CMakeFiles/cmTC_bc89f.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_bc89f.dir/CheckIncludeFile.c.o.d -o CMakeFiles/cmTC_bc89f.dir/CheckIncludeFile.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_bc89f
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_bc89f.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument  CMakeFiles/cmTC_bc89f.dir/CheckIncludeFile.c.o -o cmTC_bc89f  /usr/lib/x86_64-linux-gnu/libcap.so 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function SSL_CTX_set1_param exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_904d5/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_904d5.dir/build.make CMakeFiles/cmTC_904d5.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_904d5.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=SSL_CTX_set1_param -MD -MT CMakeFiles/cmTC_904d5.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_904d5.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_904d5.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_904d5
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_904d5.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=SSL_CTX_set1_param CMakeFiles/cmTC_904d5.dir/CheckFunctionExists.c.o -o cmTC_904d5  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function SSL_set_info_callback exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_3b0a6/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_3b0a6.dir/build.make CMakeFiles/cmTC_3b0a6.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_3b0a6.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=SSL_set_info_callback -MD -MT CMakeFiles/cmTC_3b0a6.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_3b0a6.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_3b0a6.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_3b0a6
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3b0a6.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=SSL_set_info_callback CMakeFiles/cmTC_3b0a6.dir/CheckFunctionExists.c.o -o cmTC_3b0a6  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function X509_VERIFY_PARAM_set1_host exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_887e3/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_887e3.dir/build.make CMakeFiles/cmTC_887e3.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_887e3.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=X509_VERIFY_PARAM_set1_host -MD -MT CMakeFiles/cmTC_887e3.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_887e3.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_887e3.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_887e3
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_887e3.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=X509_VERIFY_PARAM_set1_host CMakeFiles/cmTC_887e3.dir/CheckFunctionExists.c.o -o cmTC_887e3  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function RSA_set0_key exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_ceb4e/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_ceb4e.dir/build.make CMakeFiles/cmTC_ceb4e.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_ceb4e.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=RSA_set0_key -MD -MT CMakeFiles/cmTC_ceb4e.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_ceb4e.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_ceb4e.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_ceb4e
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ceb4e.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=RSA_set0_key CMakeFiles/cmTC_ceb4e.dir/CheckFunctionExists.c.o -o cmTC_ceb4e  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function X509_get_key_usage exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_e8ec0/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_e8ec0.dir/build.make CMakeFiles/cmTC_e8ec0.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_e8ec0.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=X509_get_key_usage -MD -MT CMakeFiles/cmTC_e8ec0.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_e8ec0.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_e8ec0.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_e8ec0
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e8ec0.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=X509_get_key_usage CMakeFiles/cmTC_e8ec0.dir/CheckFunctionExists.c.o -o cmTC_e8ec0  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function SSL_CTX_get0_certificate exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_5a8b2/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_5a8b2.dir/build.make CMakeFiles/cmTC_5a8b2.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_5a8b2.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=SSL_CTX_get0_certificate -MD -MT CMakeFiles/cmTC_5a8b2.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_5a8b2.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_5a8b2.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_5a8b2
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_5a8b2.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=SSL_CTX_get0_certificate CMakeFiles/cmTC_5a8b2.dir/CheckFunctionExists.c.o -o cmTC_5a8b2  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function SSL_get0_alpn_selected exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_adec9/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_adec9.dir/build.make CMakeFiles/cmTC_adec9.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_adec9.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=SSL_get0_alpn_selected -MD -MT CMakeFiles/cmTC_adec9.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_adec9.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_adec9.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_adec9
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_adec9.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=SSL_get0_alpn_selected CMakeFiles/cmTC_adec9.dir/CheckFunctionExists.c.o -o cmTC_adec9  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function SSL_set_alpn_protos exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_edfaf/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_edfaf.dir/build.make CMakeFiles/cmTC_edfaf.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_edfaf.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=SSL_set_alpn_protos -MD -MT CMakeFiles/cmTC_edfaf.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_edfaf.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_edfaf.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_edfaf
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_edfaf.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=SSL_set_alpn_protos CMakeFiles/cmTC_edfaf.dir/CheckFunctionExists.c.o -o cmTC_edfaf  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function EVP_aes_128_cfb8 exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_46f7a/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_46f7a.dir/build.make CMakeFiles/cmTC_46f7a.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_46f7a.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EVP_aes_128_cfb8 -MD -MT CMakeFiles/cmTC_46f7a.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_46f7a.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_46f7a.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_46f7a
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_46f7a.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EVP_aes_128_cfb8 CMakeFiles/cmTC_46f7a.dir/CheckFunctionExists.c.o -o cmTC_46f7a  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function EVP_aes_128_cfb128 exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_1c530/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_1c530.dir/build.make CMakeFiles/cmTC_1c530.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_1c530.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EVP_aes_128_cfb128 -MD -MT CMakeFiles/cmTC_1c530.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_1c530.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_1c530.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_1c530
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1c530.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EVP_aes_128_cfb128 CMakeFiles/cmTC_1c530.dir/CheckFunctionExists.c.o -o cmTC_1c530  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function EVP_aes_192_cfb8 exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_6c20c/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_6c20c.dir/build.make CMakeFiles/cmTC_6c20c.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_6c20c.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EVP_aes_192_cfb8 -MD -MT CMakeFiles/cmTC_6c20c.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_6c20c.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_6c20c.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_6c20c
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6c20c.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EVP_aes_192_cfb8 CMakeFiles/cmTC_6c20c.dir/CheckFunctionExists.c.o -o cmTC_6c20c  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function EVP_aes_192_cfb128 exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_ad242/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_ad242.dir/build.make CMakeFiles/cmTC_ad242.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_ad242.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EVP_aes_192_cfb128 -MD -MT CMakeFiles/cmTC_ad242.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_ad242.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_ad242.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_ad242
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ad242.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EVP_aes_192_cfb128 CMakeFiles/cmTC_ad242.dir/CheckFunctionExists.c.o -o cmTC_ad242  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function EVP_aes_256_cfb8 exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_52d2b/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_52d2b.dir/build.make CMakeFiles/cmTC_52d2b.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_52d2b.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EVP_aes_256_cfb8 -MD -MT CMakeFiles/cmTC_52d2b.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_52d2b.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_52d2b.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_52d2b
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_52d2b.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EVP_aes_256_cfb8 CMakeFiles/cmTC_52d2b.dir/CheckFunctionExists.c.o -o cmTC_52d2b  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function EVP_aes_256_cfb128 exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_50631/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_50631.dir/build.make CMakeFiles/cmTC_50631.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_50631.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EVP_aes_256_cfb128 -MD -MT CMakeFiles/cmTC_50631.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_50631.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_50631.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_50631
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_50631.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EVP_aes_256_cfb128 CMakeFiles/cmTC_50631.dir/CheckFunctionExists.c.o -o cmTC_50631  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function EVP_aes_128_xts exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_10f56/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_10f56.dir/build.make CMakeFiles/cmTC_10f56.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_10f56.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EVP_aes_128_xts -MD -MT CMakeFiles/cmTC_10f56.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_10f56.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_10f56.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_10f56
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_10f56.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EVP_aes_128_xts CMakeFiles/cmTC_10f56.dir/CheckFunctionExists.c.o -o cmTC_10f56  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function EVP_aes_128_ofb exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_3422b/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_3422b.dir/build.make CMakeFiles/cmTC_3422b.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_3422b.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EVP_aes_128_ofb -MD -MT CMakeFiles/cmTC_3422b.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_3422b.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_3422b.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_3422b
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3422b.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EVP_aes_128_ofb CMakeFiles/cmTC_3422b.dir/CheckFunctionExists.c.o -o cmTC_3422b  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function EVP_aes_128_ecb exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_fe64c/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_fe64c.dir/build.make CMakeFiles/cmTC_fe64c.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_fe64c.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EVP_aes_128_ecb -MD -MT CMakeFiles/cmTC_fe64c.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_fe64c.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_fe64c.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_fe64c
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_fe64c.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EVP_aes_128_ecb CMakeFiles/cmTC_fe64c.dir/CheckFunctionExists.c.o -o cmTC_fe64c  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function EVP_aes_128_ctr exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_d414a/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_d414a.dir/build.make CMakeFiles/cmTC_d414a.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_d414a.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EVP_aes_128_ctr -MD -MT CMakeFiles/cmTC_d414a.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_d414a.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_d414a.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_d414a
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d414a.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EVP_aes_128_ctr CMakeFiles/cmTC_d414a.dir/CheckFunctionExists.c.o -o cmTC_d414a  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function HMAC_CTX_new exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_23a7e/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_23a7e.dir/build.make CMakeFiles/cmTC_23a7e.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_23a7e.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=HMAC_CTX_new -MD -MT CMakeFiles/cmTC_23a7e.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_23a7e.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_23a7e.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_23a7e
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_23a7e.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=HMAC_CTX_new CMakeFiles/cmTC_23a7e.dir/CheckFunctionExists.c.o -o cmTC_23a7e  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function SSL_CTX_set_ciphersuites exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_57642/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_57642.dir/build.make CMakeFiles/cmTC_57642.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_57642.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=SSL_CTX_set_ciphersuites -MD -MT CMakeFiles/cmTC_57642.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_57642.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_57642.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_57642
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_57642.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=SSL_CTX_set_ciphersuites CMakeFiles/cmTC_57642.dir/CheckFunctionExists.c.o -o cmTC_57642  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function EVP_PKEY_new_raw_private_key exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_04382/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_04382.dir/build.make CMakeFiles/cmTC_04382.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_04382.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EVP_PKEY_new_raw_private_key -MD -MT CMakeFiles/cmTC_04382.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_04382.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_04382.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_04382
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_04382.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EVP_PKEY_new_raw_private_key CMakeFiles/cmTC_04382.dir/CheckFunctionExists.c.o -o cmTC_04382  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function SSL_SESSION_set_time exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_c0fec/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_c0fec.dir/build.make CMakeFiles/cmTC_c0fec.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c0fec.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=SSL_SESSION_set_time -MD -MT CMakeFiles/cmTC_c0fec.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_c0fec.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_c0fec.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_c0fec
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c0fec.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=SSL_SESSION_set_time CMakeFiles/cmTC_c0fec.dir/CheckFunctionExists.c.o -o cmTC_c0fec  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function SSL_SESSION_up_ref exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_c80b0/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_c80b0.dir/build.make CMakeFiles/cmTC_c80b0.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c80b0.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=SSL_SESSION_up_ref -MD -MT CMakeFiles/cmTC_c80b0.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_c80b0.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_c80b0.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_c80b0
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c80b0.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=SSL_SESSION_up_ref CMakeFiles/cmTC_c80b0.dir/CheckFunctionExists.c.o -o cmTC_c80b0  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function SSL_CTX_set_keylog_callback exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_a9acb/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_a9acb.dir/build.make CMakeFiles/cmTC_a9acb.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_a9acb.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=SSL_CTX_set_keylog_callback -MD -MT CMakeFiles/cmTC_a9acb.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_a9acb.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_a9acb.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_a9acb
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a9acb.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=SSL_CTX_set_keylog_callback CMakeFiles/cmTC_a9acb.dir/CheckFunctionExists.c.o -o cmTC_a9acb  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function EC_KEY_new_by_curve_name exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_f8bea/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_f8bea.dir/build.make CMakeFiles/cmTC_f8bea.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_f8bea.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EC_KEY_new_by_curve_name -MD -MT CMakeFiles/cmTC_f8bea.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_f8bea.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_f8bea.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_f8bea
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f8bea.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EC_KEY_new_by_curve_name CMakeFiles/cmTC_f8bea.dir/CheckFunctionExists.c.o -o cmTC_f8bea  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Performing C SOURCE FILE Test LWS_HAVE_SSL_EXTRA_CHAIN_CERTS succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_a31c3/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_a31c3.dir/build.make CMakeFiles/cmTC_a31c3.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_a31c3.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_SSL_EXTRA_CHAIN_CERTS -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument  -MD -MT CMakeFiles/cmTC_a31c3.dir/src.c.o -MF CMakeFiles/cmTC_a31c3.dir/src.c.o.d -o CMakeFiles/cmTC_a31c3.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_a31c3
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a31c3.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument  CMakeFiles/cmTC_a31c3.dir/src.c.o -o cmTC_a31c3  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <openssl/ssl.h>
+int main(void) { STACK_OF(X509) *c = NULL; SSL_CTX *ctx = NULL; return (int)SSL_CTX_get_extra_chain_certs_only(ctx, &c); }
+
+Performing C SOURCE FILE Test LWS_HAVE_EVP_MD_CTX_free succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_f43e4/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_f43e4.dir/build.make CMakeFiles/cmTC_f43e4.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_f43e4.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_EVP_MD_CTX_free -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument  -MD -MT CMakeFiles/cmTC_f43e4.dir/src.c.o -MF CMakeFiles/cmTC_f43e4.dir/src.c.o.d -o CMakeFiles/cmTC_f43e4.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_f43e4
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f43e4.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument  CMakeFiles/cmTC_f43e4.dir/src.c.o -o cmTC_f43e4  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <openssl/ssl.h>
+int main(void) { EVP_MD_CTX *md_ctx = NULL; EVP_MD_CTX_free(md_ctx); return 0; }
+
+Performing C SOURCE FILE Test LWS_HAVE_OPENSSL_STACK succeeded with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_8f7fc/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_8f7fc.dir/build.make CMakeFiles/cmTC_8f7fc.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_8f7fc.dir/src.c.o
+/usr/bin/clang -DKEYWORD=__inline -DLWS_HAVE_OPENSSL_STACK -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument  -MD -MT CMakeFiles/cmTC_8f7fc.dir/src.c.o -MF CMakeFiles/cmTC_8f7fc.dir/src.c.o.d -o CMakeFiles/cmTC_8f7fc.dir/src.c.o -c /tmp/libwebsockets/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_8f7fc
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8f7fc.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument  CMakeFiles/cmTC_8f7fc.dir/src.c.o -o cmTC_8f7fc  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <openssl/ssl.h>
+int main(void) { OPENSSL_STACK *x = NULL; return !x; } 
+
+Determining if the function ECDSA_SIG_set0 exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_174bb/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_174bb.dir/build.make CMakeFiles/cmTC_174bb.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_174bb.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=ECDSA_SIG_set0 -MD -MT CMakeFiles/cmTC_174bb.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_174bb.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_174bb.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_174bb
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_174bb.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=ECDSA_SIG_set0 CMakeFiles/cmTC_174bb.dir/CheckFunctionExists.c.o -o cmTC_174bb  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function BN_bn2binpad exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_7da6b/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_7da6b.dir/build.make CMakeFiles/cmTC_7da6b.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_7da6b.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=BN_bn2binpad -MD -MT CMakeFiles/cmTC_7da6b.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_7da6b.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_7da6b.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_7da6b
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_7da6b.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=BN_bn2binpad CMakeFiles/cmTC_7da6b.dir/CheckFunctionExists.c.o -o cmTC_7da6b  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function EVP_aes_128_wrap exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_1e394/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_1e394.dir/build.make CMakeFiles/cmTC_1e394.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_1e394.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EVP_aes_128_wrap -MD -MT CMakeFiles/cmTC_1e394.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_1e394.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_1e394.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_1e394
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1e394.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EVP_aes_128_wrap CMakeFiles/cmTC_1e394.dir/CheckFunctionExists.c.o -o cmTC_1e394  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function EC_POINT_get_affine_coordinates exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_e42f5/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_e42f5.dir/build.make CMakeFiles/cmTC_e42f5.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_e42f5.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EC_POINT_get_affine_coordinates -MD -MT CMakeFiles/cmTC_e42f5.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_e42f5.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_e42f5.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_e42f5
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e42f5.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=EC_POINT_get_affine_coordinates CMakeFiles/cmTC_e42f5.dir/CheckFunctionExists.c.o -o cmTC_e42f5  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function SSL_CTX_load_verify_file exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_79123/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_79123.dir/build.make CMakeFiles/cmTC_79123.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_79123.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=SSL_CTX_load_verify_file -MD -MT CMakeFiles/cmTC_79123.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_79123.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_79123.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_79123
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_79123.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=SSL_CTX_load_verify_file CMakeFiles/cmTC_79123.dir/CheckFunctionExists.c.o -o cmTC_79123  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function SSL_CTX_load_verify_dir exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_afc37/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_afc37.dir/build.make CMakeFiles/cmTC_afc37.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_afc37.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=SSL_CTX_load_verify_dir -MD -MT CMakeFiles/cmTC_afc37.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_afc37.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_afc37.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_afc37
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_afc37.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=SSL_CTX_load_verify_dir CMakeFiles/cmTC_afc37.dir/CheckFunctionExists.c.o -o cmTC_afc37  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function TLS_client_method exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_e785c/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_e785c.dir/build.make CMakeFiles/cmTC_e785c.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_e785c.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=TLS_client_method -MD -MT CMakeFiles/cmTC_e785c.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_e785c.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_e785c.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_e785c
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e785c.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=TLS_client_method CMakeFiles/cmTC_e785c.dir/CheckFunctionExists.c.o -o cmTC_e785c  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the function TLSv1_2_client_method exists passed with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_d9f40/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_d9f40.dir/build.make CMakeFiles/cmTC_d9f40.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_d9f40.dir/CheckFunctionExists.c.o
+/usr/bin/clang -DKEYWORD=__inline -I/usr/include/openssl -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=TLSv1_2_client_method -MD -MT CMakeFiles/cmTC_d9f40.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_d9f40.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_d9f40.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_d9f40
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d9f40.dir/link.txt --verbose=1
+/usr/bin/clang -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -Wno-deprecated-declarations -pthread -Wno-error=unused-command-line-argument -DCHECK_FUNCTION_EXISTS=TLSv1_2_client_method CMakeFiles/cmTC_d9f40.dir/CheckFunctionExists.c.o -o cmTC_d9f40  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so -ldl 
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler: /usr/bin/clang++ 
+Build flags: 
+Id flags:  
+
+The output was:
+0
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+
+The CXX compiler identification is Clang, found in "/tmp/libwebsockets/build/CMakeFiles/3.22.1/CompilerIdCXX/a.out"
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_d8d81/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_d8d81.dir/build.make CMakeFiles/cmTC_d8d81.dir/build
+gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_d8d81.dir/CMakeCXXCompilerABI.cpp.o
+/usr/bin/clang++   -v -MD -MT CMakeFiles/cmTC_d8d81.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_d8d81.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_d8d81.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp
+Ubuntu clang version 14.0.0-1ubuntu1.1
+Target: x86_64-pc-linux-gnu
+Thread model: posix
+InstalledDir: /usr/bin
+Found candidate GCC installation: /usr/bin/../lib/gcc/x86_64-linux-gnu/11
+Selected GCC installation: /usr/bin/../lib/gcc/x86_64-linux-gnu/11
+Candidate multilib: .;@m64
+Selected multilib: .;@m64
+ (in-process)
+ "/usr/lib/llvm-14/bin/clang" -cc1 -triple x86_64-pc-linux-gnu -emit-obj -mrelax-all --mrelax-relocations -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -tune-cpu generic -mllvm -treat-scalable-fixed-error-as-warning -debugger-tuning=gdb -v -fcoverage-compilation-dir=/tmp/libwebsockets/build/CMakeFiles/CMakeTmp -resource-dir /usr/lib/llvm-14/lib/clang/14.0.0 -dependency-file CMakeFiles/cmTC_d8d81.dir/CMakeCXXCompilerABI.cpp.o.d -MT CMakeFiles/cmTC_d8d81.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11 -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/x86_64-linux-gnu/c++/11 -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11/backward -internal-isystem /usr/lib/llvm-14/lib/clang/14.0.0/include -internal-isystem /usr/local/include -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../x86_64-linux-gnu/include -internal-externc-isystem /usr/include/x86_64-linux-gnu -internal-externc-isystem /include -internal-externc-isystem /usr/include -fdeprecated-macro -fdebug-compilation-dir=/tmp/libwebsockets/build/CMakeFiles/CMakeTmp -ferror-limit 19 -fgnuc-version=4.2.1 -fcxx-exceptions -fexceptions -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_d8d81.dir/CMakeCXXCompilerABI.cpp.o -x c++ /usr/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp
+clang -cc1 version 14.0.0 based upon LLVM 14.0.0 default target x86_64-pc-linux-gnu
+ignoring nonexistent directory "/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../x86_64-linux-gnu/include"
+ignoring nonexistent directory "/include"
+#include "..." search starts here:
+#include <...> search starts here:
+ /usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11
+ /usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/x86_64-linux-gnu/c++/11
+ /usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11/backward
+ /usr/lib/llvm-14/lib/clang/14.0.0/include
+ /usr/local/include
+ /usr/include/x86_64-linux-gnu
+ /usr/include
+End of search list.
+Linking CXX executable cmTC_d8d81
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d8d81.dir/link.txt --verbose=1
+/usr/bin/clang++  -v CMakeFiles/cmTC_d8d81.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_d8d81 
+Ubuntu clang version 14.0.0-1ubuntu1.1
+Target: x86_64-pc-linux-gnu
+Thread model: posix
+InstalledDir: /usr/bin
+Found candidate GCC installation: /usr/bin/../lib/gcc/x86_64-linux-gnu/11
+Selected GCC installation: /usr/bin/../lib/gcc/x86_64-linux-gnu/11
+Candidate multilib: .;@m64
+Selected multilib: .;@m64
+ "/usr/bin/ld" -pie -z relro --hash-style=gnu --build-id --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_d8d81 /lib/x86_64-linux-gnu/Scrt1.o /lib/x86_64-linux-gnu/crti.o /usr/bin/../lib/gcc/x86_64-linux-gnu/11/crtbeginS.o -L/usr/bin/../lib/gcc/x86_64-linux-gnu/11 -L/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../lib64 -L/lib/x86_64-linux-gnu -L/lib/../lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib64 -L/usr/lib/llvm-14/bin/../lib -L/lib -L/usr/lib CMakeFiles/cmTC_d8d81.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/bin/../lib/gcc/x86_64-linux-gnu/11/crtendS.o /lib/x86_64-linux-gnu/crtn.o
+gmake[1]: Leaving directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp'
+
+
+
+Parsed CXX implicit include dir info from above output: rv=done
+  found start of include info
+  found start of implicit include info
+    add: [/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11]
+    add: [/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/x86_64-linux-gnu/c++/11]
+    add: [/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11/backward]
+    add: [/usr/lib/llvm-14/lib/clang/14.0.0/include]
+    add: [/usr/local/include]
+    add: [/usr/include/x86_64-linux-gnu]
+    add: [/usr/include]
+  end of search list found
+  collapse include dir [/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11] ==> [/usr/include/c++/11]
+  collapse include dir [/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/x86_64-linux-gnu/c++/11] ==> [/usr/include/x86_64-linux-gnu/c++/11]
+  collapse include dir [/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11/backward] ==> [/usr/include/c++/11/backward]
+  collapse include dir [/usr/lib/llvm-14/lib/clang/14.0.0/include] ==> [/usr/lib/llvm-14/lib/clang/14.0.0/include]
+  collapse include dir [/usr/local/include] ==> [/usr/local/include]
+  collapse include dir [/usr/include/x86_64-linux-gnu] ==> [/usr/include/x86_64-linux-gnu]
+  collapse include dir [/usr/include] ==> [/usr/include]
+  implicit include dirs: [/usr/include/c++/11;/usr/include/x86_64-linux-gnu/c++/11;/usr/include/c++/11/backward;/usr/lib/llvm-14/lib/clang/14.0.0/include;/usr/local/include;/usr/include/x86_64-linux-gnu;/usr/include]
+
+
+Parsed CXX implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld\.lld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /tmp/libwebsockets/build/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_d8d81/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_d8d81.dir/build.make CMakeFiles/cmTC_d8d81.dir/build]
+  ignore line: [gmake[1]: Entering directory '/tmp/libwebsockets/build/CMakeFiles/CMakeTmp']
+  ignore line: [Building CXX object CMakeFiles/cmTC_d8d81.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [/usr/bin/clang++   -v -MD -MT CMakeFiles/cmTC_d8d81.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_d8d81.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_d8d81.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Ubuntu clang version 14.0.0-1ubuntu1.1]
+  ignore line: [Target: x86_64-pc-linux-gnu]
+  ignore line: [Thread model: posix]
+  ignore line: [InstalledDir: /usr/bin]
+  ignore line: [Found candidate GCC installation: /usr/bin/../lib/gcc/x86_64-linux-gnu/11]
+  ignore line: [Selected GCC installation: /usr/bin/../lib/gcc/x86_64-linux-gnu/11]
+  ignore line: [Candidate multilib: .]
+  ignore line: [@m64]
+  ignore line: [Selected multilib: .]
+  ignore line: [@m64]
+  ignore line: [ (in-process)]
+  ignore line: [ "/usr/lib/llvm-14/bin/clang" -cc1 -triple x86_64-pc-linux-gnu -emit-obj -mrelax-all --mrelax-relocations -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -tune-cpu generic -mllvm -treat-scalable-fixed-error-as-warning -debugger-tuning=gdb -v -fcoverage-compilation-dir=/tmp/libwebsockets/build/CMakeFiles/CMakeTmp -resource-dir /usr/lib/llvm-14/lib/clang/14.0.0 -dependency-file CMakeFiles/cmTC_d8d81.dir/CMakeCXXCompilerABI.cpp.o.d -MT CMakeFiles/cmTC_d8d81.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11 -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/x86_64-linux-gnu/c++/11 -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11/backward -internal-isystem /usr/lib/llvm-14/lib/clang/14.0.0/include -internal-isystem /usr/local/include -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../x86_64-linux-gnu/include -internal-externc-isystem /usr/include/x86_64-linux-gnu -internal-externc-isystem /include -internal-externc-isystem /usr/include -fdeprecated-macro -fdebug-compilation-dir=/tmp/libwebsockets/build/CMakeFiles/CMakeTmp -ferror-limit 19 -fgnuc-version=4.2.1 -fcxx-exceptions -fexceptions -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_d8d81.dir/CMakeCXXCompilerABI.cpp.o -x c++ /usr/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [clang -cc1 version 14.0.0 based upon LLVM 14.0.0 default target x86_64-pc-linux-gnu]
+  ignore line: [ignoring nonexistent directory "/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../x86_64-linux-gnu/include"]
+  ignore line: [ignoring nonexistent directory "/include"]
+  ignore line: [#include "..." search starts here:]
+  ignore line: [#include <...> search starts here:]
+  ignore line: [ /usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11]
+  ignore line: [ /usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/x86_64-linux-gnu/c++/11]
+  ignore line: [ /usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11/backward]
+  ignore line: [ /usr/lib/llvm-14/lib/clang/14.0.0/include]
+  ignore line: [ /usr/local/include]
+  ignore line: [ /usr/include/x86_64-linux-gnu]
+  ignore line: [ /usr/include]
+  ignore line: [End of search list.]
+  ignore line: [Linking CXX executable cmTC_d8d81]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d8d81.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/clang++  -v CMakeFiles/cmTC_d8d81.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_d8d81 ]
+  ignore line: [Ubuntu clang version 14.0.0-1ubuntu1.1]
+  ignore line: [Target: x86_64-pc-linux-gnu]
+  ignore line: [Thread model: posix]
+  ignore line: [InstalledDir: /usr/bin]
+  ignore line: [Found candidate GCC installation: /usr/bin/../lib/gcc/x86_64-linux-gnu/11]
+  ignore line: [Selected GCC installation: /usr/bin/../lib/gcc/x86_64-linux-gnu/11]
+  ignore line: [Candidate multilib: .]
+  ignore line: [@m64]
+  ignore line: [Selected multilib: .]
+  ignore line: [@m64]
+  link line: [ "/usr/bin/ld" -pie -z relro --hash-style=gnu --build-id --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_d8d81 /lib/x86_64-linux-gnu/Scrt1.o /lib/x86_64-linux-gnu/crti.o /usr/bin/../lib/gcc/x86_64-linux-gnu/11/crtbeginS.o -L/usr/bin/../lib/gcc/x86_64-linux-gnu/11 -L/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../lib64 -L/lib/x86_64-linux-gnu -L/lib/../lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib64 -L/usr/lib/llvm-14/bin/../lib -L/lib -L/usr/lib CMakeFiles/cmTC_d8d81.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/bin/../lib/gcc/x86_64-linux-gnu/11/crtendS.o /lib/x86_64-linux-gnu/crtn.o]
+    arg [/usr/bin/ld] ==> ignore
+    arg [-pie] ==> ignore
+    arg [-zrelro] ==> ignore
+    arg [--hash-style=gnu] ==> ignore
+    arg [--build-id] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-m] ==> ignore
+    arg [elf_x86_64] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_d8d81] ==> ignore
+    arg [/lib/x86_64-linux-gnu/Scrt1.o] ==> obj [/lib/x86_64-linux-gnu/Scrt1.o]
+    arg [/lib/x86_64-linux-gnu/crti.o] ==> obj [/lib/x86_64-linux-gnu/crti.o]
+    arg [/usr/bin/../lib/gcc/x86_64-linux-gnu/11/crtbeginS.o] ==> obj [/usr/bin/../lib/gcc/x86_64-linux-gnu/11/crtbeginS.o]
+    arg [-L/usr/bin/../lib/gcc/x86_64-linux-gnu/11] ==> dir [/usr/bin/../lib/gcc/x86_64-linux-gnu/11]
+    arg [-L/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../lib64] ==> dir [/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../lib64]
+    arg [-L/lib/x86_64-linux-gnu] ==> dir [/lib/x86_64-linux-gnu]
+    arg [-L/lib/../lib64] ==> dir [/lib/../lib64]
+    arg [-L/usr/lib/x86_64-linux-gnu] ==> dir [/usr/lib/x86_64-linux-gnu]
+    arg [-L/usr/lib/../lib64] ==> dir [/usr/lib/../lib64]
+    arg [-L/usr/lib/llvm-14/bin/../lib] ==> dir [/usr/lib/llvm-14/bin/../lib]
+    arg [-L/lib] ==> dir [/lib]
+    arg [-L/usr/lib] ==> dir [/usr/lib]
+    arg [CMakeFiles/cmTC_d8d81.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [-lstdc++] ==> lib [stdc++]
+    arg [-lm] ==> lib [m]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lgcc] ==> lib [gcc]
+    arg [-lc] ==> lib [c]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lgcc] ==> lib [gcc]
+    arg [/usr/bin/../lib/gcc/x86_64-linux-gnu/11/crtendS.o] ==> obj [/usr/bin/../lib/gcc/x86_64-linux-gnu/11/crtendS.o]
+    arg [/lib/x86_64-linux-gnu/crtn.o] ==> obj [/lib/x86_64-linux-gnu/crtn.o]
+  collapse obj [/usr/bin/../lib/gcc/x86_64-linux-gnu/11/crtbeginS.o] ==> [/usr/lib/gcc/x86_64-linux-gnu/11/crtbeginS.o]
+  collapse obj [/usr/bin/../lib/gcc/x86_64-linux-gnu/11/crtendS.o] ==> [/usr/lib/gcc/x86_64-linux-gnu/11/crtendS.o]
+  collapse library dir [/usr/bin/../lib/gcc/x86_64-linux-gnu/11] ==> [/usr/lib/gcc/x86_64-linux-gnu/11]
+  collapse library dir [/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../lib64] ==> [/usr/lib64]
+  collapse library dir [/lib/x86_64-linux-gnu] ==> [/lib/x86_64-linux-gnu]
+  collapse library dir [/lib/../lib64] ==> [/lib64]
+  collapse library dir [/usr/lib/x86_64-linux-gnu] ==> [/usr/lib/x86_64-linux-gnu]
+  collapse library dir [/usr/lib/../lib64] ==> [/usr/lib64]
+  collapse library dir [/usr/lib/llvm-14/bin/../lib] ==> [/usr/lib/llvm-14/lib]
+  collapse library dir [/lib] ==> [/lib]
+  collapse library dir [/usr/lib] ==> [/usr/lib]
+  implicit libs: [stdc++;m;gcc_s;gcc;c;gcc_s;gcc]
+  implicit objs: [/lib/x86_64-linux-gnu/Scrt1.o;/lib/x86_64-linux-gnu/crti.o;/usr/lib/gcc/x86_64-linux-gnu/11/crtbeginS.o;/usr/lib/gcc/x86_64-linux-gnu/11/crtendS.o;/lib/x86_64-linux-gnu/crtn.o]
+  implicit dirs: [/usr/lib/gcc/x86_64-linux-gnu/11;/usr/lib64;/lib/x86_64-linux-gnu;/lib64;/usr/lib/x86_64-linux-gnu;/usr/lib/llvm-14/lib;/lib;/usr/lib]
+  implicit fwks: []
+
+

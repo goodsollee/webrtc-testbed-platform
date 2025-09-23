@@ -1,0 +1,195 @@
+Determining if the function _snprintf exists failed with the following output:
+Change Dir: /home/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_638b0/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_638b0.dir/build.make CMakeFiles/cmTC_638b0.dir/build
+gmake[1]: Entering directory '/mnt/mydata/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_638b0.dir/CheckFunctionExists.c.o
+/usr/bin/cc -DKEYWORD=__inline  -DCHECK_FUNCTION_EXISTS=_snprintf -fPIE -o CMakeFiles/cmTC_638b0.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_638b0
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_638b0.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=_snprintf -rdynamic CMakeFiles/cmTC_638b0.dir/CheckFunctionExists.c.o -o cmTC_638b0 
+/usr/bin/ld: CMakeFiles/cmTC_638b0.dir/CheckFunctionExists.c.o: in function `main':
+CheckFunctionExists.c:(.text+0x14): undefined reference to `_snprintf'
+collect2: error: ld returned 1 exit status
+gmake[1]: *** [CMakeFiles/cmTC_638b0.dir/build.make:99: cmTC_638b0] Error 1
+gmake[1]: Leaving directory '/mnt/mydata/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_638b0/fast] Error 2
+
+
+
+Determining if the function _vsnprintf exists failed with the following output:
+Change Dir: /home/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_4c6f2/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_4c6f2.dir/build.make CMakeFiles/cmTC_4c6f2.dir/build
+gmake[1]: Entering directory '/mnt/mydata/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_4c6f2.dir/CheckFunctionExists.c.o
+/usr/bin/cc -DKEYWORD=__inline  -DCHECK_FUNCTION_EXISTS=_vsnprintf -fPIE -o CMakeFiles/cmTC_4c6f2.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_4c6f2
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4c6f2.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=_vsnprintf -rdynamic CMakeFiles/cmTC_4c6f2.dir/CheckFunctionExists.c.o -o cmTC_4c6f2 
+/usr/bin/ld: CMakeFiles/cmTC_4c6f2.dir/CheckFunctionExists.c.o: in function `main':
+CheckFunctionExists.c:(.text+0x14): undefined reference to `_vsnprintf'
+collect2: error: ld returned 1 exit status
+gmake[1]: *** [CMakeFiles/cmTC_4c6f2.dir/build.make:99: cmTC_4c6f2] Error 1
+gmake[1]: Leaving directory '/mnt/mydata/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_4c6f2/fast] Error 2
+
+
+
+Determining if the function _atoi64 exists failed with the following output:
+Change Dir: /home/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_a691d/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_a691d.dir/build.make CMakeFiles/cmTC_a691d.dir/build
+gmake[1]: Entering directory '/mnt/mydata/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_a691d.dir/CheckFunctionExists.c.o
+/usr/bin/cc -DKEYWORD=__inline  -DCHECK_FUNCTION_EXISTS=_atoi64 -fPIE -o CMakeFiles/cmTC_a691d.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_a691d
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a691d.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=_atoi64 -rdynamic CMakeFiles/cmTC_a691d.dir/CheckFunctionExists.c.o -o cmTC_a691d 
+/usr/bin/ld: CMakeFiles/cmTC_a691d.dir/CheckFunctionExists.c.o: in function `main':
+CheckFunctionExists.c:(.text+0x14): undefined reference to `_atoi64'
+collect2: error: ld returned 1 exit status
+gmake[1]: *** [CMakeFiles/cmTC_a691d.dir/build.make:99: cmTC_a691d] Error 1
+gmake[1]: Leaving directory '/mnt/mydata/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_a691d/fast] Error 2
+
+
+
+Determining if the function _stat32i64 exists failed with the following output:
+Change Dir: /home/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_55e16/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_55e16.dir/build.make CMakeFiles/cmTC_55e16.dir/build
+gmake[1]: Entering directory '/mnt/mydata/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_55e16.dir/CheckFunctionExists.c.o
+/usr/bin/cc -DKEYWORD=__inline  -DCHECK_FUNCTION_EXISTS=_stat32i64 -fPIE -o CMakeFiles/cmTC_55e16.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_55e16
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_55e16.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=_stat32i64 -rdynamic CMakeFiles/cmTC_55e16.dir/CheckFunctionExists.c.o -o cmTC_55e16 
+/usr/bin/ld: CMakeFiles/cmTC_55e16.dir/CheckFunctionExists.c.o: in function `main':
+CheckFunctionExists.c:(.text+0x14): undefined reference to `_stat32i64'
+collect2: error: ld returned 1 exit status
+gmake[1]: *** [CMakeFiles/cmTC_55e16.dir/build.make:99: cmTC_55e16] Error 1
+gmake[1]: Leaving directory '/mnt/mydata/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_55e16/fast] Error 2
+
+
+
+Determining if the include file in6addr.h exists failed with the following output:
+Change Dir: /home/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_a4140/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_a4140.dir/build.make CMakeFiles/cmTC_a4140.dir/build
+gmake[1]: Entering directory '/mnt/mydata/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_a4140.dir/CheckIncludeFile.c.o
+/usr/bin/cc -DKEYWORD=__inline  -fPIE -o CMakeFiles/cmTC_a4140.dir/CheckIncludeFile.c.o -c /home/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/home/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:10: fatal error: in6addr.h: No such file or directory
+    1 | #include <in6addr.h>
+      |          ^~~~~~~~~~~
+compilation terminated.
+gmake[1]: *** [CMakeFiles/cmTC_a4140.dir/build.make:78: CMakeFiles/cmTC_a4140.dir/CheckIncludeFile.c.o] Error 1
+gmake[1]: Leaving directory '/mnt/mydata/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_a4140/fast] Error 2
+
+
+
+Determining if the include file sys/sockio.h exists failed with the following output:
+Change Dir: /home/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_db5dd/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_db5dd.dir/build.make CMakeFiles/cmTC_db5dd.dir/build
+gmake[1]: Entering directory '/mnt/mydata/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_db5dd.dir/CheckIncludeFile.c.o
+/usr/bin/cc -DKEYWORD=__inline  -fPIE -o CMakeFiles/cmTC_db5dd.dir/CheckIncludeFile.c.o -c /home/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/home/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:10: fatal error: sys/sockio.h: No such file or directory
+    1 | #include <sys/sockio.h>
+      |          ^~~~~~~~~~~~~~
+compilation terminated.
+gmake[1]: *** [CMakeFiles/cmTC_db5dd.dir/build.make:78: CMakeFiles/cmTC_db5dd.dir/CheckIncludeFile.c.o] Error 1
+gmake[1]: Leaving directory '/mnt/mydata/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_db5dd/fast] Error 2
+
+
+
+Determining if the include file vfork.h exists failed with the following output:
+Change Dir: /home/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_ff555/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_ff555.dir/build.make CMakeFiles/cmTC_ff555.dir/build
+gmake[1]: Entering directory '/mnt/mydata/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_ff555.dir/CheckIncludeFile.c.o
+/usr/bin/cc -DKEYWORD=__inline  -fPIE -o CMakeFiles/cmTC_ff555.dir/CheckIncludeFile.c.o -c /home/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/home/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:10: fatal error: vfork.h: No such file or directory
+    1 | #include <vfork.h>
+      |          ^~~~~~~~~
+compilation terminated.
+gmake[1]: *** [CMakeFiles/cmTC_ff555.dir/build.make:78: CMakeFiles/cmTC_ff555.dir/CheckIncludeFile.c.o] Error 1
+gmake[1]: Leaving directory '/mnt/mydata/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_ff555/fast] Error 2
+
+
+
+Determining if the X509_VERIFY_PARAM_set1_host exist failed with the following output:
+Change Dir: /home/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_bd6d0/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_bd6d0.dir/build.make CMakeFiles/cmTC_bd6d0.dir/build
+gmake[1]: Entering directory '/mnt/mydata/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_bd6d0.dir/CheckSymbolExists.c.o
+/usr/bin/cc -DKEYWORD=__inline  -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers     -fPIE -o CMakeFiles/cmTC_bd6d0.dir/CheckSymbolExists.c.o -c /home/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+/home/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp/CheckSymbolExists.c:2:10: fatal error: LWS_HAVE_X509_VERIFY_PARAM_set1_host_sym: No such file or directory
+    2 | #include <LWS_HAVE_X509_VERIFY_PARAM_set1_host_sym>
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+gmake[1]: *** [CMakeFiles/cmTC_bd6d0.dir/build.make:78: CMakeFiles/cmTC_bd6d0.dir/CheckSymbolExists.c.o] Error 1
+gmake[1]: Leaving directory '/mnt/mydata/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_bd6d0/fast] Error 2
+
+
+File /home/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <LWS_HAVE_X509_VERIFY_PARAM_set1_host_sym>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef X509_VERIFY_PARAM_set1_host
+  return ((int*)(&X509_VERIFY_PARAM_set1_host))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Determining if the function SSL_CTX_EVP_PKEY_new_raw_private_key exists failed with the following output:
+Change Dir: /home/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_e7992/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_e7992.dir/build.make CMakeFiles/cmTC_e7992.dir/build
+gmake[1]: Entering directory '/mnt/mydata/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_e7992.dir/CheckFunctionExists.c.o
+/usr/bin/cc -DKEYWORD=__inline  -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -DCHECK_FUNCTION_EXISTS=SSL_CTX_EVP_PKEY_new_raw_private_key -fPIE -o CMakeFiles/cmTC_e7992.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_e7992
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e7992.dir/link.txt --verbose=1
+/usr/bin/cc -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -DCHECK_FUNCTION_EXISTS=SSL_CTX_EVP_PKEY_new_raw_private_key -rdynamic CMakeFiles/cmTC_e7992.dir/CheckFunctionExists.c.o -o cmTC_e7992  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so /usr/lib/x86_64-linux-gnu/libz.so -ldl 
+/usr/bin/ld: CMakeFiles/cmTC_e7992.dir/CheckFunctionExists.c.o: in function `main':
+CheckFunctionExists.c:(.text+0x14): undefined reference to `SSL_CTX_EVP_PKEY_new_raw_private_key'
+collect2: error: ld returned 1 exit status
+gmake[1]: *** [CMakeFiles/cmTC_e7992.dir/build.make:105: cmTC_e7992] Error 1
+gmake[1]: Leaving directory '/mnt/mydata/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_e7992/fast] Error 2
+
+
+
+Determining if the function RSA_verify_pss_mgf1 exists failed with the following output:
+Change Dir: /home/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_76c03/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_76c03.dir/build.make CMakeFiles/cmTC_76c03.dir/build
+gmake[1]: Entering directory '/mnt/mydata/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_76c03.dir/CheckFunctionExists.c.o
+/usr/bin/cc -DKEYWORD=__inline  -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -DCHECK_FUNCTION_EXISTS=RSA_verify_pss_mgf1 -fPIE -o CMakeFiles/cmTC_76c03.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_76c03
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_76c03.dir/link.txt --verbose=1
+/usr/bin/cc -Wno-deprecated-declarations -Wno-deprecated -Wall -Wextra -Wno-unused-parameter -Wconversion -Wsign-compare -Wstrict-aliasing -fvisibility=hidden -Wundef  -Wuninitialized -Wtype-limits -Wignored-qualifiers   -Werror -DCHECK_FUNCTION_EXISTS=RSA_verify_pss_mgf1 -rdynamic CMakeFiles/cmTC_76c03.dir/CheckFunctionExists.c.o -o cmTC_76c03  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcap.so /usr/lib/x86_64-linux-gnu/libz.so -ldl 
+/usr/bin/ld: CMakeFiles/cmTC_76c03.dir/CheckFunctionExists.c.o: in function `main':
+CheckFunctionExists.c:(.text+0x14): undefined reference to `RSA_verify_pss_mgf1'
+collect2: error: ld returned 1 exit status
+gmake[1]: *** [CMakeFiles/cmTC_76c03.dir/build.make:105: cmTC_76c03] Error 1
+gmake[1]: Leaving directory '/mnt/mydata/home/goodsol/workspace/QCON/webrtc/libwebsockets/out/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_76c03/fast] Error 2
+
+
+
