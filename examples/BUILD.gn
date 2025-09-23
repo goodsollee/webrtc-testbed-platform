@@ -670,17 +670,11 @@ if (is_linux || is_chromeos || is_win) {
       ]
     }
     config("websocket_config") {
-      include_dirs = [
-        "/usr/local/include",  # libwebsockets headers
+      include_dirs = [ "//third_party/libwebsockets/include" ]
+      ldflags = [
+        rebase_path("//third_party/libwebsockets/lib/libwebsockets.a", root_build_dir),
       ]
-      lib_dirs = [
-        "/usr/local/lib",      # libwebsockets library
-      ]
-      libs = [
-        "curl",
-        "websockets",          # -lwebsockets
-        "cap",                 # -lcap if needed
-      ]
+      libs = [ "ssl", "crypto", "z", "curl", "cap"]  
     }
   }
 

@@ -50,6 +50,7 @@
 /out
 /testing
 /third_party
+!third_party/libwebsockets/
 /tools
 /tools_webrtc/android/profiling/flamegraph
 /tools_webrtc/android/profiling/simpleperf

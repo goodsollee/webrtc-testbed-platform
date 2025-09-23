@@ -26,12 +26,12 @@ ENV PATH="/opt/depot_tools:${PATH}"
 RUN /opt/depot_tools/update_depot_tools && gclient --version
 
 # Project
+RUN git clone https://github.com/goodsollee/native-webrtc-project.git /src
 WORKDIR /src
-COPY . /src
 
 # Build
 ENV CC=clang CXX=clang++
 RUN gn gen out/Default --args='is_debug=true is_component_build=false rtc_build_examples=true rtc_use_x11=true treat_warnings_as_errors=false use_sysroot=false' \
  && ninja -C out/Default peerconnection_client peerconnection_server
 
-CMD ["./out/Release/peerconnection_client"]
+CMD ["./out/Default/peerconnection_client"]

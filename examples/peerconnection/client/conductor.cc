@@ -1798,6 +1798,7 @@ void Conductor::DumpActiveRtpParameters() {
   }
 }
 
+/*
 void Conductor::ApplyVideoEncodingParams(int max_bps, absl::string_view scalability) {
   if (!peer_connection_) return;
 
@@ -1833,3 +1834,4 @@ void Conductor::ApplyVideoEncodingParams(int max_bps, absl::string_view scalabil
     }
   }
 }
+*/
