@@ -670,11 +670,16 @@ if (is_linux || is_chromeos || is_win) {
       ]
     }
     config("websocket_config") {
-      include_dirs = [ "//third_party/libwebsockets/include" ]
-      ldflags = [
-        rebase_path("//third_party/libwebsockets/lib/libwebsockets.a", root_build_dir),
+      include_dirs = [ 
+        "//third_party/libwebsockets/include", 
+        "//third_party/libwebsockets/build/include" 
       ]
-      libs = [ "ssl", "crypto", "z", "curl", "cap"]  
+      lib_dirs = [ "//third_party/libwebsockets/build/lib" ]
+      libs = [ "websockets", "curl" ]
+      
+      ldflags = [
+        "-Wl,-rpath,\$ORIGIN/../../third_party/libwebsockets/build/lib"
+      ]
     }
   }
 
@@ -817,7 +822,7 @@ rtc_library("sctp_traffic") {
         "Xrender",
       ]
       configs += [ ":gtk_config" ]
-      configs += [ ":websocket_config" ]
+      configs += [ ":websocket_config"]
     }
 
     deps += [

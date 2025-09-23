@@ -72,7 +72,7 @@ fi
 ################################################################################
 headless=$([[ "$is_sender" == "true" ]] && echo "true" || echo "false")
 
-cmd="./out/Default/peerconnection_client \
+cmd="../out/Default/peerconnection_client \
       --server=goodsol.overlinkapp.org \
       --is_sender=${is_sender} \
       --room_id=${room_id} \
@@ -82,5 +82,5 @@ cmd="./out/Default/peerconnection_client \
 [[ -n "$y4m_path" ]] && cmd+=" --y4m_path=${y4m_path}"
 [[ -n "$sctp_csv" ]] && cmd+=" --sctp_csv=${sctp_csv}"  
 
-pulseaudio --start
+#pulseaudio --start
 eval "${cmd}"

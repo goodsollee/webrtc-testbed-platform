@@ -82,5 +82,5 @@ cmd="./out/Default/peerconnection_client \
 [[ -n "$y4m_path" ]] && cmd+=" --y4m_path=${y4m_path}"
 [[ -n "$sctp_csv" ]] && cmd+=" --sctp_csv=${sctp_csv}"  
 
-pulseaudio --start
+#pulseaudio --start
 eval "${cmd}"
