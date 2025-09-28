@@ -34,6 +34,7 @@ struct DcSctpOptions {
   //  -13 DTLS record header
   //   -4 TURN ChannelData
   // = 1191 bytes.
+  //static constexpr size_t kMaxSafeMTUSize = 1191;
   static constexpr size_t kMaxSafeMTUSize = 1191;
 
   // The local port for which the socket is supposed to be bound to. Incoming
@@ -70,7 +71,7 @@ struct DcSctpOptions {
   // if their payload is larger than this value. Note that this doesn't affect
   // incoming messages, which may larger than this value (but smaller than
   // `max_receiver_window_buffer_size`).
-  size_t max_message_size = 256 * 1024;
+  size_t max_message_size = 1024 * 1024;
 
   // The default stream priority, if not overridden by
   // `SctpSocket::SetStreamPriority`. The default value is selected to be

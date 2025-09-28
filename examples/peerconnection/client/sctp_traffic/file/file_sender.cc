@@ -377,7 +377,7 @@ void Sender::SendFileBatched(size_t file_bytes) {
     max_chunk_payload = 256 * 1024;
   }
   max_chunk_payload =
-      std::min(max_chunk_payload, static_cast<size_t>(512 * 1024));
+      std::min(max_chunk_payload, static_cast<size_t>(1024 * 1024));
   size_t chunk_count =
       (file_bytes + max_chunk_payload - 1) / max_chunk_payload;
 
