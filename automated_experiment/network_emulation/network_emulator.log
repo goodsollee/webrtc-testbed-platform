@@ -1,0 +1,10 @@
+2025-04-10 23:22:06:016 [INFO] [main] [main.cpp:77] Starting Network Emulator
+2025-04-10 23:22:06:016 [INFO] [PHY] [network_emulator.cpp:14] NetworkEmulator initialized
+2025-04-10 23:22:06:016 [INFO] [PHY] [network_emulator.cpp:30] Initializing NetworkEmulator
+2025-04-10 23:22:06:016 [WARNING] [PHY] [network_emulator.cpp:34] No profile path provided. Running without profile.
+2025-04-10 23:22:06:735 [INFO] [PHY] [network_emulator.cpp:127] Virtual interfaces created and configured successfully
+2025-04-10 23:22:06:735 [INFO] [PHY] [network_emulator.cpp:47] Press any key to start traffic shaping...
+2025-04-10 23:24:56:691 [INFO] [main] [main.cpp:19] Received signal 2, cleaning up...
+2025-04-10 23:24:57:008 [INFO] [PHY] [network_emulator.cpp:157] Virtual interfaces deleted and cleaned up
+2025-04-10 23:24:57:008 [INFO] [PHY] [network_emulator.cpp:20] NetworkEmulator destroyed
+2025-04-10 23:24:57:008 [INFO] [main] [main.cpp:23] Exiting with signal 2
