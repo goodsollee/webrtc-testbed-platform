@@ -215,14 +215,26 @@ void Sender::RunCustom() {
   }
 }
 
-void Sender::WaitForBufferSpace(Conductor::TrafficKind kind) {
+void Sender::WaitForBufferSpace() {
+  if (!conductor_) {
+    return;
+  }
+
+  const auto kind = static_cast<Conductor::TrafficKind>(kind_);
+
   // Wait until the buffer has drained sufficiently
   while (running_.load()) {
+    if (!conductor_->IsFlowOpen(kind)) {
+      // Flow closed temporarily; avoid tight loop and allow re-check later.
+      std::this_thread::sleep_for(std::chrono::milliseconds(kBufferCheckIntervalMs));
+      continue;
+    }
+
     uint64_t buffered = conductor_->BufferedAmount(kind);
     if (buffered < kMaxBufferedBytes) {
       break;  // Buffer has space, proceed
     }
-    
+
     // Buffer is full, wait a bit for it to drain
     std::this_thread::sleep_for(std::chrono::milliseconds(kBufferCheckIntervalMs));
   }
@@ -268,15 +280,12 @@ void Sender::SendFile(size_t file_bytes) {
   size_t chunks_sent = 0;
   size_t bytes_sent = 0;
   
-  // Track buffer warnings
-  int buffer_wait_count = 0;
-
   for (size_t chunk_index = 0; chunk_index < chunk_count && running_.load();
        ++chunk_index) {
-    
+
     // CRITICAL: Check buffer before sending each chunk
     auto kind_enum = static_cast<Conductor::TrafficKind>(kind_);
-    WaitForBufferSpace(kind_enum);
+    WaitForBufferSpace();
     
     const auto chunk_time = clock::now();
     const uint64_t send_time_ms =
