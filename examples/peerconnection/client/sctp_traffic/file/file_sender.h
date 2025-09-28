@@ -12,9 +12,8 @@
 #include <vector>
 
 #include "examples/peerconnection/client/sctp_traffic/file/file_message.h"
-#include "examples/peerconnection/client/conductor.h"  // Need full declaration for TrafficKind
 
-class Conductor;  // Forward declaration still needed
+class Conductor;  // Forward declaration for pointer member
 
 namespace sctp::file {
 
@@ -45,7 +44,7 @@ class Sender {
   void RunPeriodic();
   void RunCustom();                 // absolute-time scheduler
   void LoadTrace(const std::string& path);  // parses time_ms,size
-  void WaitForBufferSpace(Conductor::TrafficKind kind);  // Added: flow control method
+  void WaitForBufferSpace();  // Flow control helper
   
   struct LogEntry {
     double timestamp_ms = 0.0;
