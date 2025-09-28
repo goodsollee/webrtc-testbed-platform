@@ -1,6 +1,9 @@
 #pragma once
 
 #include <atomic>
+#include <chrono>
+#include <fstream>
+#include <mutex>
 #include <string>
 #include <thread>
 #include <utility>
@@ -28,6 +31,8 @@ class Sender {
   void RunPeriodic();
   void RunCustom();                 // absolute-time scheduler
   void LoadTrace(const std::string& path);  // parses time_ms,size
+  void LogSendEvent(size_t bytes);
+  std::string MakeLogPath() const;
 
   Conductor* conductor_ = nullptr;
   int kind_;
@@ -40,6 +45,13 @@ class Sender {
   std::thread worker_;
   std::atomic<bool> running_{false};
   Mode mode_;
+
+  std::mutex log_mutex_;
+  std::ofstream csv_log_;
+  bool log_started_ = false;
+  std::chrono::steady_clock::time_point log_start_time_;
+  std::string log_path_;
+  uint64_t total_bytes_sent_ = 0;
 };
 
 }  // namespace sctp::file

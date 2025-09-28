@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <cstdint>
 #include <fstream>
 #include <mutex>
@@ -30,9 +31,10 @@ class Receiver final : public sctp::Receiver {
   std::string output_dir_;
 
   std::mutex state_mutex_;
-  std::ofstream output_file_;
+  std::ofstream csv_file_;
   uint64_t total_bytes_ = 0;
-  uint64_t next_log_threshold_ = 1 << 20;  // 1 MiB steps.
+  bool log_started_ = false;
+  std::chrono::steady_clock::time_point start_time_;
 };
 
 }  // namespace sctp::file

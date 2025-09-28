@@ -2,6 +2,9 @@
 
 #include <algorithm>
 #include <cctype>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
 #include <utility>
 
 #include "absl/types/span.h"
@@ -23,13 +26,17 @@ void Receiver::Attach(Conductor& c) {
 
   const std::string path = MakeOutputPath();
   if (!path.empty()) {
-    output_file_.open(path, std::ios::binary | std::ios::out | std::ios::trunc);
-    if (!output_file_.is_open()) {
+    csv_file_.open(path, std::ios::out | std::ios::trunc);
+    if (!csv_file_.is_open()) {
       RTC_LOG(LS_WARNING) << "[SCTP][FILE] Failed to open output file: "
                           << path;
+      std::cout << "[SCTP][FILE][Receiver] Failed to open performance log file '"
+                << path << "'" << std::endl;
     } else {
-      RTC_LOG(LS_INFO) << "[SCTP][FILE] Receiving '" << label_
-                       << "' into " << path;
+      csv_file_ << "timestamp_ms,chunk_bytes,total_bytes\n";
+      csv_file_.flush();
+      std::cout << "[SCTP][FILE][Receiver] Logging performance for '" << label_
+                << "' to '" << path << "'" << std::endl;
     }
   }
 
@@ -46,13 +53,14 @@ void Receiver::Detach() {
   }
   conductor_ = nullptr;
 
-  if (output_file_.is_open()) {
-    RTC_LOG(LS_INFO) << "[SCTP][FILE] Total bytes received for '" << label_
-                     << "': " << total_bytes_;
-    output_file_.close();
+  if (csv_file_.is_open()) {
+    csv_file_.flush();
+    csv_file_.close();
   }
+  std::cout << "[SCTP][FILE][Receiver] Total bytes received for '" << label_
+            << "': " << total_bytes_ << std::endl;
   total_bytes_ = 0;
-  next_log_threshold_ = 1 << 20;
+  log_started_ = false;
 }
 
 void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
@@ -60,22 +68,32 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
     return;
   }
 
-  std::lock_guard<std::mutex> lock(state_mutex_);
-  if (!output_file_.is_open()) {
-    total_bytes_ += bytes.size();
-    return;
+  double timestamp_ms = 0.0;
+  uint64_t total_bytes = 0;
+  const size_t chunk_size = bytes.size();
+  {
+    std::lock_guard<std::mutex> lock(state_mutex_);
+    const auto now = std::chrono::steady_clock::now();
+    if (!log_started_) {
+      start_time_ = now;
+      log_started_ = true;
+    }
+    timestamp_ms =
+        std::chrono::duration<double, std::milli>(now - start_time_).count();
+    total_bytes_ += chunk_size;
+    total_bytes = total_bytes_;
+    if (csv_file_.is_open()) {
+      csv_file_ << std::fixed << std::setprecision(3) << timestamp_ms << ","
+                << chunk_size << "," << total_bytes << "\n";
+      csv_file_.flush();
+    }
   }
 
-  output_file_.write(reinterpret_cast<const char*>(bytes.data()),
-                     bytes.size());
-
-  total_bytes_ += bytes.size();
-  if (total_bytes_ >= next_log_threshold_) {
-    RTC_LOG(LS_INFO) << "[SCTP][FILE] Received " << total_bytes_
-                     << " bytes for '" << label_ << "'";
-    output_file_.flush();
-    next_log_threshold_ += (1 << 20);
-  }
+  std::ostringstream oss;
+  oss << "[SCTP][FILE][Receiver] label='" << label_ << "' time_ms="
+      << std::fixed << std::setprecision(3) << timestamp_ms
+      << " chunk_bytes=" << chunk_size << " total_bytes=" << total_bytes;
+  std::cout << oss.str() << std::endl;
 }
 
 std::string Receiver::MakeOutputPath() const {
@@ -93,13 +111,13 @@ std::string Receiver::MakeOutputPath() const {
   }
 
   if (output_dir_.empty()) {
-    return base + "_rx.bin";
+    return base + "_rx.csv";
   }
   std::string path = output_dir_;
   if (!path.empty() && path.back() != '/' && path.back() != '\\') {
     path.push_back('/');
   }
-  path += base + "_rx.bin";
+  path += base + "_rx.csv";
   return path;
 }
 
