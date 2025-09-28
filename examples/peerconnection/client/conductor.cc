@@ -12,6 +12,7 @@
 #include "examples/peerconnection/client/websocket_client.h"
 
 #include <stddef.h>
+#include <cmath>
 #include <filesystem>
 #include <memory>
 #include <optional>
@@ -43,6 +44,7 @@
 #include "api/rtp_receiver_interface.h"
 #include "api/rtp_sender_interface.h"
 #include "api/scoped_refptr.h"
+#include "api/sctp_transport_interface.h"
 #include "api/task_queue/default_task_queue_factory.h"
 #include "api/task_queue/task_queue_factory.h"
 #include "api/test/create_frame_generator.h"
@@ -1754,13 +1756,32 @@ size_t Conductor::MaxSctpMessageSize(TrafficKind kind) const {
   if (it == flows_.end() || !it->second.channel) {
     return 0;
   }
-  const uint64_t max_size = it->second.channel->max_message_size();
-  if (max_size == 0) {
+  if (!peer_connection_) {
     return 0;
   }
-  return max_size > std::numeric_limits<size_t>::max()
-             ? std::numeric_limits<size_t>::max()
-             : static_cast<size_t>(max_size);
+  rtc::scoped_refptr<webrtc::SctpTransportInterface> transport =
+      peer_connection_->GetSctpTransport();
+  if (!transport) {
+    return 0;
+  }
+
+  std::optional<double> max_size_opt = transport->Information().MaxMessageSize();
+  if (!max_size_opt.has_value()) {
+    return 0;
+  }
+
+  double max_size_value = *max_size_opt;
+  if (max_size_value <= 0) {
+    return 0;
+  }
+
+  const double kSizeTMaxAsDouble =
+      static_cast<double>(std::numeric_limits<size_t>::max());
+  if (!std::isfinite(max_size_value) || max_size_value >= kSizeTMaxAsDouble) {
+    return std::numeric_limits<size_t>::max();
+  }
+
+  return static_cast<size_t>(max_size_value);
 }
 
 void Conductor::DumpActiveRtpParameters() {
