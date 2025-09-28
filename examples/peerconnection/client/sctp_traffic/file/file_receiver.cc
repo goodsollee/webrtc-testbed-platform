@@ -201,9 +201,11 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
     pending.latest_send_time_ms = std::max(pending.latest_send_time_ms, send_time_ms);
     pending.last_arrival_time_ms = arrival_time_ms;
 
+    // per-chunk logs
+    /*
     std::cout << "Received bytes: " << pending.received_bytes 
               << " chunks: " << pending.chunks_received 
-              << "/" << pending.chunk_count << std::endl;
+              << "/" << pending.chunk_count << std::endl;*/
 
     // Check if all chunks have been received
     if (pending.chunks_received < pending.chunk_count) {

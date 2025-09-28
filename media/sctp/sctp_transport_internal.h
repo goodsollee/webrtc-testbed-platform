@@ -30,7 +30,7 @@ namespace cricket {
 
 // Constants that are important to API users
 // The size of the SCTP association send buffer. 256kB, the usrsctp default.
-constexpr int kSctpSendBufferSize = 256 * 1024;
+constexpr int kSctpSendBufferSize = 32 * 1024 * 1024;
 
 // The number of outgoing streams that we'll negotiate. Since stream IDs (SIDs)
 // are 0-based, the highest usable SID is 1023.

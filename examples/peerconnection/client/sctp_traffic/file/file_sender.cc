@@ -328,6 +328,9 @@ void Sender::MaybeLogProgress(
     return;
   }
 
+
+  // Per-chunk logs
+  /*
   const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
       chunk_time - current_file_start_time_);
   double rate_mbps = 0.0;
@@ -344,7 +347,7 @@ void Sender::MaybeLogProgress(
       << "rate=" << std::setprecision(1) << rate_mbps << "Mbps "
       << "buffer=" << current_buffer
       << " limit=" << high_water_mark_bytes_;
-  std::cout << oss.str() << std::endl;
+  std::cout << oss.str() << std::endl; */
 }
 
 void Sender::SendFileBatched(size_t file_bytes) {
