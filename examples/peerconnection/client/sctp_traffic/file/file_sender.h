@@ -2,8 +2,10 @@
 
 #include <atomic>
 #include <chrono>
+#include <condition_variable>
 #include <cstddef>
 #include <cstdint>
+#include <deque>
 #include <fstream>
 #include <mutex>
 #include <string>
@@ -56,16 +58,26 @@ class Sender {
   void RunPeriodic();
   void RunCustom();
   void LoadTrace(const std::string& path);
-  
+
   // Core transmission methods
   void SendFileBatched(size_t file_bytes);
-  bool WaitForBufferSpace();
+  void PumpMoreData();
+  void MaybeLogProgress(size_t chunk_count,
+                        size_t chunks_sent,
+                        uint64_t bytes_sent,
+                        uint64_t current_buffer,
+                        std::chrono::steady_clock::time_point chunk_time);
   bool IsFlowReady();
-  
+
   // Utility methods
   std::vector<uint8_t> BuildChunkPayload(const PayloadMetadata& metadata);
   void LogSendEvent(const PayloadMetadata& metadata);
   std::string MakeLogPath() const;
+
+  struct PendingChunk {
+    std::vector<uint8_t> payload;
+    PayloadMetadata metadata;
+  };
 
   // Core state
   Conductor* conductor_ = nullptr;
@@ -77,6 +89,22 @@ class Sender {
   std::atomic<bool> running_{false};
   Mode mode_;
   bool high_speed_mode_ = true;
+
+  // Queue management
+  std::mutex queue_mutex_;
+  std::condition_variable queue_cv_;
+  std::deque<PendingChunk> pending_chunks_;
+  bool pump_active_ = false;
+  uint64_t high_water_mark_bytes_ = Config::MAX_BUFFER_THRESHOLD;
+  uint64_t low_water_mark_bytes_ = Config::MAX_BUFFER_THRESHOLD / 2;
+  bool callback_registered_ = false;
+
+  // In-flight transfer tracking
+  size_t current_chunk_count_ = 0;
+  size_t current_chunks_sent_ = 0;
+  uint64_t current_bytes_sent_ = 0;
+  std::chrono::steady_clock::time_point current_file_start_time_;
+  size_t last_progress_logged_chunk_ = 0;
 
   // Performance tracking
   uint64_t total_data_bytes_sent_ = 0;
