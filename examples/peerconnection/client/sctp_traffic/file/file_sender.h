@@ -100,14 +100,15 @@ class Sender {
   struct TokenBucketConfig {
     int burst_window_ms = 200;
     size_t min_bucket_bytes = 64 * 1024;
-    size_t max_bucket_bytes = 8 * 1024 * 1024;
-    int max_sleep_ms = 5;
+    size_t max_bucket_bytes = 32 * 1024 * 1024;
+    size_t min_burst_chunks = 4;
   };
   TokenBucketConfig token_bucket_config_;
   bool rate_limiter_enabled_ = false;
   double current_target_bitrate_bps_ = 0.0;
   double rate_bucket_bytes_ = 0.0;
   size_t rate_bucket_capacity_bytes_ = 0;
+  double bucket_fill_rate_bytes_per_second_ = 0.0;
   std::chrono::steady_clock::time_point last_rate_update_time_;
   bool rate_bucket_initialized_ = false;
   double last_logged_target_bps_ = 0.0;

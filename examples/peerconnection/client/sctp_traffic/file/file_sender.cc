@@ -9,6 +9,7 @@
 #include <sstream>
 #include <thread>
 #include <cmath>
+#include <limits>
 
 #include "absl/types/span.h"
 #include "examples/peerconnection/client/conductor.h"
@@ -313,19 +314,29 @@ void Sender::ResetRateLimiter(size_t max_chunk_payload, size_t file_bytes) {
     rate_limiter_enabled_ = false;
     rate_bucket_bytes_ = 0.0;
     rate_bucket_capacity_bytes_ = 0;
+    bucket_fill_rate_bytes_per_second_ = 0.0;
     rate_bucket_initialized_ = false;
     return;
   }
 
   rate_limiter_enabled_ = true;
+  bucket_fill_rate_bytes_per_second_ = current_target_bitrate_bps_ / 8.0;
 
   const double burst_seconds =
       std::max(token_bucket_config_.burst_window_ms, 1) / 1000.0;
   size_t burst_from_rate = static_cast<size_t>(
       (current_target_bitrate_bps_ * burst_seconds) / 8.0);
 
+  size_t chunk_based_capacity = max_chunk_payload;
+  if (max_chunk_payload > 0 && token_bucket_config_.min_burst_chunks > 1) {
+    const uint64_t scaled = static_cast<uint64_t>(max_chunk_payload) *
+        static_cast<uint64_t>(token_bucket_config_.min_burst_chunks);
+    chunk_based_capacity = static_cast<size_t>(
+        std::min<uint64_t>(scaled, std::numeric_limits<size_t>::max()));
+  }
+
   rate_bucket_capacity_bytes_ = std::max({
-      max_chunk_payload,
+      chunk_based_capacity,
       token_bucket_config_.min_bucket_bytes,
       burst_from_rate});
 
@@ -372,16 +383,49 @@ bool Sender::ConsumeRateBudget(size_t chunk_bytes) {
     return true;
   }
 
-  UpdateRateBudget(clock::now());
+  const auto now = clock::now();
+  UpdateRateBudget(now);
 
-  while (running_.load() && rate_bucket_bytes_ + 1e-9 < chunk_bytes) {
+  if (rate_bucket_bytes_ + 1e-6 < chunk_bytes) {
+    const double fill_rate = bucket_fill_rate_bytes_per_second_;
+    if (fill_rate <= 0.0) {
+      return false;
+    }
+
     const double deficit = static_cast<double>(chunk_bytes) - rate_bucket_bytes_;
-    const double wait_seconds =
-        deficit * 8.0 / std::max(current_target_bitrate_bps_, 1.0);
-    int wait_ms = static_cast<int>(std::ceil(wait_seconds * 1000.0));
-    wait_ms = std::clamp(wait_ms, 1, token_bucket_config_.max_sleep_ms);
-    std::this_thread::sleep_for(std::chrono::milliseconds(wait_ms));
-    UpdateRateBudget(clock::now());
+    const double wait_seconds = deficit / fill_rate;
+    if (wait_seconds > 0.0) {
+      auto wait_duration = std::chrono::duration<double>(wait_seconds);
+      auto wait_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(wait_duration);
+      if (wait_ns.count() <= 0) {
+        wait_ns = std::chrono::nanoseconds(1);
+      }
+
+      const auto wait_start = clock::now();
+      const auto target_time = wait_start + wait_ns;
+      std::this_thread::sleep_until(target_time);
+      UpdateRateBudget(clock::now());
+
+      if (rate_bucket_bytes_ + 1e-6 < chunk_bytes) {
+        const double remaining_deficit =
+            static_cast<double>(chunk_bytes) - rate_bucket_bytes_;
+        if (remaining_deficit > 0.0) {
+          const double additional_wait = remaining_deficit / fill_rate;
+          if (additional_wait > 0.0) {
+            auto additional_duration =
+                std::chrono::duration<double>(additional_wait);
+            auto additional_ns =
+                std::chrono::duration_cast<std::chrono::nanoseconds>(additional_duration);
+            if (additional_ns.count() <= 0) {
+              additional_ns = std::chrono::nanoseconds(1);
+            }
+            const auto additional_target = clock::now() + additional_ns;
+            std::this_thread::sleep_until(additional_target);
+            UpdateRateBudget(clock::now());
+          }
+        }
+      }
+    }
   }
 
   if (!running_.load()) {
