@@ -54,7 +54,7 @@ PriorityValue DataChannelInterface::priority() const {
 }
 
 uint64_t DataChannelInterface::MaxSendQueueSize() {
-  return 16 * 1024 * 1024;  // 16 MiB
+  return 40 * 1024 * 1024;  // 16 MiB
 }
 
 // TODO(tommi): Remove method once downstream implementations have been removed.
