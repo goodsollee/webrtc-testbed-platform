@@ -15,7 +15,7 @@ namespace sctp::file {
 // Receives SCTP "file" traffic and optionally persists it to disk.
 class Receiver final : public sctp::Receiver {
  public:
-  Receiver(int kind, std::string label, std::string output_dir);
+  Receiver(int kind, std::string label, std::string output_dir, int slo_ms);
   ~Receiver() override;
 
   void Attach(Conductor& c) override;
@@ -29,12 +29,17 @@ class Receiver final : public sctp::Receiver {
   int kind_;
   std::string label_;
   std::string output_dir_;
+  int slo_ms_;
 
   std::mutex state_mutex_;
   std::ofstream csv_file_;
-  uint64_t total_bytes_ = 0;
+  uint64_t total_data_bytes_ = 0;
+  uint64_t total_files_received_ = 0;
+  uint64_t slo_met_count_ = 0;
   bool log_started_ = false;
   std::chrono::steady_clock::time_point start_time_;
+  bool sender_time_initialized_ = false;
+  uint64_t first_sender_timestamp_ms_ = 0;
 };
 
 }  // namespace sctp::file
