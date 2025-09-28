@@ -1742,7 +1742,7 @@ bool Conductor::SendPayload(TrafficKind kind, absl::Span<const uint8_t> data) {
     return true;
   }
 
-  constexpr uint64_t kLowWaterMark = 512 * 1024;   // 512 KB
+  constexpr uint64_t kLowWaterMark = 4096 * 1024;   // 512 KB
   constexpr auto kInitialSleep = std::chrono::milliseconds(1);
   constexpr auto kMaxSleep = std::chrono::milliseconds(50);
   constexpr auto kMaxRetryWindow = std::chrono::seconds(15);

@@ -216,24 +216,53 @@ bool Sender::WaitForBufferSpace() {
     return true;
   }
   
-  // Wait for buffer to drain with minimal overhead
+  std::cout << "[SCTP][FILE][Sender] High buffer detected: " << buffered 
+            << " bytes, waiting for drain..." << std::endl;
+  
+  // Wait for buffer to drain with exponential backoff
+  auto start_time = std::chrono::steady_clock::now();
+  const auto max_wait_time = std::chrono::seconds(30); // Maximum wait time
+  
   int wait_count = 0;
+  auto wait_duration = std::chrono::microseconds(100);
+  const auto max_wait_duration = std::chrono::microseconds(10000); // 10ms in microseconds
+  
   while (running_.load() && buffered >= Config::MAX_BUFFER_THRESHOLD) {
-    if (!conductor_->IsFlowOpen(kind)) {
+    // Check if we've exceeded maximum wait time
+    auto elapsed = std::chrono::steady_clock::now() - start_time;
+    if (elapsed > max_wait_time) {
+      std::cout << "[SCTP][FILE][Sender] Buffer wait timeout after " 
+                << std::chrono::duration_cast<std::chrono::seconds>(elapsed).count() 
+                << " seconds" << std::endl;
       return false;
     }
     
-    // Progressive backoff: yield first, then short sleeps
-    if (wait_count < 10) {
-      std::this_thread::yield();
-    } else if (wait_count < 100) {
-      std::this_thread::sleep_for(std::chrono::microseconds(10));
-    } else {
-      std::this_thread::sleep_for(std::chrono::microseconds(100));
+    if (!conductor_->IsFlowOpen(kind)) {
+      std::cout << "[SCTP][FILE][Sender] Flow closed during buffer wait" << std::endl;
+      return false;
+    }
+    
+    // Progressive backoff with cap
+    std::this_thread::sleep_for(wait_duration);
+    if (wait_duration < max_wait_duration) {
+      wait_duration = std::min(wait_duration * 2, max_wait_duration);
     }
     
     wait_count++;
-    buffered = conductor_->BufferedAmount(kind);
+    
+    // Log progress every second
+    if (wait_count % 100 == 0) {
+      buffered = conductor_->BufferedAmount(kind);
+      std::cout << "[SCTP][FILE][Sender] Still waiting, buffer: " << buffered 
+                << " bytes (target: < " << Config::MAX_BUFFER_THRESHOLD << ")" << std::endl;
+    } else {
+      buffered = conductor_->BufferedAmount(kind);
+    }
+  }
+  
+  if (buffered < Config::MAX_BUFFER_THRESHOLD) {
+    std::cout << "[SCTP][FILE][Sender] Buffer drained, proceeding. Final buffer: " 
+              << buffered << " bytes" << std::endl;
   }
   
   return running_.load();
@@ -253,7 +282,7 @@ void Sender::SendFileBatched(size_t file_bytes) {
   const uint64_t sequence = next_sequence_++;
   const auto file_send_start_time = now;
   
-  // Calculate chunk parameters
+  // Use large chunks for maximum throughput efficiency
   size_t max_message = conductor_->MaxSctpMessageSize(
       static_cast<Conductor::TrafficKind>(kind_));
   
@@ -262,15 +291,14 @@ void Sender::SendFileBatched(size_t file_bytes) {
     max_chunk_payload = max_message - kFileChunkHeaderSize - 1;
   }
   if (max_chunk_payload == 0) {
-    max_chunk_payload = 65536; // Default 64KB chunks
+    max_chunk_payload = 256 * 1024; // 256KB fallback - much larger than 32KB
   }
   
-  // Ensure chunk size is reasonable for high throughput
-  max_chunk_payload = std::min(max_chunk_payload, static_cast<size_t>(1024 * 1024)); // Max 1MB per chunk
-
+  // Use large chunks but cap at reasonable size for memory
+  max_chunk_payload = std::min(max_chunk_payload, static_cast<size_t>(512 * 1024)); // 512KB max
   size_t chunk_count = (file_bytes + max_chunk_payload - 1) / max_chunk_payload;
 
-  std::cout << "[SCTP][FILE][Sender] HIGH-SPEED transmission: "
+  std::cout << "[SCTP][FILE][Sender] HIGH-THROUGHPUT transmission: "
             << "seq=" << sequence
             << " file_bytes=" << file_bytes
             << " chunks=" << chunk_count
@@ -278,86 +306,139 @@ void Sender::SendFileBatched(size_t file_bytes) {
 
   const auto kind_enum = static_cast<Conductor::TrafficKind>(kind_);
   
-  // Pre-allocate buffers for maximum performance
+  // Pre-allocate buffers
   std::vector<uint8_t> payload_buffer;
   payload_buffer.reserve(kFileChunkHeaderSize + max_chunk_payload);
   
   size_t chunks_sent = 0;
   size_t bytes_sent = 0;
-
-  for (size_t chunk_index = 0; chunk_index < chunk_count && running_.load(); ) {
+  
+  // Adaptive flow control based on observed receiver capacity
+  // Start conservative and adapt based on actual performance
+  uint64_t adaptive_buffer_limit = 256 * 1024;  // Start at 256KB
+  const uint64_t min_buffer_limit = 128 * 1024;  // Never go below 128KB
+  const uint64_t max_buffer_limit = 2 * 1024 * 1024;  // Never exceed 2MB
+  
+  // Performance tracking for adaptation
+  auto last_successful_batch = clock::now();
+  size_t consecutive_successes = 0;
+  size_t consecutive_waits = 0;
+  
+  for (size_t chunk_index = 0; chunk_index < chunk_count && running_.load(); ++chunk_index) {
     
-    // Check buffer space periodically, not every chunk
-    if (chunk_index % Config::BUFFER_CHECK_INTERVAL == 0) {
-      if (!WaitForBufferSpace()) {
-        std::cout << "[SCTP][FILE][Sender] Buffer wait failed, stopping transmission" << std::endl;
-        break;
-      }
+    // Check flow status
+    if (!conductor_->IsFlowOpen(kind_enum)) {
+      std::cout << "[SCTP][FILE][Sender] Flow closed, aborting transmission" << std::endl;
+      break;
     }
     
-    // Calculate dynamic batch size based on remaining chunks
-    size_t remaining_chunks = chunk_count - chunk_index;
-    size_t current_batch_size = std::min({
-        Config::MAX_BATCH_SIZE,
-        remaining_chunks,
-        static_cast<size_t>(high_speed_mode_ ? Config::MAX_BATCH_SIZE : Config::MIN_BATCH_SIZE)
-    });
+    // Get current buffer level
+    uint64_t current_buffer = conductor_->BufferedAmount(kind_enum);
     
-    size_t batch_end = chunk_index + current_batch_size;
-    
-    // Send entire batch without interruption for maximum throughput
-    for (size_t i = chunk_index; i < batch_end && running_.load(); ++i) {
-      const size_t remaining_bytes = file_bytes - bytes_sent;
-      const size_t chunk_bytes = std::min(max_chunk_payload, remaining_bytes);
-
-      const auto chunk_time = clock::now();
-      const uint64_t send_time_ms =
-          std::chrono::duration_cast<std::chrono::milliseconds>(
-              chunk_time - flow_start_time_).count();
-
-      // Build payload with pre-allocated buffer
-      payload_buffer.clear();
-      payload_buffer.resize(kFileChunkHeaderSize + chunk_bytes, 0);
+    // Adaptive buffer management
+    if (current_buffer >= adaptive_buffer_limit) {
+      consecutive_waits++;
+      consecutive_successes = 0;
       
-      FileChunkHeader header;
-      header.sequence = sequence;
-      header.send_time_ms = send_time_ms;
-      header.file_size_bytes = file_bytes;
-      header.chunk_size_bytes = chunk_bytes;
-      header.chunk_index = static_cast<uint32_t>(i);
-      header.chunk_count = static_cast<uint32_t>(chunk_count);
-      
-      WriteFileChunkHeader(payload_buffer.data(), header);
-      
-      // Send immediately
-      if (!conductor_->SendPayload(
-              kind_enum, absl::Span<const uint8_t>(payload_buffer))) {
-        std::cout << "[SCTP][FILE][Sender] Send failed due to backpressure, "
-                  << "aborting sequence " << sequence << std::endl;
-        return;
-      }
-
-      // Reduced logging for performance
-      if (i % Config::LOG_INTERVAL == 0 || chunk_count < Config::LOG_INTERVAL) {
-        PayloadMetadata metadata;
-        metadata.sequence = sequence;
-        metadata.send_time_ms = send_time_ms;
-        metadata.file_bytes = file_bytes;
-        metadata.chunk_bytes = chunk_bytes;
-        metadata.chunk_index = static_cast<uint32_t>(i);
-        metadata.chunk_count = static_cast<uint32_t>(chunk_count);
-        LogSendEvent(metadata);
+      // If we're waiting too often, increase the buffer limit (receiver can handle more)
+      if (consecutive_waits >= 5 && adaptive_buffer_limit < max_buffer_limit) {
+        adaptive_buffer_limit = std::min(adaptive_buffer_limit * 2, max_buffer_limit);
+        std::cout << "[SCTP][FILE][Sender] Increased buffer limit to " << adaptive_buffer_limit << std::endl;
+        consecutive_waits = 0;
       }
       
+      // Calculate proportional wait time
+      double buffer_ratio = static_cast<double>(current_buffer) / adaptive_buffer_limit;
+      auto wait_time = std::chrono::microseconds(static_cast<int>(500 * buffer_ratio));
+      
+      std::cout << "[SCTP][FILE][Sender] Buffer=" << current_buffer 
+                << "/" << adaptive_buffer_limit 
+                << ", waiting " << wait_time.count() << "us" << std::endl;
+      
+      std::this_thread::sleep_for(wait_time);
+      --chunk_index;  // Retry this chunk
+      continue;
+    }
+    
+    // Build and send chunk
+    const size_t chunk_start_byte = chunk_index * max_chunk_payload;
+    const size_t remaining_bytes = file_bytes - chunk_start_byte;
+    const size_t chunk_bytes = std::min(max_chunk_payload, remaining_bytes);
+
+    const auto chunk_time = clock::now();
+    const uint64_t send_time_ms =
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+            chunk_time - flow_start_time_).count();
+
+    // Build payload
+    payload_buffer.clear();
+    payload_buffer.resize(kFileChunkHeaderSize + chunk_bytes, 0);
+    
+    FileChunkHeader header;
+    header.sequence = sequence;
+    header.send_time_ms = send_time_ms;
+    header.file_size_bytes = file_bytes;
+    header.chunk_size_bytes = chunk_bytes;
+    header.chunk_index = static_cast<uint32_t>(chunk_index);
+    header.chunk_count = static_cast<uint32_t>(chunk_count);
+    
+    WriteFileChunkHeader(payload_buffer.data(), header);
+    
+    // Attempt to send
+    if (conductor_->SendPayload(kind_enum, absl::Span<const uint8_t>(payload_buffer))) {
+      // Success
       ++chunks_sent;
       bytes_sent += chunk_bytes;
-    }
-
-    chunk_index = batch_end;
-    
-    // Minimal yield only for very large batches
-    if (current_batch_size >= 1000) {
-      std::this_thread::yield();
+      consecutive_successes++;
+      consecutive_waits = 0;
+      last_successful_batch = chunk_time;
+      
+      // If we're consistently successful with low buffer usage, we can be more aggressive
+      if (consecutive_successes >= 10 && current_buffer < adaptive_buffer_limit / 4) {
+        if (adaptive_buffer_limit > min_buffer_limit) {
+          // Don't increase too aggressively - receiver might not keep up
+          adaptive_buffer_limit = std::max(adaptive_buffer_limit * 9 / 10, min_buffer_limit);
+          std::cout << "[SCTP][FILE][Sender] Decreased buffer limit to " << adaptive_buffer_limit 
+                    << " for higher throughput" << std::endl;
+        }
+        consecutive_successes = 0;
+      }
+      
+      // Log progress
+      if (chunk_index % std::max(static_cast<size_t>(1), chunk_count / 20) == 0 || chunk_index == chunk_count - 1) {
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+            chunk_time - file_send_start_time);
+        double rate_mbps = 0.0;
+        if (elapsed.count() > 0) {
+          rate_mbps = (bytes_sent * 8.0 / 1000000.0) / (elapsed.count() / 1000.0);
+        }
+        
+        std::cout << "[SCTP][FILE][Sender] Progress: " << chunks_sent << "/" << chunk_count 
+                  << " (" << std::fixed << std::setprecision(1) 
+                  << (100.0 * chunks_sent / chunk_count) << "%) "
+                  << "rate=" << std::setprecision(1) << rate_mbps << "Mbps "
+                  << "buffer=" << current_buffer 
+                  << " limit=" << adaptive_buffer_limit << std::endl;
+      }
+      
+      // Minimal pacing - only when buffer is getting high
+      if (current_buffer > adaptive_buffer_limit / 2) {
+        std::this_thread::sleep_for(std::chrono::microseconds(100));
+      }
+      
+    } else {
+      // Send failed - this indicates the buffer is really full
+      std::cout << "[SCTP][FILE][Sender] Send failed for chunk " << chunk_index 
+                << ", buffer=" << current_buffer << std::endl;
+      
+      // Reduce buffer limit since we hit resistance
+      adaptive_buffer_limit = std::max(adaptive_buffer_limit / 2, min_buffer_limit);
+      std::cout << "[SCTP][FILE][Sender] Reduced buffer limit to " << adaptive_buffer_limit << std::endl;
+      
+      // Wait and retry
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+      --chunk_index;
+      continue;
     }
   }
 
@@ -371,13 +452,16 @@ void Sender::SendFileBatched(size_t file_bytes) {
     effective_rate_mbps = (bytes_sent * 8.0 / 1000000.0) / (total_duration_ms / 1000.0);
   }
 
+  double completion_rate = (100.0 * chunks_sent / chunk_count);
+  
   std::cout << "[SCTP][FILE][Sender] COMPLETED: "
             << "seq=" << sequence  
             << " chunks=" << chunks_sent << "/" << chunk_count
-            << " bytes=" << bytes_sent
+            << " (" << std::fixed << std::setprecision(1) << completion_rate << "%) "
+            << " bytes=" << bytes_sent << "/" << file_bytes
             << " duration_ms=" << total_duration_ms
-            << " rate_mbps=" << std::fixed << std::setprecision(2) << effective_rate_mbps
-            << std::endl;
+            << " rate_mbps=" << std::setprecision(2) << effective_rate_mbps
+            << " final_buffer_limit=" << adaptive_buffer_limit << std::endl;
 }
 
 std::vector<uint8_t> Sender::BuildChunkPayload(const PayloadMetadata& metadata) {
