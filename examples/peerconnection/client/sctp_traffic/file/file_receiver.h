@@ -5,6 +5,7 @@
 #include <mutex>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "examples/peerconnection/client/sctp_traffic/traffic.h"
 #include "examples/peerconnection/client/sctp_traffic/file/file_message.h"
@@ -29,7 +30,9 @@ class Receiver final : public sctp::Receiver {
   struct PendingFile {
     uint64_t file_size_bytes = 0;
     uint32_t chunk_count = 0;
-    uint32_t next_chunk_index = 0;
+    // Removed: uint32_t next_chunk_index = 0;  // This enforced sequential ordering
+    uint32_t chunks_received = 0;  // Added: Count of chunks received so far
+    std::vector<bool> received_chunks;  // Added: Bitmap to track which chunks we've received
     uint64_t received_bytes = 0;
     uint64_t latest_send_time_ms = 0;
     int64_t last_arrival_time_ms = 0;
@@ -55,4 +58,3 @@ class Receiver final : public sctp::Receiver {
 };
 
 }  // namespace sctp::file
-

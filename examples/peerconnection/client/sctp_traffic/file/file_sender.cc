@@ -43,6 +43,11 @@ static bool ParseIntStrict(const std::string& s, int& out) {
 
 namespace sctp::file {
 
+// Buffer threshold - when buffer exceeds this, wait for it to drain
+// This is conservative to avoid overwhelming the channel
+static constexpr uint64_t kMaxBufferedBytes = 16 * 1024 * 1024;  // 16MB buffer limit
+static constexpr int kBufferCheckIntervalMs = 1;  // Check buffer every 1ms when waiting
+
 Sender::Sender(int kind, int file_size, int periodicity_ms)
     : kind_(kind), file_size_(file_size), periodicity_ms_(periodicity_ms),
       mode_(Mode::kPeriodic) {}
@@ -210,6 +215,19 @@ void Sender::RunCustom() {
   }
 }
 
+void Sender::WaitForBufferSpace(Conductor::TrafficKind kind) {
+  // Wait until the buffer has drained sufficiently
+  while (running_.load()) {
+    uint64_t buffered = conductor_->BufferedAmount(kind);
+    if (buffered < kMaxBufferedBytes) {
+      break;  // Buffer has space, proceed
+    }
+    
+    // Buffer is full, wait a bit for it to drain
+    std::this_thread::sleep_for(std::chrono::milliseconds(kBufferCheckIntervalMs));
+  }
+}
+
 void Sender::SendFile(size_t file_bytes) {
   using clock = std::chrono::steady_clock;
   if (file_bytes == 0) {
@@ -248,10 +266,18 @@ void Sender::SendFile(size_t file_bytes) {
   Sender::LogEntry last_entry;
   PayloadMetadata last_metadata;
   size_t chunks_sent = 0;
-
   size_t bytes_sent = 0;
+  
+  // Track buffer warnings
+  int buffer_wait_count = 0;
+
   for (size_t chunk_index = 0; chunk_index < chunk_count && running_.load();
        ++chunk_index) {
+    
+    // CRITICAL: Check buffer before sending each chunk
+    auto kind_enum = static_cast<Conductor::TrafficKind>(kind_);
+    WaitForBufferSpace(kind_enum);
+    
     const auto chunk_time = clock::now();
     const uint64_t send_time_ms =
         std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -270,13 +296,20 @@ void Sender::SendFile(size_t file_bytes) {
     metadata.chunk_count = static_cast<uint32_t>(chunk_count);
 
     std::vector<uint8_t> payload = BuildChunkPayload(metadata);
-    conductor_->SendPayload(
-        static_cast<Conductor::TrafficKind>(kind_),
-        absl::Span<const uint8_t>(payload));
+    
+    // Send the chunk
+    conductor_->SendPayload(kind_enum, absl::Span<const uint8_t>(payload));
+    
     last_entry = LogSendEvent(metadata);
     last_metadata = metadata;
     ++chunks_sent;
     bytes_sent += chunk_bytes;
+    
+    // Optional: Add a small delay between chunks for very large files
+    // This helps prevent overwhelming the receiver even with buffer checks
+    if (chunk_count > 100 && chunk_index % 10 == 0) {
+      std::this_thread::sleep_for(std::chrono::microseconds(100));
+    }
   }
 
   if (chunks_sent == 0) {

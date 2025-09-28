@@ -6,6 +6,7 @@
 #include <iostream>
 #include <sstream>
 #include <utility>
+#include <vector>
 
 #include "absl/types/span.h"
 #include "examples/peerconnection/client/conductor.h"
@@ -138,6 +139,7 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
   bool completed_file = false;
   uint32_t chunk_count = header.chunk_count;
   uint64_t file_bytes = header.file_size_bytes;
+  
   {
     std::lock_guard<std::mutex> lock(state_mutex_);
     if (!log_started_) {
@@ -159,10 +161,16 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
     }
 
     PendingFile& pending = in_flight_files_[sequence];
-    if (pending.next_chunk_index == 0) {
+    
+    // First chunk for this sequence - initialize
+    if (pending.chunk_count == 0) {
       pending.file_size_bytes = file_bytes;
       pending.chunk_count = chunk_count;
+      pending.received_chunks.resize(chunk_count, false);
+      pending.chunks_received = 0;
     }
+    
+    // Validate header consistency
     if (pending.file_size_bytes != file_bytes ||
         pending.chunk_count != chunk_count) {
       RTC_LOG(LS_WARNING)
@@ -170,21 +178,35 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
       in_flight_files_.erase(sequence);
       return;
     }
-    if (header.chunk_index != pending.next_chunk_index) {
-      RTC_LOG(LS_WARNING) << "[SCTP][FILE] Unexpected chunk index "
+    
+    // Check for invalid chunk index
+    if (header.chunk_index >= pending.chunk_count) {
+      RTC_LOG(LS_WARNING) << "[SCTP][FILE] Invalid chunk index "
                           << header.chunk_index << " for sequence "
-                          << sequence;
+                          << sequence << " (max: " << pending.chunk_count - 1 << ")";
+      return;
+    }
+    
+    // Check for duplicate chunk
+    if (pending.received_chunks[header.chunk_index]) {
+      RTC_LOG(LS_VERBOSE) << "[SCTP][FILE] Duplicate chunk "
+                          << header.chunk_index << " for sequence " << sequence;
       return;
     }
 
+    // Mark chunk as received
+    pending.received_chunks[header.chunk_index] = true;
+    pending.chunks_received++;
     pending.received_bytes += chunk_bytes;
-    pending.next_chunk_index++;
-    pending.latest_send_time_ms = send_time_ms;
+    pending.latest_send_time_ms = std::max(pending.latest_send_time_ms, send_time_ms);
     pending.last_arrival_time_ms = arrival_time_ms;
 
-    std::cout<<"Received bytes: "<< pending.received_bytes << " " << pending.next_chunk_index << std::endl;
+    std::cout << "Received bytes: " << pending.received_bytes 
+              << " chunks: " << pending.chunks_received 
+              << "/" << pending.chunk_count << std::endl;
 
-    if (pending.next_chunk_index < pending.chunk_count) {
+    // Check if all chunks have been received
+    if (pending.chunks_received < pending.chunk_count) {
       return;
     }
 
@@ -282,4 +304,3 @@ std::string Receiver::MakeOutputPath() const {
 }
 
 }  // namespace sctp::file
-
