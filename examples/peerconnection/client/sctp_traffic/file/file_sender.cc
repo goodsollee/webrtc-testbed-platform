@@ -317,7 +317,7 @@ void Sender::SendFileBatched(size_t file_bytes) {
   // Start conservative and adapt based on actual performance
   uint64_t adaptive_buffer_limit = 256 * 1024;  // Start at 256KB
   const uint64_t min_buffer_limit = 128 * 1024;  // Never go below 128KB
-  const uint64_t max_buffer_limit = 2 * 1024 * 1024;  // Never exceed 2MB
+  const uint64_t max_buffer_limit = 16 * 1024 * 1024;  // Never exceed 2MB
   
   // Performance tracking for adaptation
   auto last_successful_batch = clock::now();
@@ -349,7 +349,7 @@ void Sender::SendFileBatched(size_t file_bytes) {
       
       // Calculate proportional wait time
       double buffer_ratio = static_cast<double>(current_buffer) / adaptive_buffer_limit;
-      auto wait_time = std::chrono::microseconds(static_cast<int>(500 * buffer_ratio));
+      auto wait_time = std::chrono::microseconds(static_cast<int>(100 * buffer_ratio));
       
       std::cout << "[SCTP][FILE][Sender] Buffer=" << current_buffer 
                 << "/" << adaptive_buffer_limit 
