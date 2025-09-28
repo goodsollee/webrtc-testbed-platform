@@ -43,11 +43,6 @@ static bool ParseIntStrict(const std::string& s, int& out) {
 
 namespace sctp::file {
 
-// Buffer threshold - when buffer exceeds this, wait for it to drain
-// This is conservative to avoid overwhelming the channel
-static constexpr uint64_t kMaxBufferedBytes = 16 * 1024 * 1024;  // 16MB buffer limit
-static constexpr int kBufferCheckIntervalMs = 1;  // Check buffer every 1ms when waiting
-
 Sender::Sender(int kind, int file_size, int periodicity_ms)
     : kind_(kind), file_size_(file_size), periodicity_ms_(periodicity_ms),
       mode_(Mode::kPeriodic) {}
@@ -81,6 +76,12 @@ void Sender::Start(Conductor& c) {
     }
   }
   std::cout << log_message << std::endl;
+  
+  // Reset backpressure state
+  current_batch_size_ = backpressure_config_.batch_size;
+  current_check_interval_ms_ = backpressure_config_.base_check_interval_ms;
+  consecutive_blocks_ = 0;
+  
   if (mode_ == Mode::kPeriodic) {
     worker_ = std::thread([this]() { RunPeriodic(); });
   } else {
@@ -118,7 +119,7 @@ void Sender::RunPeriodic() {
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
       continue;
     }
-    SendFile(file_size_);
+    SendFileBatched(file_size_);
     std::this_thread::sleep_for(std::chrono::milliseconds(periodicity_ms_));
   }
 }
@@ -193,8 +194,6 @@ void Sender::RunCustom() {
     for (;;) {
       if (!running_.load()) break;
 
-      // If channel closed mid-run, just keep waiting for time; you could add
-      // logic to pause/shift/drop if you want different behavior.
       const auto now = clock::now();
       if (now >= due) break;
 
@@ -207,40 +206,100 @@ void Sender::RunCustom() {
 
     // Send at/after the due time (best-effort even if late).
     if (conductor_->IsFlowOpen(static_cast<Conductor::TrafficKind>(kind_))) {
-      SendFile(ev.second);
-    } else {
-      // Channel closed right at the send time; skip or busy-wait here if preferred.
-      // (Current policy: skip the send if the flow isn't open at due time.)
+      SendFileBatched(ev.second);
     }
   }
 }
 
-void Sender::WaitForBufferSpace() {
-  if (!conductor_) {
-    return;
-  }
+bool Sender::CheckBufferSpaceNonBlocking() {
+  if (!conductor_) return false;
+  
+  const auto kind = static_cast<Conductor::TrafficKind>(kind_);
+  if (!conductor_->IsFlowOpen(kind)) return false;
+  
+  uint64_t buffered = conductor_->BufferedAmount(kind);
+  
+  // Adaptive parameter adjustment based on current buffer state
+  AdaptBackpressureParameters(buffered);
+  
+  return buffered < backpressure_config_.buffer_threshold;
+}
+
+bool Sender::WaitForBufferSpaceAdaptive() {
+  if (!conductor_) return false;
 
   const auto kind = static_cast<Conductor::TrafficKind>(kind_);
-
-  // Wait until the buffer has drained sufficiently
+  
   while (running_.load()) {
     if (!conductor_->IsFlowOpen(kind)) {
-      // Flow closed temporarily; avoid tight loop and allow re-check later.
-      std::this_thread::sleep_for(std::chrono::milliseconds(kBufferCheckIntervalMs));
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
       continue;
     }
 
     uint64_t buffered = conductor_->BufferedAmount(kind);
-    if (buffered < kMaxBufferedBytes) {
-      break;  // Buffer has space, proceed
+    AdaptBackpressureParameters(buffered);
+    
+    // Use hysteresis: wait until buffer drains to target level
+    if (buffered < backpressure_config_.buffer_target) {
+      consecutive_blocks_ = 0;  // Reset backoff counter
+      return true;
     }
 
-    // Buffer is full, wait a bit for it to drain
-    std::this_thread::sleep_for(std::chrono::milliseconds(kBufferCheckIntervalMs));
+    // Exponential backoff when repeatedly blocked
+    int sleep_ms = current_check_interval_ms_;
+    if (backpressure_config_.use_exponential_backoff && consecutive_blocks_ > 0) {
+      sleep_ms = std::min(sleep_ms * (1 << std::min(consecutive_blocks_, 4)), 
+                         backpressure_config_.max_check_interval_ms);
+    }
+    
+    ++consecutive_blocks_;
+    std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));
+  }
+  
+  return false;
+}
+
+void Sender::AdaptBackpressureParameters(uint64_t current_buffered) {
+  const double buffer_ratio = static_cast<double>(current_buffered) / 
+                              backpressure_config_.buffer_threshold;
+  
+  if (backpressure_config_.adaptive_batching) {
+    // Adapt batch size based on buffer state
+    if (buffer_ratio < 0.25) {
+      // Buffer very low - increase batch size for efficiency
+      current_batch_size_ = std::min(backpressure_config_.batch_size * 3, 
+                                   static_cast<size_t>(12));
+    } else if (buffer_ratio < 0.5) {
+      // Buffer low - moderate increase
+      current_batch_size_ = std::min(backpressure_config_.batch_size * 2, 
+                                   static_cast<size_t>(8));
+    } else if (buffer_ratio > 0.8) {
+      // Buffer getting full - reduce batch size for responsiveness
+      current_batch_size_ = 1;
+    } else {
+      // Normal range - use default batch size
+      current_batch_size_ = backpressure_config_.batch_size;
+    }
+  }
+  
+  // Adapt check interval based on buffer fullness
+  if (buffer_ratio < 0.3) {
+    current_check_interval_ms_ = backpressure_config_.base_check_interval_ms;
+  } else {
+    // Increase check interval as buffer fills up (less aggressive polling)
+    current_check_interval_ms_ = std::min(
+      static_cast<int>(backpressure_config_.base_check_interval_ms * (1 + buffer_ratio * 4)),
+      backpressure_config_.max_check_interval_ms
+    );
   }
 }
 
 void Sender::SendFile(size_t file_bytes) {
+  // Use the new batched implementation
+  SendFileBatched(file_bytes);
+}
+
+void Sender::SendFileBatched(size_t file_bytes) {
   using clock = std::chrono::steady_clock;
   if (file_bytes == 0) {
     return;
@@ -253,6 +312,7 @@ void Sender::SendFile(size_t file_bytes) {
   }
 
   const uint64_t sequence = next_sequence_++;
+  const auto file_send_start_time = clock::now();
   const size_t header_bytes = kFileChunkHeaderSize;
   size_t max_message = conductor_->MaxSctpMessageSize(
       static_cast<Conductor::TrafficKind>(kind_));
@@ -275,49 +335,85 @@ void Sender::SendFile(size_t file_bytes) {
     ++chunk_count;
   }
 
+  
+  // Log start of file sending
+  const uint64_t start_time_ms =
+      std::chrono::duration_cast<std::chrono::milliseconds>(
+          file_send_start_time - flow_start_time_)
+          .count();
+  
+  std::cout << "[SCTP][FILE][Sender] kind=" << kind_
+            << " sequence=" << sequence
+            << " STARTED sending file_bytes=" << file_bytes
+            << " chunk_count=" << chunk_count
+            << " start_time_ms=" << start_time_ms << std::endl;
+
   Sender::LogEntry last_entry;
   PayloadMetadata last_metadata;
   size_t chunks_sent = 0;
   size_t bytes_sent = 0;
   
-  for (size_t chunk_index = 0; chunk_index < chunk_count && running_.load();
-       ++chunk_index) {
+  for (size_t chunk_index = 0; chunk_index < chunk_count && running_.load();) {
+    
+    // Check buffer space before sending a batch
+    if (!CheckBufferSpaceNonBlocking()) {
+      if (!WaitForBufferSpaceAdaptive()) {
+        break;  // Stopped or flow closed
+      }
+    }
+    
+    // Send a batch of chunks with buffer checking
+    size_t batch_end = std::min(chunk_index + current_batch_size_, chunk_count);
+    
+    for (size_t i = chunk_index; i < batch_end && running_.load(); ++i) {
+      // Check buffer every few chunks within the batch to prevent overflow
+      if (i > chunk_index && (i - chunk_index) % 8 == 0) {
+        if (!CheckBufferSpaceNonBlocking()) {
+          // Buffer getting full mid-batch, reduce remaining batch size
+          batch_end = i;
+          break;
+        }
+      }
+      
+      const auto chunk_time = clock::now();
+      const uint64_t send_time_ms =
+          std::chrono::duration_cast<std::chrono::milliseconds>(
+              chunk_time - flow_start_time_)
+              .count();
+      const size_t remaining_bytes = file_bytes - bytes_sent;
+      const size_t chunk_bytes =
+          std::min(max_chunk_payload, remaining_bytes);
 
-    // CRITICAL: Check buffer before sending each chunk
-    auto kind_enum = static_cast<Conductor::TrafficKind>(kind_);
-    WaitForBufferSpace();
-    
-    const auto chunk_time = clock::now();
-    const uint64_t send_time_ms =
-        std::chrono::duration_cast<std::chrono::milliseconds>(
-            chunk_time - flow_start_time_)
-            .count();
-    const size_t remaining_bytes = file_bytes - bytes_sent;
-    const size_t chunk_bytes =
-        std::min(max_chunk_payload, remaining_bytes);
+      PayloadMetadata metadata;
+      metadata.sequence = sequence;
+      metadata.send_time_ms = send_time_ms;
+      metadata.file_bytes = file_bytes;
+      metadata.chunk_bytes = chunk_bytes;
+      metadata.chunk_index = static_cast<uint32_t>(i);
+      metadata.chunk_count = static_cast<uint32_t>(chunk_count);
 
-    PayloadMetadata metadata;
-    metadata.sequence = sequence;
-    metadata.send_time_ms = send_time_ms;
-    metadata.file_bytes = file_bytes;
-    metadata.chunk_bytes = chunk_bytes;
-    metadata.chunk_index = static_cast<uint32_t>(chunk_index);
-    metadata.chunk_count = static_cast<uint32_t>(chunk_count);
-
-    std::vector<uint8_t> payload = BuildChunkPayload(metadata);
+      std::vector<uint8_t> payload = BuildChunkPayload(metadata);
+      
+      // Send the chunk
+      auto kind_enum = static_cast<Conductor::TrafficKind>(kind_);
+      conductor_->SendPayload(kind_enum, absl::Span<const uint8_t>(payload));
+      
+      last_entry = LogSendEvent(metadata);
+      last_metadata = metadata;
+      ++chunks_sent;
+      bytes_sent += chunk_bytes;
+      
+      // Small pause between chunks to prevent receiver overwhelm
+      if (current_batch_size_ > 16) {
+        std::this_thread::sleep_for(std::chrono::microseconds(10));
+      }
+    }
     
-    // Send the chunk
-    conductor_->SendPayload(kind_enum, absl::Span<const uint8_t>(payload));
+    chunk_index = batch_end;
     
-    last_entry = LogSendEvent(metadata);
-    last_metadata = metadata;
-    ++chunks_sent;
-    bytes_sent += chunk_bytes;
-    
-    // Optional: Add a small delay between chunks for very large files
-    // This helps prevent overwhelming the receiver even with buffer checks
-    if (chunk_count > 100 && chunk_index % 10 == 0) {
-      std::this_thread::sleep_for(std::chrono::microseconds(100));
+    // Small yield between batches to prevent completely monopolizing the thread
+    if (current_batch_size_ > 1 && chunk_index < chunk_count) {
+      std::this_thread::sleep_for(std::chrono::microseconds(50));
     }
   }
 
@@ -325,13 +421,27 @@ void Sender::SendFile(size_t file_bytes) {
     return;
   }
 
+  // Log completion of file sending with timing
+  const auto file_send_end_time = clock::now();
+  const uint64_t end_time_ms =
+      std::chrono::duration_cast<std::chrono::milliseconds>(
+          file_send_end_time - flow_start_time_)
+          .count();
+  const uint64_t total_send_duration_ms =
+      std::chrono::duration_cast<std::chrono::milliseconds>(
+          file_send_end_time - file_send_start_time)
+          .count();
+
   std::ostringstream oss;
   oss << "[SCTP][FILE][Sender] kind=" << kind_
       << " sequence=" << sequence
-      << " file_bytes=" << file_bytes
+      << " COMPLETED file_bytes=" << file_bytes
       << " chunks_sent=" << chunks_sent << "/" << chunk_count
+      << " batch_size=" << current_batch_size_
       << " total_data_bytes=" << last_entry.total_data_bytes
-      << " last_send_time_ms=" << last_metadata.send_time_ms;
+      << " start_time_ms=" << start_time_ms
+      << " end_time_ms=" << end_time_ms
+      << " duration_ms=" << total_send_duration_ms;
   std::cout << oss.str() << std::endl;
 }
 

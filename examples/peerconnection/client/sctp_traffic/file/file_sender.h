@@ -41,10 +41,26 @@ class Sender {
 
  private:
   enum class Mode { kPeriodic, kCustom };
+
+  // Enhanced backpressure configuration
+  struct BackpressureConfig {
+    uint64_t buffer_threshold = 16 * 1024 * 1024;   // 8MB - more aggressive than 16MB
+    uint64_t buffer_target = 8 * 1024 * 1024;      // 3MB - target level after draining
+    int base_check_interval_ms = 1;                 // Base polling interval
+    int max_check_interval_ms = 8;                  // Max adaptive interval
+    size_t batch_size = 16;                          // Send multiple chunks per batch
+    bool adaptive_batching = true;                  // Enable adaptive batch sizing
+    bool use_exponential_backoff = true;            // Use exponential backoff when blocked
+  };
+
   void RunPeriodic();
   void RunCustom();                 // absolute-time scheduler
   void LoadTrace(const std::string& path);  // parses time_ms,size
-  void WaitForBufferSpace();  // Flow control helper
+  
+  // Enhanced backpressure methods
+  bool CheckBufferSpaceNonBlocking();
+  bool WaitForBufferSpaceAdaptive();
+  void AdaptBackpressureParameters(uint64_t current_buffered);
   
   struct LogEntry {
     double timestamp_ms = 0.0;
@@ -53,6 +69,7 @@ class Sender {
 
   LogEntry LogSendEvent(const PayloadMetadata& metadata);
   void SendFile(size_t file_bytes);
+  void SendFileBatched(size_t file_bytes);
   std::vector<uint8_t> BuildChunkPayload(const PayloadMetadata& metadata);
   std::string MakeLogPath() const;
 
@@ -67,6 +84,12 @@ class Sender {
   std::thread worker_;
   std::atomic<bool> running_{false};
   Mode mode_;
+
+  // Enhanced backpressure state
+  BackpressureConfig backpressure_config_;
+  size_t current_batch_size_ = 1;
+  int current_check_interval_ms_ = 1;
+  int consecutive_blocks_ = 0;  // For exponential backoff
 
   std::mutex log_mutex_;
   std::ofstream csv_log_;
