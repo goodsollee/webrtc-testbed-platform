@@ -4,8 +4,10 @@
 #include <fstream>
 #include <mutex>
 #include <string>
+#include <unordered_map>
 
 #include "examples/peerconnection/client/sctp_traffic/traffic.h"
+#include "examples/peerconnection/client/sctp_traffic/file/file_message.h"
 
 class Conductor;  // Forward declaration.
 
@@ -24,6 +26,15 @@ class Receiver final : public sctp::Receiver {
   void HandlePayload(absl::Span<const uint8_t> bytes);
   std::string MakeOutputPath() const;
 
+  struct PendingFile {
+    uint64_t file_size_bytes = 0;
+    uint32_t chunk_count = 0;
+    uint32_t next_chunk_index = 0;
+    uint64_t received_bytes = 0;
+    uint64_t latest_send_time_ms = 0;
+    int64_t last_arrival_time_ms = 0;
+  };
+
   Conductor* conductor_ = nullptr;
   int kind_;
   std::string label_;
@@ -32,6 +43,7 @@ class Receiver final : public sctp::Receiver {
 
   std::mutex state_mutex_;
   std::ofstream csv_file_;
+  std::unordered_map<uint64_t, PendingFile> in_flight_files_;
   uint64_t total_data_bytes_ = 0;
   uint64_t total_files_received_ = 0;
   uint64_t slo_met_count_ = 0;

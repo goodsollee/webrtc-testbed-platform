@@ -17,7 +17,7 @@
 namespace sctp::file {
 
 namespace {
-constexpr size_t kHeaderSize = sizeof(uint64_t) * 2;  // sequence + send_time
+constexpr size_t kHeaderSize = kFileChunkHeaderSize;
 }
 
 Receiver::Receiver(int kind,
@@ -44,8 +44,10 @@ void Receiver::Attach(Conductor& c) {
       std::cout << "[SCTP][FILE][Receiver] Failed to open performance log file '"
                 << path << "'" << std::endl;
     } else {
-      csv_file_ << "timestamp_ms,data_bytes,total_data_bytes,sequence,send_time_ms,";
-      csv_file_ << "transmit_start_time_ms,transmit_end_time_ms,delivery_delay_ms,";
+      csv_file_ <<
+          "timestamp_ms,file_bytes,total_data_bytes,sequence,chunk_count,send_time_ms,";
+      csv_file_ <<
+          "transmit_start_time_ms,transmit_end_time_ms,delivery_delay_ms,";
       csv_file_ << "slo_ms,slo_satisfied,slo_satisfaction_ratio\n";
       csv_file_.flush();
       std::cout << "[SCTP][FILE][Receiver] Logging performance for '" << label_
@@ -74,6 +76,7 @@ void Receiver::Detach() {
     csv_file_.flush();
     csv_file_.close();
   }
+  in_flight_files_.clear();
   double ratio = 0.0;
   if (total_files_received_ > 0) {
     ratio = static_cast<double>(slo_met_count_) /
@@ -107,11 +110,22 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
     return;
   }
 
-  const uint64_t sequence =
-      webrtc::ByteReader<uint64_t>::ReadLittleEndian(bytes.data());
-  const uint64_t send_time_ms =
-      webrtc::ByteReader<uint64_t>::ReadLittleEndian(bytes.data() + sizeof(uint64_t));
-  const size_t data_bytes = bytes.size() - kHeaderSize;
+  FileChunkHeader header;
+  if (!ParseFileChunkHeader(bytes, &header)) {
+    RTC_LOG(LS_WARNING) << "[SCTP][FILE] Failed to parse payload header.";
+    return;
+  }
+
+  const size_t chunk_bytes = bytes.size() - kHeaderSize;
+  if (chunk_bytes != header.chunk_size_bytes) {
+    RTC_LOG(LS_WARNING)
+        << "[SCTP][FILE] Header chunk size mismatch: expected "
+        << header.chunk_size_bytes << " got " << chunk_bytes;
+    return;
+  }
+
+  const uint64_t sequence = header.sequence;
+  const uint64_t send_time_ms = header.send_time_ms;
   double delivery_delay_ms = 0.0;
   int64_t arrival_time_ms = rtc::TimeMillis();
   int64_t transmit_start_time_ms = 0;
@@ -121,6 +135,9 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
   uint64_t slo_met = 0;
   bool slo_satisfied = true;
   double slo_ratio = 0.0;
+  bool completed_file = false;
+  uint32_t chunk_count = header.chunk_count;
+  uint64_t file_bytes = header.file_size_bytes;
   {
     std::lock_guard<std::mutex> lock(state_mutex_);
     if (!log_started_) {
@@ -140,10 +157,47 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
       sender_start_time_initialized_ = true;
       sender_start_time_ms_ = arrival_time_ms - sender_relative_ms;
     }
+
+    PendingFile& pending = in_flight_files_[sequence];
+    if (pending.next_chunk_index == 0) {
+      pending.file_size_bytes = file_bytes;
+      pending.chunk_count = chunk_count;
+    }
+    if (pending.file_size_bytes != file_bytes ||
+        pending.chunk_count != chunk_count) {
+      RTC_LOG(LS_WARNING)
+          << "[SCTP][FILE] Header mismatch for sequence " << sequence;
+      in_flight_files_.erase(sequence);
+      return;
+    }
+    if (header.chunk_index != pending.next_chunk_index) {
+      RTC_LOG(LS_WARNING) << "[SCTP][FILE] Unexpected chunk index "
+                          << header.chunk_index << " for sequence "
+                          << sequence;
+      return;
+    }
+
+    pending.received_bytes += chunk_bytes;
+    pending.next_chunk_index++;
+    pending.latest_send_time_ms = send_time_ms;
+    pending.last_arrival_time_ms = arrival_time_ms;
+
+    if (pending.next_chunk_index < pending.chunk_count) {
+      return;
+    }
+
+    completed_file = true;
+
+    sender_relative_ms = 0;
+    if (pending.latest_send_time_ms >= first_sender_timestamp_ms_) {
+      sender_relative_ms = static_cast<int64_t>(
+          pending.latest_send_time_ms - first_sender_timestamp_ms_);
+    }
     transmit_start_time_ms = sender_start_time_ms_;
     transmit_end_time_ms = sender_start_time_ms_ + sender_relative_ms;
     delivery_delay_ms =
-        static_cast<double>(std::max<int64_t>(0, arrival_time_ms - transmit_end_time_ms));
+        static_cast<double>(std::max<int64_t>(
+            0, pending.last_arrival_time_ms - transmit_end_time_ms));
 
     ++total_files_received_;
     if (slo_ms_ > 0) {
@@ -158,7 +212,7 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
       slo_satisfied = true;
     }
 
-    total_data_bytes_ += data_bytes;
+    total_data_bytes_ += pending.received_bytes;
     total_data_bytes = total_data_bytes_;
     files_received = total_files_received_;
     slo_met = slo_met_count_;
@@ -166,10 +220,11 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
       slo_ratio = static_cast<double>(slo_met) /
                   static_cast<double>(files_received);
     }
+    file_bytes = pending.file_size_bytes;
     if (csv_file_.is_open()) {
-      csv_file_ << arrival_time_ms << "," << data_bytes << ","
-                << total_data_bytes << ","
-                << sequence << "," << send_time_ms << ","
+      csv_file_ << arrival_time_ms << "," << pending.received_bytes << ","
+                << total_data_bytes << "," << sequence << ","
+                << pending.chunk_count << "," << send_time_ms << ","
                 << transmit_start_time_ms << ","
                 << transmit_end_time_ms << ","
                 << std::fixed << std::setprecision(3) << delivery_delay_ms
@@ -178,16 +233,21 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
                 << std::fixed << std::setprecision(6) << slo_ratio << "\n";
       csv_file_.flush();
     }
+    in_flight_files_.erase(sequence);
+  }
+
+  if (!completed_file) {
+    return;
   }
 
   std::ostringstream oss;
   oss << "[SCTP][FILE][Receiver] label='" << label_ << "' time_ms="
       << arrival_time_ms
-      << " data_bytes=" << data_bytes << " total_data_bytes="
+      << " file_bytes=" << file_bytes << " total_data_bytes="
       << total_data_bytes << " seq=" << sequence
       << " send_time_ms=" << send_time_ms
       << " delivery_delay_ms=" << std::fixed << std::setprecision(3)
-      << delivery_delay_ms;
+      << delivery_delay_ms << " chunks=" << chunk_count;
   oss << " slo_ms=" << slo_ms_ << " satisfied="
       << (slo_satisfied ? "true" : "false") << " ratio="
       << std::fixed << std::setprecision(3) << slo_ratio;

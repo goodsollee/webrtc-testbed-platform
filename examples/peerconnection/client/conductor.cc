@@ -22,6 +22,7 @@
 #include <cstring>
 #include <cstdint>
 #include <functional>
+#include <limits>
 #include <unordered_map>
 
 
@@ -241,24 +242,17 @@ class MyDataObserver : public webrtc::DataChannelObserver {
     if (channel_->state() == webrtc::DataChannelInterface::kOpen) {
       RTC_LOG(LS_INFO) << "[SCTP] " << channel_->label() << " opened";
     }
-    const std::string kPattern = "hello data";
-    channel_->Send(webrtc::DataBuffer(kPattern));
   }
 
   void OnMessage(const webrtc::DataBuffer& buffer) override {
     if (!on_payload_) return;
-    if (buffer.data.size() == 0) return;
+    if (!buffer.binary) return;
+    if (buffer.data.size() <= 1) return;
 
     // If you keep the 1-byte TrafficKind header, strip it when present.
     const uint8_t* raw = buffer.data.cdata<uint8_t>();
     size_t sz = buffer.data.size();
-    // Heuristic: if upper bit-pattern looks like a valid enum in your range, strip,
-    // otherwise pass through whole buffer. For simplicity we strip 1 byte unconditionally.
-    if (sz >= 1) {
-      on_payload_(absl::Span<const uint8_t>(raw + 1, sz - 1));
-    } else {
-      on_payload_(absl::Span<const uint8_t>());  // empty
-    }
+    on_payload_(absl::Span<const uint8_t>(raw + 1, sz - 1));
   }
 
  private:
@@ -1385,22 +1379,26 @@ void Conductor::AddSCTPs() {
 
     AddSctpFlow(kind, profile.traffic_name, cfg);
 
-    auto receiver = std::make_unique<sctp::file::Receiver>(
-        static_cast<int>(kind), profile.traffic_name, log_dir_,
-        profile.slo_ms);
-    receiver->Attach(*this);
-    file_receivers_.push_back(std::move(receiver));
+    if (!is_sender_) {
+      auto receiver = std::make_unique<sctp::file::Receiver>(
+          static_cast<int>(kind), profile.traffic_name, log_dir_,
+          profile.slo_ms);
+      receiver->Attach(*this);
+      file_receivers_.push_back(std::move(receiver));
+    }
 
-    if (profile.pattern == "Periodic") {
-      auto sender = std::make_unique<sctp::file::Sender>(
-          static_cast<int>(kind), profile.file_size, profile.periodicity);
-      sender->Start(*this);
-      file_senders_.push_back(std::move(sender));
-    } else if (profile.pattern == "Custom") {
-      auto sender = std::make_unique<sctp::file::Sender>(
-          static_cast<int>(kind), profile.custom_trace);
-      sender->Start(*this);
-      file_senders_.push_back(std::move(sender));
+    if (is_sender_) {
+      if (profile.pattern == "Periodic") {
+        auto sender = std::make_unique<sctp::file::Sender>(
+            static_cast<int>(kind), profile.file_size, profile.periodicity);
+        sender->Start(*this);
+        file_senders_.push_back(std::move(sender));
+      } else if (profile.pattern == "Custom") {
+        auto sender = std::make_unique<sctp::file::Sender>(
+            static_cast<int>(kind), profile.custom_trace);
+        sender->Start(*this);
+        file_senders_.push_back(std::move(sender));
+      }
     }
   }
 }
@@ -1715,16 +1713,16 @@ void Conductor::SendPayload(TrafficKind kind, absl::Span<const uint8_t> data) {
     return;
   }
   // If you keep the 1-byte header, prepend it:
-  std::vector<uint8_t> buf;
-  buf.reserve(data.size() + 1);
-  buf.push_back(static_cast<uint8_t>(kind));
-  buf.insert(buf.end(), data.begin(), data.end());
+  rtc::CopyOnWriteBuffer buf(data.size() + 1);
+  buf.MutableData()[0] = static_cast<uint8_t>(kind);
+  if (!data.empty()) {
+    std::memcpy(buf.MutableData() + 1, data.data(), data.size());
+  }
 
-
-    const std::string kPattern = "hello data";
-  it->second.channel->Send(webrtc::DataBuffer(kPattern));
-
-  it->second.channel->Send(webrtc::DataBuffer(rtc::CopyOnWriteBuffer(buf), true));
+  if (!it->second.channel->Send(webrtc::DataBuffer(buf, true))) {
+    RTC_LOG(LS_WARNING) << "Failed to send SCTP payload for kind "
+                        << static_cast<int>(kind);
+  }
 }
 
 void Conductor::RegisterPayloadHandler(TrafficKind kind, PayloadHandler handler) {
@@ -1749,6 +1747,20 @@ uint64_t Conductor::BufferedAmount(TrafficKind kind) const {
   auto it = flows_.find(kind);
   if (it == flows_.end() || !it->second.channel) return 0;
   return it->second.channel->buffered_amount();
+}
+
+size_t Conductor::MaxSctpMessageSize(TrafficKind kind) const {
+  auto it = flows_.find(kind);
+  if (it == flows_.end() || !it->second.channel) {
+    return 0;
+  }
+  const uint64_t max_size = it->second.channel->max_message_size();
+  if (max_size == 0) {
+    return 0;
+  }
+  return max_size > std::numeric_limits<size_t>::max()
+             ? std::numeric_limits<size_t>::max()
+             : static_cast<size_t>(max_size);
 }
 
 void Conductor::DumpActiveRtpParameters() {
