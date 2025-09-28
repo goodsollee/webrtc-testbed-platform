@@ -4,6 +4,8 @@
 #include <chrono>
 #include <cctype>
 #include <fstream>
+#include <iomanip>
+#include <iostream>
 #include <sstream>
 #include <thread>
 
@@ -52,6 +54,25 @@ Sender::~Sender() { Stop(); }
 void Sender::Start(Conductor& c) {
   conductor_ = &c;
   running_.store(true);
+  std::string log_message;
+  {
+    std::lock_guard<std::mutex> lock(log_mutex_);
+    total_bytes_sent_ = 0;
+    log_started_ = false;
+    log_path_ = MakeLogPath();
+    csv_log_.open(log_path_, std::ios::out | std::ios::trunc);
+    if (csv_log_.is_open()) {
+      csv_log_ << "timestamp_ms,chunk_bytes,total_bytes\n";
+      csv_log_.flush();
+      log_message = "[SCTP][FILE][Sender] Logging performance data to '" +
+                    log_path_ + "'";
+    } else {
+      log_message =
+          "[SCTP][FILE][Sender] Failed to open performance log file '" +
+          log_path_ + "'";
+    }
+  }
+  std::cout << log_message << std::endl;
   if (mode_ == Mode::kPeriodic) {
     worker_ = std::thread([this]() { RunPeriodic(); });
   } else {
@@ -63,6 +84,24 @@ void Sender::Stop() {
   running_.store(false);
   if (worker_.joinable())
     worker_.join();
+  uint64_t total_bytes = 0;
+  std::string path;
+  {
+    std::lock_guard<std::mutex> lock(log_mutex_);
+    if (csv_log_.is_open()) {
+      csv_log_.flush();
+      csv_log_.close();
+    }
+    total_bytes = total_bytes_sent_;
+    path = log_path_;
+  }
+  std::ostringstream oss;
+  oss << "[SCTP][FILE][Sender] kind=" << kind_
+      << " stopped after sending " << total_bytes << " bytes";
+  if (!path.empty()) {
+    oss << ". Log file: '" << path << "'";
+  }
+  std::cout << oss.str() << std::endl;
 }
 
 void Sender::RunPeriodic() {
@@ -75,6 +114,7 @@ void Sender::RunPeriodic() {
     conductor_->SendPayload(
         static_cast<Conductor::TrafficKind>(kind_),
         absl::Span<const uint8_t>(payload));
+    LogSendEvent(payload.size());
     std::this_thread::sleep_for(std::chrono::milliseconds(periodicity_ms_));
   }
 }
@@ -167,11 +207,53 @@ void Sender::RunCustom() {
       conductor_->SendPayload(
           static_cast<Conductor::TrafficKind>(kind_),
           absl::Span<const uint8_t>(payload));
+      LogSendEvent(payload.size());
     } else {
       // Channel closed right at the send time; skip or busy-wait here if preferred.
       // (Current policy: skip the send if the flow isn't open at due time.)
     }
   }
+}
+
+void Sender::LogSendEvent(size_t bytes) {
+  using clock = std::chrono::steady_clock;
+  double timestamp_ms = 0.0;
+  uint64_t total_bytes = 0;
+  {
+    std::lock_guard<std::mutex> lock(log_mutex_);
+    const auto now = clock::now();
+    if (!log_started_) {
+      log_start_time_ = now;
+      log_started_ = true;
+    }
+    timestamp_ms =
+        std::chrono::duration<double, std::milli>(now - log_start_time_).count();
+    total_bytes_sent_ += bytes;
+    total_bytes = total_bytes_sent_;
+    if (csv_log_.is_open()) {
+      csv_log_ << std::fixed << std::setprecision(3) << timestamp_ms << ","
+               << bytes << "," << total_bytes << "\n";
+      csv_log_.flush();
+    }
+  }
+
+  std::ostringstream oss;
+  oss << "[SCTP][FILE][Sender] kind=" << kind_
+      << " time_ms=" << std::fixed << std::setprecision(3) << timestamp_ms
+      << " chunk_bytes=" << bytes << " total_bytes=" << total_bytes;
+  std::cout << oss.str() << std::endl;
+}
+
+std::string Sender::MakeLogPath() const {
+  std::ostringstream oss;
+  oss << "sctp_file_sender_kind" << kind_;
+  if (mode_ == Mode::kPeriodic) {
+    oss << "_periodic";
+  } else {
+    oss << "_custom";
+  }
+  oss << ".csv";
+  return oss.str();
 }
 
 }  // namespace sctp::file
