@@ -12,7 +12,9 @@
 #include "examples/peerconnection/client/websocket_client.h"
 
 #include <stddef.h>
+#include <algorithm>
 #include <cmath>
+#include <cctype>
 #include <filesystem>
 #include <memory>
 #include <optional>
@@ -1378,6 +1380,11 @@ void Conductor::AddSCTPs() {
 
     cfg.id = next_id++;
     TrafficKind kind = static_cast<TrafficKind>(next_kind++);
+
+    std::string lower_label = profile.traffic_name;
+    std::transform(lower_label.begin(), lower_label.end(), lower_label.begin(),
+                   [](unsigned char ch) { return std::tolower(ch); });
+    label2kind_[lower_label] = kind;
 
     AddSctpFlow(kind, profile.traffic_name, cfg);
 

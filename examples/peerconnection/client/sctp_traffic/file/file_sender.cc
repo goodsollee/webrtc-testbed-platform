@@ -243,6 +243,10 @@ void Sender::SendFile(size_t file_bytes) {
   const size_t chunk_count =
       (file_bytes + max_chunk_payload - 1) / max_chunk_payload;
 
+  Sender::LogEntry last_entry;
+  PayloadMetadata last_metadata;
+  size_t chunks_sent = 0;
+
   for (size_t chunk_index = 0; chunk_index < chunk_count && running_.load();
        ++chunk_index) {
     const auto chunk_time = clock::now();
@@ -265,8 +269,23 @@ void Sender::SendFile(size_t file_bytes) {
     conductor_->SendPayload(
         static_cast<Conductor::TrafficKind>(kind_),
         absl::Span<const uint8_t>(payload));
-    LogSendEvent(metadata);
+    last_entry = LogSendEvent(metadata);
+    last_metadata = metadata;
+    ++chunks_sent;
   }
+
+  if (chunks_sent == 0) {
+    return;
+  }
+
+  std::ostringstream oss;
+  oss << "[SCTP][FILE][Sender] kind=" << kind_
+      << " sequence=" << sequence
+      << " file_bytes=" << file_bytes
+      << " chunks_sent=" << chunks_sent << "/" << chunk_count
+      << " total_data_bytes=" << last_entry.total_data_bytes
+      << " last_send_time_ms=" << last_metadata.send_time_ms;
+  std::cout << oss.str() << std::endl;
 }
 
 std::vector<uint8_t> Sender::BuildChunkPayload(const PayloadMetadata& metadata) {
@@ -282,7 +301,7 @@ std::vector<uint8_t> Sender::BuildChunkPayload(const PayloadMetadata& metadata) 
   return payload;
 }
 
-void Sender::LogSendEvent(const PayloadMetadata& metadata) {
+Sender::LogEntry Sender::LogSendEvent(const PayloadMetadata& metadata) {
   using clock = std::chrono::steady_clock;
   double timestamp_ms = 0.0;
   uint64_t total_bytes = 0;
@@ -307,15 +326,7 @@ void Sender::LogSendEvent(const PayloadMetadata& metadata) {
     }
   }
 
-  std::ostringstream oss;
-  oss << "[SCTP][FILE][Sender] kind=" << kind_
-      << " time_ms=" << std::fixed << std::setprecision(3) << timestamp_ms
-      << " chunk_bytes=" << metadata.chunk_bytes
-      << " total_data_bytes=" << total_bytes << " file_bytes="
-      << metadata.file_bytes << " seq=" << metadata.sequence
-      << " chunk=" << (metadata.chunk_index + 1) << "/"
-      << metadata.chunk_count << " send_time_ms=" << metadata.send_time_ms;
-  std::cout << oss.str() << std::endl;
+  return {timestamp_ms, total_bytes};
 }
 
 std::string Sender::MakeLogPath() const {

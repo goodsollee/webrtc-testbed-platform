@@ -44,7 +44,12 @@ class Sender {
   void RunPeriodic();
   void RunCustom();                 // absolute-time scheduler
   void LoadTrace(const std::string& path);  // parses time_ms,size
-  void LogSendEvent(const PayloadMetadata& metadata);
+  struct LogEntry {
+    double timestamp_ms = 0.0;
+    uint64_t total_data_bytes = 0;
+  };
+
+  LogEntry LogSendEvent(const PayloadMetadata& metadata);
   void SendFile(size_t file_bytes);
   std::vector<uint8_t> BuildChunkPayload(const PayloadMetadata& metadata);
   std::string MakeLogPath() const;
