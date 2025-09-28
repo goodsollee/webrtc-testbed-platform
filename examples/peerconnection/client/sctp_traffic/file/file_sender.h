@@ -2,6 +2,8 @@
 
 #include <atomic>
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
 #include <fstream>
 #include <mutex>
 #include <string>
@@ -16,6 +18,12 @@ namespace sctp::file {
 // Sends dummy file data over SCTP according to a traffic profile.
 class Sender {
  public:
+  struct PayloadMetadata {
+    uint64_t sequence = 0;
+    uint64_t send_time_ms = 0;
+    size_t data_bytes = 0;
+  };
+
   // Periodic pattern constructor.
   Sender(int kind, int file_size, int periodicity_ms);
   // Custom trace pattern constructor (ABSOLUTE time).
@@ -31,7 +39,8 @@ class Sender {
   void RunPeriodic();
   void RunCustom();                 // absolute-time scheduler
   void LoadTrace(const std::string& path);  // parses time_ms,size
-  void LogSendEvent(size_t bytes);
+  void LogSendEvent(const PayloadMetadata& metadata);
+  std::vector<uint8_t> BuildPayload(size_t data_bytes, PayloadMetadata* metadata);
   std::string MakeLogPath() const;
 
   Conductor* conductor_ = nullptr;
@@ -51,7 +60,10 @@ class Sender {
   bool log_started_ = false;
   std::chrono::steady_clock::time_point log_start_time_;
   std::string log_path_;
-  uint64_t total_bytes_sent_ = 0;
+  uint64_t total_data_bytes_sent_ = 0;
+  uint64_t next_sequence_ = 0;
+  std::chrono::steady_clock::time_point flow_start_time_;
+  bool flow_start_time_initialized_ = false;
 };
 
 }  // namespace sctp::file

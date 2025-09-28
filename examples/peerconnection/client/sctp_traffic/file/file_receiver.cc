@@ -9,14 +9,23 @@
 
 #include "absl/types/span.h"
 #include "examples/peerconnection/client/conductor.h"
+#include "rtc_base/byte_order.h"
 #include "rtc_base/logging.h"
 
 namespace sctp::file {
 
-Receiver::Receiver(int kind, std::string label, std::string output_dir)
+namespace {
+constexpr size_t kHeaderSize = sizeof(uint64_t) * 2;  // sequence + send_time
+}
+
+Receiver::Receiver(int kind,
+                   std::string label,
+                   std::string output_dir,
+                   int slo_ms)
     : kind_(kind),
       label_(std::move(label)),
-      output_dir_(std::move(output_dir)) {}
+      output_dir_(std::move(output_dir)),
+      slo_ms_(slo_ms) {}
 
 Receiver::~Receiver() { Detach(); }
 
@@ -33,10 +42,15 @@ void Receiver::Attach(Conductor& c) {
       std::cout << "[SCTP][FILE][Receiver] Failed to open performance log file '"
                 << path << "'" << std::endl;
     } else {
-      csv_file_ << "timestamp_ms,chunk_bytes,total_bytes\n";
+      csv_file_ << "timestamp_ms,data_bytes,total_data_bytes,sequence,send_time_ms,";
+      csv_file_ << "delivery_delay_ms,slo_ms,slo_satisfied,slo_satisfaction_ratio\n";
       csv_file_.flush();
       std::cout << "[SCTP][FILE][Receiver] Logging performance for '" << label_
-                << "' to '" << path << "'" << std::endl;
+                << "' to '" << path << "'";
+      if (slo_ms_ > 0) {
+        std::cout << " (SLO=" << slo_ms_ << " ms)";
+      }
+      std::cout << std::endl;
     }
   }
 
@@ -57,10 +71,24 @@ void Receiver::Detach() {
     csv_file_.flush();
     csv_file_.close();
   }
-  std::cout << "[SCTP][FILE][Receiver] Total bytes received for '" << label_
-            << "': " << total_bytes_ << std::endl;
-  total_bytes_ = 0;
+  double ratio = 0.0;
+  if (total_files_received_ > 0) {
+    ratio = static_cast<double>(slo_met_count_) /
+            static_cast<double>(total_files_received_);
+  }
+  std::ostringstream summary;
+  summary << "[SCTP][FILE][Receiver] Total data bytes received for '" << label_
+          << "': " << total_data_bytes_ << ". Files=" << total_files_received_
+          << " slo_met=" << slo_met_count_;
+  if (total_files_received_ > 0) {
+    summary << " ratio=" << std::fixed << std::setprecision(3) << ratio;
+  }
+  std::cout << summary.str() << std::endl;
+  total_data_bytes_ = 0;
+  total_files_received_ = 0;
+  slo_met_count_ = 0;
   log_started_ = false;
+  sender_time_initialized_ = false;
 }
 
 void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
@@ -68,9 +96,23 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
     return;
   }
 
-  double timestamp_ms = 0.0;
-  uint64_t total_bytes = 0;
-  const size_t chunk_size = bytes.size();
+  if (bytes.size() < kHeaderSize) {
+    RTC_LOG(LS_WARNING) << "[SCTP][FILE] Payload too small to contain header.";
+    return;
+  }
+
+  const uint64_t sequence =
+      rtc::ByteReader<uint64_t>::ReadLittleEndian(bytes.data());
+  const uint64_t send_time_ms =
+      rtc::ByteReader<uint64_t>::ReadLittleEndian(bytes.data() + sizeof(uint64_t));
+  const size_t data_bytes = bytes.size() - kHeaderSize;
+  double arrival_timestamp_ms = 0.0;
+  double delivery_delay_ms = 0.0;
+  uint64_t total_data_bytes = 0;
+  uint64_t files_received = 0;
+  uint64_t slo_met = 0;
+  bool slo_satisfied = true;
+  double slo_ratio = 0.0;
   {
     std::lock_guard<std::mutex> lock(state_mutex_);
     const auto now = std::chrono::steady_clock::now();
@@ -78,21 +120,64 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
       start_time_ = now;
       log_started_ = true;
     }
-    timestamp_ms =
+    arrival_timestamp_ms =
         std::chrono::duration<double, std::milli>(now - start_time_).count();
-    total_bytes_ += chunk_size;
-    total_bytes = total_bytes_;
+
+    if (!sender_time_initialized_) {
+      sender_time_initialized_ = true;
+      first_sender_timestamp_ms_ = send_time_ms;
+    }
+    const double sender_relative_ms =
+        static_cast<double>(send_time_ms - first_sender_timestamp_ms_);
+    delivery_delay_ms = arrival_timestamp_ms - sender_relative_ms;
+    if (delivery_delay_ms < 0.0) {
+      delivery_delay_ms = 0.0;
+    }
+
+    ++total_files_received_;
+    if (slo_ms_ > 0) {
+      if (delivery_delay_ms <= static_cast<double>(slo_ms_)) {
+        ++slo_met_count_;
+        slo_satisfied = true;
+      } else {
+        slo_satisfied = false;
+      }
+    } else {
+      ++slo_met_count_;
+      slo_satisfied = true;
+    }
+
+    total_data_bytes_ += data_bytes;
+    total_data_bytes = total_data_bytes_;
+    files_received = total_files_received_;
+    slo_met = slo_met_count_;
+    if (files_received > 0) {
+      slo_ratio = static_cast<double>(slo_met) /
+                  static_cast<double>(files_received);
+    }
     if (csv_file_.is_open()) {
-      csv_file_ << std::fixed << std::setprecision(3) << timestamp_ms << ","
-                << chunk_size << "," << total_bytes << "\n";
+      csv_file_ << std::fixed << std::setprecision(3) << arrival_timestamp_ms
+                << "," << data_bytes << "," << total_data_bytes << ","
+                << sequence << "," << send_time_ms << ","
+                << std::fixed << std::setprecision(3) << delivery_delay_ms
+                << "," << slo_ms_ << ","
+                << (slo_satisfied ? "true" : "false") << ","
+                << std::fixed << std::setprecision(6) << slo_ratio << "\n";
       csv_file_.flush();
     }
   }
 
   std::ostringstream oss;
   oss << "[SCTP][FILE][Receiver] label='" << label_ << "' time_ms="
-      << std::fixed << std::setprecision(3) << timestamp_ms
-      << " chunk_bytes=" << chunk_size << " total_bytes=" << total_bytes;
+      << std::fixed << std::setprecision(3) << arrival_timestamp_ms
+      << " data_bytes=" << data_bytes << " total_data_bytes="
+      << total_data_bytes << " seq=" << sequence
+      << " send_time_ms=" << send_time_ms
+      << " delivery_delay_ms=" << std::fixed << std::setprecision(3)
+      << delivery_delay_ms;
+  oss << " slo_ms=" << slo_ms_ << " satisfied="
+      << (slo_satisfied ? "true" : "false") << " ratio="
+      << std::fixed << std::setprecision(3) << slo_ratio;
   std::cout << oss.str() << std::endl;
 }
 

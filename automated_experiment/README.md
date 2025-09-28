@@ -58,10 +58,15 @@ The script forwards the `--sctp PATH` argument as `--sctp_csv=PATH` to `peerconn
 
 ```
 csv
-Traffic name,Protocol,Pattern,File size,Periodicity,Custom traffic traces,Max bitrate,Frame rate,Video file name
-file_send,SCTP,Custom,,,traces/file_traffic.csv,,,,
-video_stream,RTP,Periodic,5000,33,,,30,sample_video.y4m
+Traffic name,Protocol,Pattern,File size,Periodicity,Custom traffic traces,Max bitrate,Frame rate,Video file name,SLO (ms)
+file_send,SCTP,Custom,,,traces/file_traffic.csv,,,,200
+video_stream,RTP,Periodic,5000,33,,,30,sample_video.y4m,
 ```
+
+The optional `SLO (ms)` column sets the maximum acceptable end-to-end delivery
+delay for each SCTP "file" transfer. The peer connection client records, for
+every SCTP payload, the observed delivery delay, whether the SLO was met, and
+the running satisfaction ratio.
 
 ## Dependencies
 

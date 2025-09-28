@@ -1386,7 +1386,8 @@ void Conductor::AddSCTPs() {
     AddSctpFlow(kind, profile.traffic_name, cfg);
 
     auto receiver = std::make_unique<sctp::file::Receiver>(
-        static_cast<int>(kind), profile.traffic_name, log_dir_);
+        static_cast<int>(kind), profile.traffic_name, log_dir_,
+        profile.slo_ms);
     receiver->Attach(*this);
     file_receivers_.push_back(std::move(receiver));
 

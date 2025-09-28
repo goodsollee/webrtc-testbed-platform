@@ -11,6 +11,7 @@
 
 #include "absl/types/span.h"
 #include "examples/peerconnection/client/conductor.h"
+#include "rtc_base/byte_order.h"
 
 static bool ParseIntStrict(const std::string& s, int& out) {
   // Reject empty
@@ -57,12 +58,12 @@ void Sender::Start(Conductor& c) {
   std::string log_message;
   {
     std::lock_guard<std::mutex> lock(log_mutex_);
-    total_bytes_sent_ = 0;
+    total_data_bytes_sent_ = 0;
     log_started_ = false;
     log_path_ = MakeLogPath();
     csv_log_.open(log_path_, std::ios::out | std::ios::trunc);
     if (csv_log_.is_open()) {
-      csv_log_ << "timestamp_ms,chunk_bytes,total_bytes\n";
+      csv_log_ << "timestamp_ms,data_bytes,total_data_bytes,sequence,send_time_ms\n";
       csv_log_.flush();
       log_message = "[SCTP][FILE][Sender] Logging performance data to '" +
                     log_path_ + "'";
@@ -92,12 +93,12 @@ void Sender::Stop() {
       csv_log_.flush();
       csv_log_.close();
     }
-    total_bytes = total_bytes_sent_;
+    total_bytes = total_data_bytes_sent_;
     path = log_path_;
   }
   std::ostringstream oss;
   oss << "[SCTP][FILE][Sender] kind=" << kind_
-      << " stopped after sending " << total_bytes << " bytes";
+      << " stopped after sending " << total_bytes << " data bytes";
   if (!path.empty()) {
     oss << ". Log file: '" << path << "'";
   }
@@ -105,16 +106,17 @@ void Sender::Stop() {
 }
 
 void Sender::RunPeriodic() {
-  std::vector<uint8_t> payload(file_size_, 0);
   while (running_.load()) {
     if (!conductor_->IsFlowOpen(static_cast<Conductor::TrafficKind>(kind_))) {
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
       continue;
     }
+    PayloadMetadata metadata;
+    std::vector<uint8_t> payload = BuildPayload(file_size_, &metadata);
     conductor_->SendPayload(
         static_cast<Conductor::TrafficKind>(kind_),
         absl::Span<const uint8_t>(payload));
-    LogSendEvent(payload.size());
+    LogSendEvent(metadata);
     std::this_thread::sleep_for(std::chrono::milliseconds(periodicity_ms_));
   }
 }
@@ -202,12 +204,13 @@ void Sender::RunCustom() {
     if (!running_.load()) break;
 
     // Send at/after the due time (best-effort even if late).
-    std::vector<uint8_t> payload(ev.second, 0);
     if (conductor_->IsFlowOpen(static_cast<Conductor::TrafficKind>(kind_))) {
+      PayloadMetadata metadata;
+      std::vector<uint8_t> payload = BuildPayload(ev.second, &metadata);
       conductor_->SendPayload(
           static_cast<Conductor::TrafficKind>(kind_),
           absl::Span<const uint8_t>(payload));
-      LogSendEvent(payload.size());
+      LogSendEvent(metadata);
     } else {
       // Channel closed right at the send time; skip or busy-wait here if preferred.
       // (Current policy: skip the send if the flow isn't open at due time.)
@@ -215,7 +218,37 @@ void Sender::RunCustom() {
   }
 }
 
-void Sender::LogSendEvent(size_t bytes) {
+std::vector<uint8_t> Sender::BuildPayload(size_t data_bytes,
+                                         PayloadMetadata* metadata) {
+  using clock = std::chrono::steady_clock;
+  if (metadata == nullptr) {
+    return {};
+  }
+
+  const size_t header_bytes = sizeof(uint64_t) * 2;
+  std::vector<uint8_t> payload(header_bytes + data_bytes, 0);
+
+  const auto now = clock::now();
+  if (!flow_start_time_initialized_) {
+    flow_start_time_ = now;
+    flow_start_time_initialized_ = true;
+  }
+
+  metadata->sequence = next_sequence_++;
+  metadata->send_time_ms =
+      std::chrono::duration_cast<std::chrono::milliseconds>(now - flow_start_time_)
+          .count();
+  metadata->data_bytes = data_bytes;
+
+  rtc::ByteWriter<uint64_t>::WriteLittleEndian(payload.data(),
+                                               metadata->sequence);
+  rtc::ByteWriter<uint64_t>::WriteLittleEndian(
+      payload.data() + sizeof(uint64_t), metadata->send_time_ms);
+
+  return payload;
+}
+
+void Sender::LogSendEvent(const PayloadMetadata& metadata) {
   using clock = std::chrono::steady_clock;
   double timestamp_ms = 0.0;
   uint64_t total_bytes = 0;
@@ -228,11 +261,12 @@ void Sender::LogSendEvent(size_t bytes) {
     }
     timestamp_ms =
         std::chrono::duration<double, std::milli>(now - log_start_time_).count();
-    total_bytes_sent_ += bytes;
-    total_bytes = total_bytes_sent_;
+    total_data_bytes_sent_ += metadata.data_bytes;
+    total_bytes = total_data_bytes_sent_;
     if (csv_log_.is_open()) {
       csv_log_ << std::fixed << std::setprecision(3) << timestamp_ms << ","
-               << bytes << "," << total_bytes << "\n";
+               << metadata.data_bytes << "," << total_bytes << ","
+               << metadata.sequence << "," << metadata.send_time_ms << "\n";
       csv_log_.flush();
     }
   }
@@ -240,7 +274,9 @@ void Sender::LogSendEvent(size_t bytes) {
   std::ostringstream oss;
   oss << "[SCTP][FILE][Sender] kind=" << kind_
       << " time_ms=" << std::fixed << std::setprecision(3) << timestamp_ms
-      << " chunk_bytes=" << bytes << " total_bytes=" << total_bytes;
+      << " data_bytes=" << metadata.data_bytes
+      << " total_data_bytes=" << total_bytes << " seq=" << metadata.sequence
+      << " send_time_ms=" << metadata.send_time_ms;
   std::cout << oss.str() << std::endl;
 }
 

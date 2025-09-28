@@ -14,6 +14,7 @@ struct TrafficProfile {
   int max_bitrate = 0;
   int frame_rate = 0;
   std::string video_file_name;
+  int slo_ms = 0;
 };
 
 // Loads traffic profiles from a CSV file at |path|.
