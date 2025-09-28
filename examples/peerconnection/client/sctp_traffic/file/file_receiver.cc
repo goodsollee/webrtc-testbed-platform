@@ -11,6 +11,7 @@
 #include "examples/peerconnection/client/conductor.h"
 #include "rtc_base/byte_order.h"
 #include "rtc_base/logging.h"
+#include "rtc_base/time_utils.h"
 
 namespace sctp::file {
 
@@ -43,7 +44,8 @@ void Receiver::Attach(Conductor& c) {
                 << path << "'" << std::endl;
     } else {
       csv_file_ << "timestamp_ms,data_bytes,total_data_bytes,sequence,send_time_ms,";
-      csv_file_ << "delivery_delay_ms,slo_ms,slo_satisfied,slo_satisfaction_ratio\n";
+      csv_file_ << "transmit_start_time_ms,transmit_end_time_ms,delivery_delay_ms,";
+      csv_file_ << "slo_ms,slo_satisfied,slo_satisfaction_ratio\n";
       csv_file_.flush();
       std::cout << "[SCTP][FILE][Receiver] Logging performance for '" << label_
                 << "' to '" << path << "'";
@@ -89,6 +91,9 @@ void Receiver::Detach() {
   slo_met_count_ = 0;
   log_started_ = false;
   sender_time_initialized_ = false;
+  sender_start_time_initialized_ = false;
+  first_sender_timestamp_ms_ = 0;
+  sender_start_time_ms_ = 0;
 }
 
 void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
@@ -106,8 +111,10 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
   const uint64_t send_time_ms =
       rtc::ByteReader<uint64_t>::ReadLittleEndian(bytes.data() + sizeof(uint64_t));
   const size_t data_bytes = bytes.size() - kHeaderSize;
-  double arrival_timestamp_ms = 0.0;
   double delivery_delay_ms = 0.0;
+  int64_t arrival_time_ms = rtc::TimeMillis();
+  int64_t transmit_start_time_ms = 0;
+  int64_t transmit_end_time_ms = 0;
   uint64_t total_data_bytes = 0;
   uint64_t files_received = 0;
   uint64_t slo_met = 0;
@@ -115,24 +122,27 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
   double slo_ratio = 0.0;
   {
     std::lock_guard<std::mutex> lock(state_mutex_);
-    const auto now = std::chrono::steady_clock::now();
     if (!log_started_) {
-      start_time_ = now;
       log_started_ = true;
     }
-    arrival_timestamp_ms =
-        std::chrono::duration<double, std::milli>(now - start_time_).count();
 
     if (!sender_time_initialized_) {
       sender_time_initialized_ = true;
       first_sender_timestamp_ms_ = send_time_ms;
     }
-    const double sender_relative_ms =
-        static_cast<double>(send_time_ms - first_sender_timestamp_ms_);
-    delivery_delay_ms = arrival_timestamp_ms - sender_relative_ms;
-    if (delivery_delay_ms < 0.0) {
-      delivery_delay_ms = 0.0;
+    int64_t sender_relative_ms = 0;
+    if (send_time_ms >= first_sender_timestamp_ms_) {
+      sender_relative_ms =
+          static_cast<int64_t>(send_time_ms - first_sender_timestamp_ms_);
     }
+    if (!sender_start_time_initialized_) {
+      sender_start_time_initialized_ = true;
+      sender_start_time_ms_ = arrival_time_ms - sender_relative_ms;
+    }
+    transmit_start_time_ms = sender_start_time_ms_;
+    transmit_end_time_ms = sender_start_time_ms_ + sender_relative_ms;
+    delivery_delay_ms =
+        static_cast<double>(std::max<int64_t>(0, arrival_time_ms - transmit_end_time_ms));
 
     ++total_files_received_;
     if (slo_ms_ > 0) {
@@ -156,9 +166,11 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
                   static_cast<double>(files_received);
     }
     if (csv_file_.is_open()) {
-      csv_file_ << std::fixed << std::setprecision(3) << arrival_timestamp_ms
-                << "," << data_bytes << "," << total_data_bytes << ","
+      csv_file_ << arrival_time_ms << "," << data_bytes << ","
+                << total_data_bytes << ","
                 << sequence << "," << send_time_ms << ","
+                << transmit_start_time_ms << ","
+                << transmit_end_time_ms << ","
                 << std::fixed << std::setprecision(3) << delivery_delay_ms
                 << "," << slo_ms_ << ","
                 << (slo_satisfied ? "true" : "false") << ","
@@ -169,7 +181,7 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
 
   std::ostringstream oss;
   oss << "[SCTP][FILE][Receiver] label='" << label_ << "' time_ms="
-      << std::fixed << std::setprecision(3) << arrival_timestamp_ms
+      << arrival_time_ms
       << " data_bytes=" << data_bytes << " total_data_bytes="
       << total_data_bytes << " seq=" << sequence
       << " send_time_ms=" << send_time_ms
