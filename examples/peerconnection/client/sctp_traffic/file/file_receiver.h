@@ -1,6 +1,5 @@
 #pragma once
 
-#include <chrono>
 #include <cstdint>
 #include <fstream>
 #include <mutex>
@@ -37,9 +36,10 @@ class Receiver final : public sctp::Receiver {
   uint64_t total_files_received_ = 0;
   uint64_t slo_met_count_ = 0;
   bool log_started_ = false;
-  std::chrono::steady_clock::time_point start_time_;
   bool sender_time_initialized_ = false;
   uint64_t first_sender_timestamp_ms_ = 0;
+  bool sender_start_time_initialized_ = false;
+  int64_t sender_start_time_ms_ = 0;
 };
 
 }  // namespace sctp::file
