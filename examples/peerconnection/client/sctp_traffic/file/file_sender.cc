@@ -330,8 +330,13 @@ void Sender::SendFileBatched(size_t file_bytes) {
       WriteFileChunkHeader(payload_buffer.data(), header);
       
       // Send immediately
-      conductor_->SendPayload(kind_enum, absl::Span<const uint8_t>(payload_buffer));
-      
+      if (!conductor_->SendPayload(
+              kind_enum, absl::Span<const uint8_t>(payload_buffer))) {
+        std::cout << "[SCTP][FILE][Sender] Send failed due to backpressure, "
+                  << "aborting sequence " << sequence << std::endl;
+        return;
+      }
+
       // Reduced logging for performance
       if (i % Config::LOG_INTERVAL == 0 || chunk_count < Config::LOG_INTERVAL) {
         PayloadMetadata metadata;

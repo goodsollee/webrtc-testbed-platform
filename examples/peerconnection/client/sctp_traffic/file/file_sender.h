@@ -45,11 +45,11 @@ class Sender {
 
   // Optimized configuration for maximum throughput
   struct Config {
-    static constexpr uint64_t MAX_BUFFER_THRESHOLD = 1024 * 1024 * 1024;  // 1GB
-    static constexpr uint64_t BUFFER_CHECK_THRESHOLD = 512 * 1024 * 1024; // 512MB
-    static constexpr size_t MAX_BATCH_SIZE = 4096;  // Very large batches
-    static constexpr size_t MIN_BATCH_SIZE = 64;    // Minimum batch size
-    static constexpr int BUFFER_CHECK_INTERVAL = 128; // Check every N chunks
+    static constexpr uint64_t MAX_BUFFER_THRESHOLD = 16 * 1024 * 1024;   // 16MB
+    static constexpr uint64_t BUFFER_CHECK_THRESHOLD = 8 * 1024 * 1024;  // 8MB
+    static constexpr size_t MAX_BATCH_SIZE = 512;    // Limit bursts for fairness
+    static constexpr size_t MIN_BATCH_SIZE = 32;     // Minimum batch size
+    static constexpr int BUFFER_CHECK_INTERVAL = 16; // Check regularly
     static constexpr size_t LOG_INTERVAL = 1000;   // Log every N chunks
   };
 

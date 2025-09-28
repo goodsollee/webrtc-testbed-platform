@@ -13,12 +13,14 @@
 
 #include <stddef.h>
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <cctype>
 #include <filesystem>
 #include <memory>
 #include <optional>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 #include <fstream>
@@ -1442,18 +1444,24 @@ void Conductor::StartBulkSctp() {
   if (bulk_receiver_)
     bulk_receiver_->LogStart();
   const std::string cmd = "start";
-  SendPayload(TrafficKind::kControl,
-              absl::Span<const uint8_t>(
-                  reinterpret_cast<const uint8_t*>(cmd.data()), cmd.size()));
+  if (!SendPayload(TrafficKind::kControl,
+                   absl::Span<const uint8_t>(
+                       reinterpret_cast<const uint8_t*>(cmd.data()),
+                       cmd.size()))) {
+    RTC_LOG(LS_WARNING) << "Failed to send SCTP start command";
+  }
 }
 
 void Conductor::StopBulkSctp() {
   if (bulk_receiver_)
     bulk_receiver_->LogStop();
   const std::string cmd = "stop";
-  SendPayload(TrafficKind::kControl,
-              absl::Span<const uint8_t>(
-                  reinterpret_cast<const uint8_t*>(cmd.data()), cmd.size()));
+  if (!SendPayload(TrafficKind::kControl,
+                   absl::Span<const uint8_t>(
+                       reinterpret_cast<const uint8_t*>(cmd.data()),
+                       cmd.size()))) {
+    RTC_LOG(LS_WARNING) << "Failed to send SCTP stop command";
+  }
 }
 
 void Conductor::ServiceWebSocket() {
@@ -1714,12 +1722,12 @@ bool Conductor::AddSctpFlow(TrafficKind kind, const std::string& label, const we
 }
 
 
-void Conductor::SendPayload(TrafficKind kind, absl::Span<const uint8_t> data) {
+bool Conductor::SendPayload(TrafficKind kind, absl::Span<const uint8_t> data) {
   auto it = flows_.find(kind);
   if (it == flows_.end() || !it->second.channel ||
       it->second.channel->state() != webrtc::DataChannelInterface::kOpen) {
     RTC_LOG(LS_WARNING) << "Flow " << static_cast<int>(kind) << " not ready";
-    return;
+    return false;
   }
   // If you keep the 1-byte header, prepend it:
   rtc::CopyOnWriteBuffer buf(data.size() + 1);
@@ -1728,10 +1736,58 @@ void Conductor::SendPayload(TrafficKind kind, absl::Span<const uint8_t> data) {
     std::memcpy(buf.MutableData() + 1, data.data(), data.size());
   }
 
-  if (!it->second.channel->Send(webrtc::DataBuffer(buf, true))) {
-    RTC_LOG(LS_WARNING) << "Failed to send SCTP payload for kind "
-                        << static_cast<int>(kind);
+  webrtc::DataBuffer payload(buf, true);
+  auto channel = it->second.channel;
+  if (channel->Send(payload)) {
+    return true;
   }
+
+  constexpr uint64_t kLowWaterMark = 512 * 1024;   // 512 KB
+  constexpr auto kInitialSleep = std::chrono::milliseconds(1);
+  constexpr auto kMaxSleep = std::chrono::milliseconds(50);
+  constexpr auto kMaxRetryWindow = std::chrono::seconds(15);
+
+  RTC_LOG(LS_WARNING) << "DataChannel backpressure for kind "
+                      << static_cast<int>(kind)
+                      << ", buffered=" << channel->buffered_amount();
+
+  auto deadline = std::chrono::steady_clock::now() + kMaxRetryWindow;
+  auto sleep = kInitialSleep;
+
+  while (channel->state() == webrtc::DataChannelInterface::kOpen &&
+         std::chrono::steady_clock::now() < deadline) {
+    // Wait until the channel drains below the low-water mark before retrying.
+    uint64_t buffered = channel->buffered_amount();
+    while (channel->state() == webrtc::DataChannelInterface::kOpen &&
+           buffered > kLowWaterMark &&
+           std::chrono::steady_clock::now() < deadline) {
+      std::this_thread::sleep_for(sleep);
+      if (sleep < kMaxSleep) {
+        sleep = std::min(sleep * 2, kMaxSleep);
+      }
+      buffered = channel->buffered_amount();
+    }
+
+    if (channel->state() != webrtc::DataChannelInterface::kOpen) {
+      break;
+    }
+
+    sleep = kInitialSleep;
+    if (channel->Send(payload)) {
+      RTC_LOG(LS_INFO) << "Recovered from backpressure for kind "
+                       << static_cast<int>(kind);
+      return true;
+    }
+
+    RTC_LOG(LS_WARNING)
+        << "Retrying SCTP payload send for kind " << static_cast<int>(kind)
+        << ", buffered=" << channel->buffered_amount();
+  }
+
+  RTC_LOG(LS_ERROR) << "Failed to send SCTP payload for kind "
+                    << static_cast<int>(kind)
+                    << ", channel state=" << channel->state();
+  return false;
 }
 
 void Conductor::RegisterPayloadHandler(TrafficKind kind, PayloadHandler handler) {
