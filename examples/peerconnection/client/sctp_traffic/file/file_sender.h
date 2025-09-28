@@ -56,12 +56,18 @@ class Sender {
   void RunPeriodic();
   void RunCustom();                 // absolute-time scheduler
   void LoadTrace(const std::string& path);  // parses time_ms,size
-  
+
   // Enhanced backpressure methods
   bool CheckBufferSpaceNonBlocking();
   bool WaitForBufferSpaceAdaptive();
   void AdaptBackpressureParameters(uint64_t current_buffered);
-  
+
+  // Token bucket rate limiting helpers
+  double ComputeTargetBitrateBps(size_t file_bytes) const;
+  void ResetRateLimiter(size_t max_chunk_payload, size_t file_bytes);
+  void UpdateRateBudget(std::chrono::steady_clock::time_point now);
+  bool ConsumeRateBudget(size_t chunk_bytes);
+
   struct LogEntry {
     double timestamp_ms = 0.0;
     uint64_t total_data_bytes = 0;
@@ -90,6 +96,21 @@ class Sender {
   size_t current_batch_size_ = 1;
   int current_check_interval_ms_ = 1;
   int consecutive_blocks_ = 0;  // For exponential backoff
+
+  struct TokenBucketConfig {
+    int burst_window_ms = 200;
+    size_t min_bucket_bytes = 64 * 1024;
+    size_t max_bucket_bytes = 8 * 1024 * 1024;
+    int max_sleep_ms = 5;
+  };
+  TokenBucketConfig token_bucket_config_;
+  bool rate_limiter_enabled_ = false;
+  double current_target_bitrate_bps_ = 0.0;
+  double rate_bucket_bytes_ = 0.0;
+  size_t rate_bucket_capacity_bytes_ = 0;
+  std::chrono::steady_clock::time_point last_rate_update_time_;
+  bool rate_bucket_initialized_ = false;
+  double last_logged_target_bps_ = 0.0;
 
   std::mutex log_mutex_;
   std::ofstream csv_log_;
