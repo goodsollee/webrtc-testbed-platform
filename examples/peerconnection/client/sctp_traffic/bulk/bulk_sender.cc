@@ -66,9 +66,12 @@ void Sender::PumpOnce(int64_t now_ms) {
 
   size_t sent_bytes = 0;
   while (credit_bytes_ >= static_cast<double>(payload_.size())) {
-    conductor_->SendPayload(
-        Kind::kBulkTest,
-        absl::Span<const uint8_t>(payload_.data(), payload_.size()));
+    if (!conductor_->SendPayload(
+            Kind::kBulkTest,
+            absl::Span<const uint8_t>(payload_.data(), payload_.size()))) {
+      std::cout << "[BULK][TX] send blocked by backpressure" << std::endl;
+      break;
+    }
     credit_bytes_ -= payload_.size();
     sent_bytes += payload_.size();
 

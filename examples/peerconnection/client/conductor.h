@@ -106,7 +106,7 @@ class Conductor : public webrtc::PeerConnectionObserver,
   using PayloadHandler = std::function<void(absl::Span<const uint8_t>)>;
 
   bool AddSctpFlow(TrafficKind kind, const std::string& label, const webrtc::DataChannelInit& cfg);
-  void SendPayload(TrafficKind kind, absl::Span<const uint8_t> data);
+  bool SendPayload(TrafficKind kind, absl::Span<const uint8_t> data);
   void RegisterPayloadHandler(TrafficKind kind, PayloadHandler handler);
 
   bool IsFlowOpen(TrafficKind kind) const;
