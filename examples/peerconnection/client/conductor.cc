@@ -28,6 +28,7 @@
 #include <cstdint>
 #include <functional>
 #include <limits>
+#include <mutex>
 #include <unordered_map>
 
 
@@ -76,6 +77,7 @@
 #include "pc/video_track_source.h"
 #include "rtc_base/checks.h"
 #include "rtc_base/logging.h"
+#include "rtc_base/thread_annotations.h"
 #include "rtc_base/strings/json.h"
 #include "system_wrappers/include/clock.h"
 #include "test/frame_generator_capturer.h"
@@ -236,6 +238,7 @@ private:
 class MyDataObserver : public webrtc::DataChannelObserver {
  public:
   using OnPayload = std::function<void(absl::Span<const uint8_t>)>;
+  using OnBufferedAmountLow = std::function<void()>;
 
   MyDataObserver(rtc::scoped_refptr<webrtc::DataChannelInterface> channel,
                  OnPayload on_payload)
@@ -261,9 +264,61 @@ class MyDataObserver : public webrtc::DataChannelObserver {
     on_payload_(absl::Span<const uint8_t>(raw + 1, sz - 1));
   }
 
+  void OnBufferedAmountChange(uint64_t /*sent_data_size*/) override {
+    OnBufferedAmountLow callback;
+    bool should_fire = false;
+    {
+      std::lock_guard<std::mutex> lock(callback_mutex_);
+      if (!on_buffered_low_) {
+        return;
+      }
+      const uint64_t current = channel_->buffered_amount();
+      const bool below = current <= buffered_low_threshold_;
+      if (below && !was_below_threshold_) {
+        should_fire = true;
+        callback = on_buffered_low_;
+      }
+      was_below_threshold_ = below;
+    }
+    if (should_fire && callback) {
+      callback();
+    }
+  }
+
+  void SetBufferedAmountLowThreshold(uint64_t threshold) {
+    std::lock_guard<std::mutex> lock(callback_mutex_);
+    buffered_low_threshold_ = threshold;
+    was_below_threshold_ = channel_->buffered_amount() <= buffered_low_threshold_;
+  }
+
+  void SetOnBufferedAmountLow(OnBufferedAmountLow cb) {
+    OnBufferedAmountLow immediate;
+    {
+      std::lock_guard<std::mutex> lock(callback_mutex_);
+      on_buffered_low_ = std::move(cb);
+      if (on_buffered_low_) {
+        const uint64_t current = channel_->buffered_amount();
+        was_below_threshold_ = current <= buffered_low_threshold_;
+        if (was_below_threshold_) {
+          immediate = on_buffered_low_;
+        }
+      } else {
+        was_below_threshold_ = false;
+      }
+    }
+    if (immediate) {
+      immediate();
+    }
+  }
+
  private:
   rtc::scoped_refptr<webrtc::DataChannelInterface> channel_;
   OnPayload on_payload_;
+
+  std::mutex callback_mutex_;
+  OnBufferedAmountLow on_buffered_low_ RTC_GUARDED_BY(callback_mutex_);
+  uint64_t buffered_low_threshold_ RTC_GUARDED_BY(callback_mutex_) = 0;
+  bool was_below_threshold_ RTC_GUARDED_BY(callback_mutex_) = false;
 };
 
 bool Conductor::curl_initialized_ = false;
@@ -1708,12 +1763,26 @@ bool Conductor::AddSctpFlow(TrafficKind kind, const std::string& label, const we
   };
 
   if (it == flows_.end()) {
-    Flow f; f.channel = ch; f.observer = std::make_unique<MyDataObserver>(ch, on_payload); f.label = label;
+    Flow f;
+    f.channel = ch;
+    f.observer = std::make_unique<MyDataObserver>(ch, on_payload);
+    f.label = label;
+    if (f.buffered_low_threshold != 0 || f.buffered_low_callback) {
+      f.observer->SetBufferedAmountLowThreshold(f.buffered_low_threshold);
+      f.observer->SetOnBufferedAmountLow(f.buffered_low_callback);
+    }
     flows_.emplace(kind, std::move(f));
   } else {
-    it->second.channel  = ch;  
+    it->second.channel  = ch;
     it->second.observer = std::make_unique<MyDataObserver>(ch, on_payload);
     it->second.label    = label;
+    if (it->second.buffered_low_threshold != 0 ||
+        it->second.buffered_low_callback) {
+      it->second.observer->SetBufferedAmountLowThreshold(
+          it->second.buffered_low_threshold);
+      it->second.observer->SetOnBufferedAmountLow(
+          it->second.buffered_low_callback);
+    }
   }
 
   std::cout << "Bound outgoing channel '" << label << "' to kind "
@@ -1800,6 +1869,27 @@ void Conductor::RegisterPayloadHandler(TrafficKind kind, PayloadHandler handler)
     return;
   }
   it->second.handler = std::move(handler);
+}
+
+void Conductor::ConfigureBufferedAmountLowCallback(
+    TrafficKind kind,
+    uint64_t threshold_bytes,
+    std::function<void()> callback) {
+  auto it = flows_.find(kind);
+  if (it == flows_.end()) {
+    Flow f;
+    f.buffered_low_threshold = threshold_bytes;
+    f.buffered_low_callback = std::move(callback);
+    flows_.emplace(kind, std::move(f));
+    return;
+  }
+
+  it->second.buffered_low_threshold = threshold_bytes;
+  it->second.buffered_low_callback = callback;
+  if (it->second.observer) {
+    it->second.observer->SetBufferedAmountLowThreshold(threshold_bytes);
+    it->second.observer->SetOnBufferedAmountLow(std::move(callback));
+  }
 }
 
 bool Conductor::IsFlowOpen(TrafficKind kind) const {

@@ -108,6 +108,10 @@ class Conductor : public webrtc::PeerConnectionObserver,
   bool AddSctpFlow(TrafficKind kind, const std::string& label, const webrtc::DataChannelInit& cfg);
   bool SendPayload(TrafficKind kind, absl::Span<const uint8_t> data);
   void RegisterPayloadHandler(TrafficKind kind, PayloadHandler handler);
+  void ConfigureBufferedAmountLowCallback(
+      TrafficKind kind,
+      uint64_t threshold_bytes,
+      std::function<void()> callback);
 
   bool IsFlowOpen(TrafficKind kind) const;
   uint64_t BufferedAmount(TrafficKind kind) const;
@@ -203,9 +207,11 @@ class Conductor : public webrtc::PeerConnectionObserver,
   // One flow = one channel + its observer + its handler.
   struct Flow {
     rtc::scoped_refptr<webrtc::DataChannelInterface> channel;
-   std::unique_ptr<MyDataObserver> observer;
+    std::unique_ptr<MyDataObserver> observer;
     PayloadHandler handler;  // nullable until user registers it
     std::string label;       // for debugging / remote mapping
+    uint64_t buffered_low_threshold = 0;
+    std::function<void()> buffered_low_callback;
   };
 
    // Map flows by kind
