@@ -77,3 +77,4 @@
 !webrtc/*
 webrtc_logs/*
 *.txt
+automated_experiment/webrtc_logs/*
