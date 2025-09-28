@@ -240,13 +240,16 @@ void Sender::SendFile(size_t file_bytes) {
     max_chunk_payload = file_bytes;
   }
 
-  const size_t chunk_count =
-      (file_bytes + max_chunk_payload - 1) / max_chunk_payload;
+  size_t chunk_count = file_bytes / max_chunk_payload;
+  if (file_bytes % max_chunk_payload != 0) {
+    ++chunk_count;
+  }
 
   Sender::LogEntry last_entry;
   PayloadMetadata last_metadata;
   size_t chunks_sent = 0;
 
+  size_t bytes_sent = 0;
   for (size_t chunk_index = 0; chunk_index < chunk_count && running_.load();
        ++chunk_index) {
     const auto chunk_time = clock::now();
@@ -254,8 +257,9 @@ void Sender::SendFile(size_t file_bytes) {
         std::chrono::duration_cast<std::chrono::milliseconds>(
             chunk_time - flow_start_time_)
             .count();
+    const size_t remaining_bytes = file_bytes - bytes_sent;
     const size_t chunk_bytes =
-        std::min(max_chunk_payload, file_bytes - chunk_index * max_chunk_payload);
+        std::min(max_chunk_payload, remaining_bytes);
 
     PayloadMetadata metadata;
     metadata.sequence = sequence;
@@ -272,6 +276,7 @@ void Sender::SendFile(size_t file_bytes) {
     last_entry = LogSendEvent(metadata);
     last_metadata = metadata;
     ++chunks_sent;
+    bytes_sent += chunk_bytes;
   }
 
   if (chunks_sent == 0) {
