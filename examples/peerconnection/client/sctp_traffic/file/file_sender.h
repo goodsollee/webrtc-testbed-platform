@@ -11,6 +11,8 @@
 #include <utility>
 #include <vector>
 
+#include "examples/peerconnection/client/sctp_traffic/file/file_message.h"
+
 class Conductor;  // Forward declaration.
 
 namespace sctp::file {
@@ -21,7 +23,10 @@ class Sender {
   struct PayloadMetadata {
     uint64_t sequence = 0;
     uint64_t send_time_ms = 0;
-    size_t data_bytes = 0;
+    uint64_t file_bytes = 0;
+    uint64_t chunk_bytes = 0;
+    uint32_t chunk_index = 0;
+    uint32_t chunk_count = 0;
   };
 
   // Periodic pattern constructor.
@@ -40,7 +45,8 @@ class Sender {
   void RunCustom();                 // absolute-time scheduler
   void LoadTrace(const std::string& path);  // parses time_ms,size
   void LogSendEvent(const PayloadMetadata& metadata);
-  std::vector<uint8_t> BuildPayload(size_t data_bytes, PayloadMetadata* metadata);
+  void SendFile(size_t file_bytes);
+  std::vector<uint8_t> BuildChunkPayload(const PayloadMetadata& metadata);
   std::string MakeLogPath() const;
 
   Conductor* conductor_ = nullptr;

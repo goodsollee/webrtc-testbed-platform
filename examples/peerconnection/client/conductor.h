@@ -111,6 +111,7 @@ class Conductor : public webrtc::PeerConnectionObserver,
 
   bool IsFlowOpen(TrafficKind kind) const;
   uint64_t BufferedAmount(TrafficKind kind) const;
+  size_t MaxSctpMessageSize(TrafficKind kind) const;
   rtc::Thread* signaling_thread() const { return signaling_thread_.get(); }
 
  protected:
