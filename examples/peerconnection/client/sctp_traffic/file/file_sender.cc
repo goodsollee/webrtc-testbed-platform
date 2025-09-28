@@ -11,6 +11,7 @@
 
 #include "absl/types/span.h"
 #include "examples/peerconnection/client/conductor.h"
+#include "modules/rtp_rtcp/source/byte_io.h"
 #include "rtc_base/byte_order.h"
 
 static bool ParseIntStrict(const std::string& s, int& out) {
@@ -240,9 +241,9 @@ std::vector<uint8_t> Sender::BuildPayload(size_t data_bytes,
           .count();
   metadata->data_bytes = data_bytes;
 
-  rtc::ByteWriter<uint64_t>::WriteLittleEndian(payload.data(),
+  webrtc::ByteWriter<uint64_t>::WriteLittleEndian(payload.data(),
                                                metadata->sequence);
-  rtc::ByteWriter<uint64_t>::WriteLittleEndian(
+  webrtc::ByteWriter<uint64_t>::WriteLittleEndian(
       payload.data() + sizeof(uint64_t), metadata->send_time_ms);
 
   return payload;

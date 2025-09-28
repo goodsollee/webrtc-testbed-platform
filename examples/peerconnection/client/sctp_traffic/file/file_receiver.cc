@@ -9,6 +9,7 @@
 
 #include "absl/types/span.h"
 #include "examples/peerconnection/client/conductor.h"
+#include "modules/rtp_rtcp/source/byte_io.h"
 #include "rtc_base/byte_order.h"
 #include "rtc_base/logging.h"
 #include "rtc_base/time_utils.h"
@@ -107,9 +108,9 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
   }
 
   const uint64_t sequence =
-      rtc::ByteReader<uint64_t>::ReadLittleEndian(bytes.data());
+      webrtc::ByteReader<uint64_t>::ReadLittleEndian(bytes.data());
   const uint64_t send_time_ms =
-      rtc::ByteReader<uint64_t>::ReadLittleEndian(bytes.data() + sizeof(uint64_t));
+      webrtc::ByteReader<uint64_t>::ReadLittleEndian(bytes.data() + sizeof(uint64_t));
   const size_t data_bytes = bytes.size() - kHeaderSize;
   double delivery_delay_ms = 0.0;
   int64_t arrival_time_ms = rtc::TimeMillis();
