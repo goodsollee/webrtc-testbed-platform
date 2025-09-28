@@ -8,6 +8,7 @@
 #include <iostream>
 #include <sstream>
 #include <thread>
+#include <cmath>
 
 #include "absl/types/span.h"
 #include "examples/peerconnection/client/conductor.h"
@@ -260,7 +261,7 @@ bool Sender::WaitForBufferSpaceAdaptive() {
 }
 
 void Sender::AdaptBackpressureParameters(uint64_t current_buffered) {
-  const double buffer_ratio = static_cast<double>(current_buffered) / 
+  const double buffer_ratio = static_cast<double>(current_buffered) /
                               backpressure_config_.buffer_threshold;
   
   if (backpressure_config_.adaptive_batching) {
@@ -292,6 +293,106 @@ void Sender::AdaptBackpressureParameters(uint64_t current_buffered) {
       backpressure_config_.max_check_interval_ms
     );
   }
+}
+
+double Sender::ComputeTargetBitrateBps(size_t file_bytes) const {
+  if (periodicity_ms_ <= 0) {
+    return 0.0;
+  }
+
+  const int clamped_period_ms = std::max(periodicity_ms_, 1);
+  const double period_seconds = static_cast<double>(clamped_period_ms) / 1000.0;
+  return (static_cast<double>(file_bytes) * 8.0) / period_seconds;
+}
+
+void Sender::ResetRateLimiter(size_t max_chunk_payload, size_t file_bytes) {
+  using clock = std::chrono::steady_clock;
+
+  current_target_bitrate_bps_ = ComputeTargetBitrateBps(file_bytes);
+  if (current_target_bitrate_bps_ <= 0.0) {
+    rate_limiter_enabled_ = false;
+    rate_bucket_bytes_ = 0.0;
+    rate_bucket_capacity_bytes_ = 0;
+    rate_bucket_initialized_ = false;
+    return;
+  }
+
+  rate_limiter_enabled_ = true;
+
+  const double burst_seconds =
+      std::max(token_bucket_config_.burst_window_ms, 1) / 1000.0;
+  size_t burst_from_rate = static_cast<size_t>(
+      (current_target_bitrate_bps_ * burst_seconds) / 8.0);
+
+  rate_bucket_capacity_bytes_ = std::max({
+      max_chunk_payload,
+      token_bucket_config_.min_bucket_bytes,
+      burst_from_rate});
+
+  if (token_bucket_config_.max_bucket_bytes > 0) {
+    rate_bucket_capacity_bytes_ =
+        std::min(rate_bucket_capacity_bytes_, token_bucket_config_.max_bucket_bytes);
+  }
+
+  rate_bucket_bytes_ = static_cast<double>(rate_bucket_capacity_bytes_);
+  last_rate_update_time_ = clock::now();
+  rate_bucket_initialized_ = true;
+
+  if (std::fabs(last_logged_target_bps_ - current_target_bitrate_bps_) >
+      current_target_bitrate_bps_ * 0.05) {
+    RTC_LOG(LS_INFO)
+        << "[SCTP][FILE][Sender] kind=" << kind_
+        << " applying token bucket target=" << current_target_bitrate_bps_
+        << " bps (bucket=" << rate_bucket_capacity_bytes_ << " bytes)";
+    last_logged_target_bps_ = current_target_bitrate_bps_;
+  }
+}
+
+void Sender::UpdateRateBudget(std::chrono::steady_clock::time_point now) {
+  if (!rate_limiter_enabled_ || !rate_bucket_initialized_) {
+    return;
+  }
+
+  const double delta_seconds =
+      std::chrono::duration<double>(now - last_rate_update_time_).count();
+  if (delta_seconds <= 0.0) {
+    return;
+  }
+
+  rate_bucket_bytes_ = std::min(
+      static_cast<double>(rate_bucket_capacity_bytes_),
+      rate_bucket_bytes_ + (current_target_bitrate_bps_ * delta_seconds) / 8.0);
+  last_rate_update_time_ = now;
+}
+
+bool Sender::ConsumeRateBudget(size_t chunk_bytes) {
+  using clock = std::chrono::steady_clock;
+
+  if (!rate_limiter_enabled_) {
+    return true;
+  }
+
+  UpdateRateBudget(clock::now());
+
+  while (running_.load() && rate_bucket_bytes_ + 1e-9 < chunk_bytes) {
+    const double deficit = static_cast<double>(chunk_bytes) - rate_bucket_bytes_;
+    const double wait_seconds =
+        deficit * 8.0 / std::max(current_target_bitrate_bps_, 1.0);
+    int wait_ms = static_cast<int>(std::ceil(wait_seconds * 1000.0));
+    wait_ms = std::clamp(wait_ms, 1, token_bucket_config_.max_sleep_ms);
+    std::this_thread::sleep_for(std::chrono::milliseconds(wait_ms));
+    UpdateRateBudget(clock::now());
+  }
+
+  if (!running_.load()) {
+    return false;
+  }
+
+  rate_bucket_bytes_ -= static_cast<double>(chunk_bytes);
+  if (rate_bucket_bytes_ < 0.0) {
+    rate_bucket_bytes_ = 0.0;
+  }
+  return true;
 }
 
 void Sender::SendFile(size_t file_bytes) {
@@ -335,7 +436,8 @@ void Sender::SendFileBatched(size_t file_bytes) {
     ++chunk_count;
   }
 
-  
+  ResetRateLimiter(max_chunk_payload, file_bytes);
+
   // Log start of file sending
   const uint64_t start_time_ms =
       std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -353,8 +455,10 @@ void Sender::SendFileBatched(size_t file_bytes) {
   size_t chunks_sent = 0;
   size_t bytes_sent = 0;
   
-  for (size_t chunk_index = 0; chunk_index < chunk_count && running_.load();) {
-    
+  bool aborted = false;
+  for (size_t chunk_index = 0;
+       chunk_index < chunk_count && running_.load() && !aborted;) {
+
     // Check buffer space before sending a batch
     if (!CheckBufferSpaceNonBlocking()) {
       if (!WaitForBufferSpaceAdaptive()) {
@@ -374,15 +478,21 @@ void Sender::SendFileBatched(size_t file_bytes) {
           break;
         }
       }
-      
+
+      const size_t remaining_bytes = file_bytes - bytes_sent;
+      const size_t chunk_bytes =
+          std::min(max_chunk_payload, remaining_bytes);
+
+      if (!ConsumeRateBudget(chunk_bytes)) {
+        aborted = true;
+        break;
+      }
+
       const auto chunk_time = clock::now();
       const uint64_t send_time_ms =
           std::chrono::duration_cast<std::chrono::milliseconds>(
               chunk_time - flow_start_time_)
               .count();
-      const size_t remaining_bytes = file_bytes - bytes_sent;
-      const size_t chunk_bytes =
-          std::min(max_chunk_payload, remaining_bytes);
 
       PayloadMetadata metadata;
       metadata.sequence = sequence;
@@ -408,9 +518,13 @@ void Sender::SendFileBatched(size_t file_bytes) {
         std::this_thread::sleep_for(std::chrono::microseconds(10));
       }
     }
-    
+
+    if (aborted) {
+      break;
+    }
+
     chunk_index = batch_end;
-    
+
     // Small yield between batches to prevent completely monopolizing the thread
     if (current_batch_size_ > 1 && chunk_index < chunk_count) {
       std::this_thread::sleep_for(std::chrono::microseconds(50));
