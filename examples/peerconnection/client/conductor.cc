@@ -28,7 +28,6 @@
 #include <cstdint>
 #include <functional>
 #include <limits>
-#include <mutex>
 #include <unordered_map>
 
 
@@ -78,6 +77,7 @@
 #include "rtc_base/checks.h"
 #include "rtc_base/logging.h"
 #include "rtc_base/thread_annotations.h"
+#include "rtc_base/synchronization/mutex.h"
 #include "rtc_base/strings/json.h"
 #include "system_wrappers/include/clock.h"
 #include "test/frame_generator_capturer.h"
@@ -268,7 +268,7 @@ class MyDataObserver : public webrtc::DataChannelObserver {
     OnBufferedAmountLow callback;
     bool should_fire = false;
     {
-      std::lock_guard<std::mutex> lock(callback_mutex_);
+      webrtc::MutexLock lock(&callback_mutex_);
       if (!on_buffered_low_) {
         return;
       }
@@ -286,7 +286,7 @@ class MyDataObserver : public webrtc::DataChannelObserver {
   }
 
   void SetBufferedAmountLowThreshold(uint64_t threshold) {
-    std::lock_guard<std::mutex> lock(callback_mutex_);
+    webrtc::MutexLock lock(&callback_mutex_);
     buffered_low_threshold_ = threshold;
     was_below_threshold_ = channel_->buffered_amount() <= buffered_low_threshold_;
   }
@@ -294,7 +294,7 @@ class MyDataObserver : public webrtc::DataChannelObserver {
   void SetOnBufferedAmountLow(OnBufferedAmountLow cb) {
     OnBufferedAmountLow immediate;
     {
-      std::lock_guard<std::mutex> lock(callback_mutex_);
+      webrtc::MutexLock lock(&callback_mutex_);
       on_buffered_low_ = std::move(cb);
       if (on_buffered_low_) {
         const uint64_t current = channel_->buffered_amount();
@@ -315,7 +315,7 @@ class MyDataObserver : public webrtc::DataChannelObserver {
   rtc::scoped_refptr<webrtc::DataChannelInterface> channel_;
   OnPayload on_payload_;
 
-  std::mutex callback_mutex_;
+  webrtc::Mutex callback_mutex_;
   OnBufferedAmountLow on_buffered_low_ RTC_GUARDED_BY(callback_mutex_);
   uint64_t buffered_low_threshold_ RTC_GUARDED_BY(callback_mutex_) = 0;
   bool was_below_threshold_ RTC_GUARDED_BY(callback_mutex_) = false;
