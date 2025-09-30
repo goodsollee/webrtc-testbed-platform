@@ -41,6 +41,10 @@ ABSL_FLAG(std::string, y4m_path, "",
         "Path to SCTP traffic CSV to drive traffic");
 // In flag_defs.h, add:
 ABSL_FLAG(std::string, log_date, "", "Date for log folder (YYYY-MM-DD)");
+ABSL_FLAG(std::string,
+          log_root,
+          "webrtc_logs",
+          "Root directory used to store experiment logs");
 
 ABSL_FLAG(bool, headless, false, 
     "Whether to run in headless or not");
@@ -204,13 +208,19 @@ Example Commands:
   std::string room_id = absl::GetFlag(FLAGS_room_id);
   bool is_sender = absl::GetFlag(FLAGS_is_sender);
   std::string role = is_sender ? "sender" : "receiver";
-  std::string log_dir = "webrtc_logs/" + date + "_" + room_id + "/" + role;
-  
+  std::filesystem::path log_root = absl::GetFlag(FLAGS_log_root);
+  if (log_root.empty()) {
+    log_root = std::filesystem::path("webrtc_logs");
+  }
+
+  std::filesystem::path log_dir =
+      log_root / std::filesystem::path(date) / room_id / role;
+
   // Create directory
   std::filesystem::create_directories(log_dir);
-  
+
   // Pass log_dir to conductor
-  conductor->SetLogDirectory(log_dir);
+  conductor->SetLogDirectory(log_dir.string());
 
   // Configure experiment mode
   conductor->SetEmulationMode(is_emulation, is_sender);
