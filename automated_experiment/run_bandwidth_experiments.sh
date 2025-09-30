@@ -167,7 +167,7 @@ run_single_trace() {
 
     local wait_seconds=0
 
-    while [[ ! -f "$emulator_stdout" || -z $(grep -m1 "Press any key to start traffic shaping..." "$emulator_stdout" 2>/dev/null) ]]; do
+    while [[ ! -f "$emulator_stdout" || -z $(grep -m1 "Type 'start' to begin traffic shaping..." "$emulator_stdout" 2>/dev/null) ]]; do
         if ! kill -0 "$emulator_pid" 2>/dev/null; then
             echo "Emulator exited before becoming ready. Check $emulator_stdout" >&2
             return 1
@@ -243,7 +243,7 @@ run_single_trace() {
     echo -e "\n=== STARTING EMULATION TRACE ==="
     sleep 1
     echo "Starting bandwidth emulation for trace: $trace_name"
-    echo "start" | sudo tee /proc/$(cat "$run_stdout_dir/emulator.pid")/fd/0 > /dev/null 2>&1 || echo "Note: Could not send start signal to emulator stdin"
+    printf 'start\n' | sudo tee /proc/$(cat "$run_stdout_dir/emulator.pid")/fd/0 > /dev/null 2>&1 || echo "Note: Could not send 'start' command to emulator"
 
     local exit_code=0
     wait "$receiver_pid" || exit_code=$?
