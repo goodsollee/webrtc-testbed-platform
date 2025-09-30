@@ -2,6 +2,8 @@
 #include <iostream>
 #include <memory>
 #include <csignal>
+#include <unistd.h>
+#include <sys/select.h>
 
 #include "absl/flags/flag.h"
 #include "absl/flags/parse.h"
@@ -84,6 +86,40 @@ int main(int argc, char* argv[]) {
         if (!g_emulator->Initialize(profile_path, interface_name, peer_name)) {
             LOG_ERROR("main", "Failed to initialize network emulator");
             return 1;
+        }
+
+        // Wait for external trigger to start
+        LOG_INFO("main", "Waiting for start signal...");
+
+        // Check if stdin is a terminal (interactive) or redirected
+        bool stdin_available = isatty(fileno(stdin));
+
+        if (stdin_available) {
+            // Interactive mode: wait for user input
+            std::string input;
+            std::getline(std::cin, input);
+        } else {
+            // Non-interactive mode: continuously try to read from stdin
+            // This allows the script to send data via /proc/PID/fd/0
+            std::string input;
+            while (true) {
+                // Attempt to read from stdin with a small timeout
+                fd_set readfds;
+                FD_ZERO(&readfds);
+                FD_SET(STDIN_FILENO, &readfds);
+
+                struct timeval timeout;
+                timeout.tv_sec = 0;
+                timeout.tv_usec = 100000; // 100ms timeout
+
+                int ret = select(STDIN_FILENO + 1, &readfds, NULL, NULL, &timeout);
+                if (ret > 0 && FD_ISSET(STDIN_FILENO, &readfds)) {
+                    std::getline(std::cin, input);
+                    if (!input.empty()) {
+                        break;
+                    }
+                }
+            }
         }
 
         // Start the emulator

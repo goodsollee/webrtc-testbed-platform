@@ -101,7 +101,7 @@ else
     fi
     while IFS= read -r -d '' config_file; do
         TRAFFIC_CONFIGS+=("$config_file")
-    done < <(find "$TRAFFIC_DIR" -type f -name '*.csv' -print0 | sort -z)
+    done < <(find "$TRAFFIC_DIR" -maxdepth 1 -type f -name '*.csv' -print0 | sort -z)
 
     if [[ ${#TRAFFIC_CONFIGS[@]} -eq 0 ]]; then
         echo "Error: no CSV files found in $TRAFFIC_DIR" >&2
@@ -165,9 +165,9 @@ run_single_trace() {
     cd "$previous_dir"
     echo "$emulator_pid" > "$run_stdout_dir/emulator.pid"
 
-    local emulator_log_file="$SCRIPT_DIR/network_emulation/network_emulator.log"
     local wait_seconds=0
-    while [[ ! -f "$emulator_log_file" || -z $(grep -m1 "Network emulator running" "$emulator_log_file" 2>/dev/null) ]]; do
+
+    while [[ ! -f "$emulator_stdout" || -z $(grep -m1 "Press any key to start traffic shaping..." "$emulator_stdout" 2>/dev/null) ]]; do
         if ! kill -0 "$emulator_pid" 2>/dev/null; then
             echo "Emulator exited before becoming ready. Check $emulator_stdout" >&2
             return 1
@@ -259,9 +259,8 @@ run_single_trace() {
         wait "$emulator_pid" || true
     fi
 
-    if [[ -f "$emulator_log_file" ]]; then
-        cp "$emulator_log_file" "$EMULATOR_LOG_DIR/${trace_name}.log"
-        : > "$emulator_log_file"
+    if [[ -f "$emulator_stdout" ]]; then
+        cp "$emulator_stdout" "$EMULATOR_LOG_DIR/${trace_name}.log"
     fi
 
     if [[ $exit_code -ne 0 ]]; then

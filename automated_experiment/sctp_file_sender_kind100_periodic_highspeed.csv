@@ -1,2 +1,2 @@
 timestamp_ms,chunk_bytes,total_data_bytes,file_bytes,sequence,chunk_index,chunk_count,send_time_ms
-0.000,1048576,1048576,1210000000,0,0,1154,0
+0.000,1048576,1048576,121000000,0,0,116,0

@@ -43,13 +43,7 @@ bool NetworkEmulator::Initialize(const std::string& profile_path,
         LOG_WARNING(NETWORK_EMULATOR_MODULE_NAME, "Profile parsing failed or no valid profiles found");
     }
 
-    // Wait for user input before starting traffic shaping
     LOG_INFO(NETWORK_EMULATOR_MODULE_NAME, "Press any key to start traffic shaping...");
-    std::cin.get();
-
-    Start();
-
-    LOG_INFO("main", "Network emulator running. Press Ctrl+C to stop...");
 
     return true;
 }
