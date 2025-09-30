@@ -1,0 +1,88 @@
+net.ipv4.ip_forward = 1
+2025-09-30 10:56:11:057 [INFO] [main] [main.cpp:62] Interface: wlo1
+2025-09-30 10:56:11:057 [INFO] [main] [main.cpp:65] Using profile path: /mnt/mydata/home/goodsol/workspace/QCON/webrtc/src/automated_experiment/results/promptVSkvcache1/custom_traffic_pattern/abc4g_0/profiles/abc4g_0.csv
+2025-09-30 10:56:11:062 [INFO] [main] [main.cpp:77] Starting Network Emulator
+2025-09-30 10:56:11:062 [INFO] [PHY] [network_emulator.cpp:14] NetworkEmulator initialized
+2025-09-30 10:56:11:062 [INFO] [PHY] [network_emulator.cpp:30] Initializing NetworkEmulator
+2025-09-30 10:56:11:062 [INFO] [PHY] [network_emulator.cpp:32] Profile path provided: /mnt/mydata/home/goodsol/workspace/QCON/webrtc/src/automated_experiment/results/promptVSkvcache1/custom_traffic_pattern/abc4g_0/profiles/abc4g_0.csv
+2025-09-30 10:56:11:758 [INFO] [PHY] [network_emulator.cpp:127] Virtual interfaces created and configured successfully
+2025-09-30 10:56:11:759 [INFO] [PHY] [network_emulator.cpp:226] Parsed and sorted 1358 profiles from file
+2025-09-30 10:56:11:759 [INFO] [PHY] [network_emulator.cpp:47] Press any key to start traffic shaping...
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 24719Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 27980Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 32615Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 25634Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 20427Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 22316Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 15678Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 13103Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 14820Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 16136Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 11043Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 8010Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 15735Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 14133Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 10814Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 10528Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 10070Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 9040Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 5378Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 11158Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 15049Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 13160Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 8468Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 7324Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 4863Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 3147Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 6122Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 8583Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 8583Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 3948Kbit
+2025-09-30 10:56:11:759 [INFO] [PHY] [network_emulator.cpp:164] Starting emulation loop
+2025-09-30 10:56:11:759 [INFO] [PHY] [network_emulator.cpp:167] Emulation thread created
+2025-09-30 10:56:11:759 [INFO] [main] [network_emulator.cpp:52] Network emulator running. Press Ctrl+C to stop...
+2025-09-30 10:56:11:759 [INFO] [PHY] [network_emulator.cpp:231] Entering emulation loop
+2025-09-30 10:56:11:759 [INFO] [main] [main.cpp:91] Network emulator running. Press Ctrl+C to stop...
+2025-09-30 10:56:11:765 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 24719.2 kbps, Delay: 30 ms
+2025-09-30 10:56:11:954 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 27980.8 kbps, Delay: 30 ms
+2025-09-30 10:56:12:151 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 32615.7 kbps, Delay: 30 ms
+2025-09-30 10:56:12:352 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 25634.8 kbps, Delay: 30 ms
+2025-09-30 10:56:12:552 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 20427.7 kbps, Delay: 30 ms
+2025-09-30 10:56:12:752 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 22316 kbps, Delay: 30 ms
+2025-09-30 10:56:12:953 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 15678.4 kbps, Delay: 30 ms
+2025-09-30 10:56:13:150 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 13103.5 kbps, Delay: 30 ms
+2025-09-30 10:56:13:354 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 14820.1 kbps, Delay: 30 ms
+2025-09-30 10:56:13:548 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 16136.2 kbps, Delay: 30 ms
+2025-09-30 10:56:13:752 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 11043.5 kbps, Delay: 30 ms
+2025-09-30 10:56:13:950 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 8010.86 kbps, Delay: 30 ms
+2025-09-30 10:56:14:152 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 15735.6 kbps, Delay: 30 ms
+2025-09-30 10:56:14:350 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 14133.5 kbps, Delay: 30 ms
+2025-09-30 10:56:14:553 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 10814.7 kbps, Delay: 30 ms
+2025-09-30 10:56:14:752 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 10528.6 kbps, Delay: 30 ms
+2025-09-30 10:56:14:951 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 10070.8 kbps, Delay: 30 ms
+2025-09-30 10:56:15:153 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 9040.83 kbps, Delay: 30 ms
+2025-09-30 10:56:15:353 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 5378.72 kbps, Delay: 30 ms
+2025-09-30 10:56:15:559 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 11158 kbps, Delay: 30 ms
+2025-09-30 10:56:15:744 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 15049 kbps, Delay: 30 ms
+2025-09-30 10:56:15:951 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 13160.7 kbps, Delay: 30 ms
+2025-09-30 10:56:16:152 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 8468.63 kbps, Delay: 30 ms
+2025-09-30 10:56:16:351 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 7324.22 kbps, Delay: 30 ms
+2025-09-30 10:56:16:552 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 4863.74 kbps, Delay: 30 ms
+2025-09-30 10:56:16:754 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 3147.13 kbps, Delay: 30 ms
+2025-09-30 10:56:16:950 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 6122.59 kbps, Delay: 30 ms
+2025-09-30 10:56:17:152 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 8583.07 kbps, Delay: 30 ms
+2025-09-30 10:56:17:348 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 8583.07 kbps, Delay: 30 ms
+2025-09-30 10:56:17:553 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 3948.21 kbps, Delay: 30 ms
+2025-09-30 10:56:17:753 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_nqdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 2975Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 3547Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 4749Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 4806Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 3662Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 2346Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 1888Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 1945Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 2174Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 858304bit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 1487Kbit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 686640bit
+qdisc netem 8016: root refcnt 21 limit 50000 delay 30ms rate 2059Kbit

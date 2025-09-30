@@ -1194,7 +1194,7 @@ void Conductor::AddTracks() {
 
   webrtc::RtpEncodingParameters svc;
   svc.scalability_mode = "L1T3";  // pick the mode you need
-  svc.max_bitrate_bps = 25000000;
+  svc.max_bitrate_bps = 10000000;
   svc.max_framerate   = 30;
   svc.scale_resolution_down_by = 1.0;
   init.send_encodings.push_back(svc);
@@ -1344,7 +1344,7 @@ void Conductor::AddTracks() {
             if (!e.scalability_mode.has_value()) {
               e.scalability_mode = "L1T3";  // 또는 "L3T3_KEY" 등 원하는 모드
             }
-            e.max_bitrate_bps = 25000000;
+            e.max_bitrate_bps = 10000000;
             e.max_framerate   = 30;
             e.scale_resolution_down_by = 1.0;
           }
@@ -1352,7 +1352,7 @@ void Conductor::AddTracks() {
           // 부득이 새로 만들 경우에도 scalability_mode 반드시 설정
           webrtc::RtpEncodingParameters e;
           e.scalability_mode = "L1T3";
-          e.max_bitrate_bps = 25000000;
+          e.max_bitrate_bps = 10000000;
           e.max_framerate   = 30;
           e.scale_resolution_down_by = 1.0;
           parameters.encodings.push_back(e);

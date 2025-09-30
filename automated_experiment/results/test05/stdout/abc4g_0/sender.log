@@ -1,0 +1,3 @@
+headless mode, skip gtk init!
+Error: Network interface (--network_interface) is required in emulation mode.
+Use --help for usage information.

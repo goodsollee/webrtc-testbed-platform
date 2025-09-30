@@ -1,0 +1,3 @@
+init gtk!
+Error: Network interface (--network_interface) is required in emulation mode.
+Use --help for usage information.

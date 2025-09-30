@@ -1,0 +1,4 @@
+timestamp_ms,file_bytes,total_data_bytes,sequence,chunk_count,send_time_ms,transmit_start_time_ms,transmit_end_time_ms,delivery_delay_ms,slo_ms,slo_satisfied,slo_satisfaction_ratio
+51964345,1024,1024,0,1,0,51964345,51964345,0.000,200,true,1.000000
+51987366,1024,2048,1,1,5000,51964345,51969345,18021.000,200,false,0.500000
+51987369,1024,3072,2,1,10000,51964345,51974345,13024.000,200,false,0.333333

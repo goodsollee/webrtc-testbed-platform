@@ -1,0 +1,36 @@
+*   Trying 43.203.190.40:443...
+* Connected to goodsol.overlinkapp.org (43.203.190.40) port 443 (#0)
+* found 440 certificates in /etc/ssl/certs
+* GnuTLS ciphers: NORMAL:-ARCFOUR-128:-CTYPE-ALL:+CTYPE-X509:-VERS-SSL3.0
+* ALPN, offering h2
+* ALPN, offering http/1.1
+* SSL connection using TLS1.2 / ECDHE_RSA_AES_256_GCM_SHA384
+*   server certificate verification OK
+*   server certificate status verification SKIPPED
+*   common name: goodsol.overlinkapp.org (matched)
+*   server certificate expiration date OK
+*   server certificate activation date OK
+*   certificate public key: RSA
+*   certificate version: #3
+*   subject: CN=goodsol.overlinkapp.org
+*   start date: Tue, 22 Jul 2025 02:46:02 GMT
+*   expire date: Mon, 20 Oct 2025 02:46:01 GMT
+*   issuer: C=US,O=Let's Encrypt,CN=R11
+* ALPN, server accepted to use http/1.1
+> POST /join/abc4g_0 HTTP/1.1
+Host: goodsol.overlinkapp.org
+Accept: */*
+Content-Type: application/json
+User-Agent: peerconnection-client/1.0
+Content-Length: 26
+
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Server: nginx/1.22.1
+< Date: Tue, 30 Sep 2025 02:24:03 GMT
+< Content-Type: text/html; charset=utf-8
+< Content-Length: 46
+< Connection: keep-alive
+< cache-control: no-cache
+< 
+* Connection #0 to host goodsol.overlinkapp.org left intact

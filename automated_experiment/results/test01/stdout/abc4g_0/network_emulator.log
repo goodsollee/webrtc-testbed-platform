@@ -1,0 +1,26 @@
+net.ipv4.ip_forward = 1
+2025-09-29 20:27:50:518 [INFO] [main] [main.cpp:62] Interface: wlo1
+2025-09-29 20:27:50:518 [INFO] [main] [main.cpp:65] Using profile path: /mnt/mydata/home/goodsol/workspace/QCON/webrtc/src/automated_experiment/results/test01/profiles/abc4g_0.csv
+2025-09-29 20:27:50:518 [INFO] [main] [main.cpp:77] Starting Network Emulator
+2025-09-29 20:27:50:518 [INFO] [PHY] [network_emulator.cpp:14] NetworkEmulator initialized
+2025-09-29 20:27:50:518 [INFO] [PHY] [network_emulator.cpp:30] Initializing NetworkEmulator
+2025-09-29 20:27:50:518 [INFO] [PHY] [network_emulator.cpp:32] Profile path provided: /mnt/mydata/home/goodsol/workspace/QCON/webrtc/src/automated_experiment/results/test01/profiles/abc4g_0.csv
+2025-09-29 20:27:51:186 [INFO] [PHY] [network_emulator.cpp:127] Virtual interfaces created and configured successfully
+2025-09-29 20:27:51:186 [INFO] [PHY] [network_emulator.cpp:226] Parsed and sorted 1358 profiles from file
+2025-09-29 20:27:51:186 [INFO] [PHY] [network_emulator.cpp:47] Press any key to start traffic shaping...
+Error: Qdisc not found. To create specify NLM_F_CREATE flag.
+qdisc netem 8005: root refcnt 21 limit 50000 delay 30ms rate 24719Kbit
+qdisc netem 8005: root refcnt 21 limit 50000 delay 30ms rate 27980Kbit
+2025-09-29 20:27:51:186 [INFO] [PHY] [network_emulator.cpp:164] Starting emulation loop
+2025-09-29 20:27:51:186 [INFO] [PHY] [network_emulator.cpp:167] Emulation thread created
+2025-09-29 20:27:51:186 [INFO] [main] [network_emulator.cpp:52] Network emulator running. Press Ctrl+C to stop...
+2025-09-29 20:27:51:186 [INFO] [main] [main.cpp:91] Network emulator running. Press Ctrl+C to stop...
+2025-09-29 20:27:51:186 [INFO] [PHY] [network_emulator.cpp:231] Entering emulation loop
+2025-09-29 20:27:51:199 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 24719.2 kbps, Delay: 30 ms
+2025-09-29 20:27:51:374 [INFO] [PHY] [network_emulator.cpp:304] Applied to veth_ns - Rate: 27980.8 kbps, Delay: 30 ms
+2025-09-29 20:27:51:538 [INFO] [main] [main.cpp:19] Received signal 2, cleaning up...
+2025-09-29 20:27:51:569 [INFO] [PHY] [network_emulator.cpp:283] Exiting emulation loop
+2025-09-29 20:27:51:569 [INFO] [PHY] [network_emulator.cpp:177] Stopped network emulation
+2025-09-29 20:27:51:865 [INFO] [PHY] [network_emulator.cpp:157] Virtual interfaces deleted and cleaned up
+2025-09-29 20:27:51:865 [INFO] [PHY] [network_emulator.cpp:20] NetworkEmulator destroyed
+2025-09-29 20:27:51:865 [INFO] [main] [main.cpp:23] Exiting with signal 2

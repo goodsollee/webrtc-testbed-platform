@@ -1,0 +1,126 @@
+*   Trying 43.203.190.40:443...
+* Connected to goodsol.overlinkapp.org (43.203.190.40) port 443 (#0)
+* found 440 certificates in /etc/ssl/certs
+* GnuTLS ciphers: NORMAL:-ARCFOUR-128:-CTYPE-ALL:+CTYPE-X509:-VERS-SSL3.0
+* ALPN, offering h2
+* ALPN, offering http/1.1
+* SSL connection using TLS1.2 / ECDHE_RSA_AES_256_GCM_SHA384
+*   server certificate verification OK
+*   server certificate status verification SKIPPED
+*   common name: goodsol.overlinkapp.org (matched)
+*   server certificate expiration date OK
+*   server certificate activation date OK
+*   certificate public key: RSA
+*   certificate version: #3
+*   subject: CN=goodsol.overlinkapp.org
+*   start date: Tue, 22 Jul 2025 02:46:02 GMT
+*   expire date: Mon, 20 Oct 2025 02:46:01 GMT
+*   issuer: C=US,O=Let's Encrypt,CN=R11
+* ALPN, server accepted to use http/1.1
+> POST /join/20250930T093902_abc4g_0 HTTP/1.1
+Host: goodsol.overlinkapp.org
+Accept: */*
+Content-Type: application/json
+User-Agent: peerconnection-client/1.0
+Content-Length: 42
+
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Server: nginx/1.22.1
+< Date: Tue, 30 Sep 2025 15:30:29 GMT
+< Content-Type: text/html; charset=utf-8
+< Content-Length: 4083
+< Connection: keep-alive
+< cache-control: no-cache
+< 
+* Connection #0 to host goodsol.overlinkapp.org left intact
+[2025/09/30 09:39:07:0528] N: lws_create_context: LWS: 4.4.99-3768615, NET CLI SRV H1 H2 WS SS-JSON-POL ConMon IPv6-absent
+headless mode, skip gtk init!
+  VP8  H264  level-asymmetry-allowed: 1  packetization-mode: 1  profile-level-id: 42001f  H264  level-asymmetry-allowed: 1  packetization-mode: 0  profile-level-id: 42001f  H264  level-asymmetry-allowed: 1  packetization-mode: 1  profile-level-id: 42e01f  H264  level-asymmetry-allowed: 1  packetization-mode: 0  profile-level-id: 42e01f  H264  level-asymmetry-allowed: 1  packetization-mode: 1  profile-level-id: 4d001f  H264  level-asymmetry-allowed: 1  packetization-mode: 0  profile-level-id: 4d001f  AV1  level-idx: 5  profile: 0  tier: 0  VP9  profile-id: 0  VP9  profile-id: 2Bound outgoing channel 'KVCache' to kind 100 id= 0
+[SCTP][FILE][Receiver] Logging performance for 'KVCache' to '/mnt/mydata/home/goodsol/workspace/QCON/webrtc/src/automated_experiment/results/test10/webrtc_logs/test10/20250930T093902_abc4g_0/receiver/KVCache_rx.csv' (SLO=3000 ms)
+Bound outgoing channel 'Prompt' to kind 101 id= 1
+[SCTP][FILE][Receiver] Logging performance for 'Prompt' to '/mnt/mydata/home/goodsol/workspace/QCON/webrtc/src/automated_experiment/results/test10/webrtc_logs/test10/20250930T093902_abc4g_0/receiver/Prompt_rx.csv' (SLO=200 ms)
+* Found bundle for host goodsol.overlinkapp.org: 0x5b0ecf24a760 [serially]
+* Can not multiplex, even if we wanted to!
+* Hostname goodsol.overlinkapp.org was found in DNS cache
+*   Trying 43.203.190.40:443...
+* Connected to goodsol.overlinkapp.org (43.203.190.40) port 443 (#1)
+* found 440 certificates in /etc/ssl/certs
+* GnuTLS ciphers: NORMAL:-ARCFOUR-128:-CTYPE-ALL:+CTYPE-X509:-VERS-SSL3.0
+* ALPN, offering h2
+* ALPN, offering http/1.1
+* SSL connection using TLS1.2 / ECDHE_RSA_AES_256_GCM_SHA384
+*   server certificate verification SKIPPED
+*   server certificate status verification SKIPPED
+*   common name: goodsol.overlinkapp.org (matched)
+*   server certificate expiration date OK
+*   server certificate activation date OK
+*   certificate public key: RSA
+*   certificate version: #3
+*   subject: CN=goodsol.overlinkapp.org
+*   start date: Tue, 22 Jul 2025 02:46:02 GMT
+*   expire date: Mon, 20 Oct 2025 02:46:01 GMT
+*   issuer: C=US,O=Let's Encrypt,CN=R11
+* ALPN, server accepted to use http/1.1
+> POST /message/20250930T093902_abc4g_0/87550283 HTTP/1.1
+Host: goodsol.overlinkapp.org
+Accept: */*
+Content-Type: application/json
+Content-Length: 1986
+
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Server: nginx/1.22.1
+< Date: Tue, 30 Sep 2025 15:30:29 GMT
+< Content-Type: text/html; charset=utf-8
+< Content-Length: 21
+< Connection: keep-alive
+< cache-control: no-cache
+< 
+* Connection #1 to host goodsol.overlinkapp.org left intact
+
+=== Negotiated RTP parameters ===
+[Recv] 8c499a4b-c60c-4aab-afae-d157824a5bb2 kind=video
+  codec pt=45 name=AV1
+[SCTP][FILE][Receiver] label='Prompt' time_ms=51964345 file_bytes=1024 total_data_bytes=1024 seq=0 send_time_ms=0 delivery_delay_ms=0.000 chunks=1 slo_ms=200 satisfied=true ratio=1.000
+Elapsed time: 1.108s, Frame rate: 10.8303, Bitrate: 154.346
+Elapsed time: 2.318s, Frame rate: 11.5702, Bitrate: 416.865
+Elapsed time: 3.434s, Frame rate: 2.68817, Bitrate: 70.4315
+Elapsed time: 4.465s, Frame rate: 10.6693, Bitrate: 103.093
+Elapsed time: 5.567s, Frame rate: 4.53721, Bitrate: 23.1397
+Elapsed time: 6.585s, Frame rate: 2.94695, Bitrate: 59.9444
+Elapsed time: 7.593s, Frame rate: 3.96825, Bitrate: 34.8695
+Elapsed time: 8.596s, Frame rate: 2.99103, Bitrate: 45.5431
+Elapsed time: 10.941s, Frame rate: 1.27932, Bitrate: 19.2797
+Elapsed time: 13.072s, Frame rate: 2.81558, Bitrate: 24.266
+Elapsed time: 14.484s, Frame rate: 2.12465, Bitrate: 46.3604
+Elapsed time: 16.757s, Frame rate: 1.31984, Bitrate: 48.5179
+Elapsed time: 17.908s, Frame rate: 1.73762, Bitrate: 43.4066
+Elapsed time: 19.053s, Frame rate: 3.49345, Bitrate: 124.345
+Elapsed time: 20.226s, Frame rate: 3.41006, Bitrate: 144.708
+Elapsed time: 21.259s, Frame rate: 13.5528, Bitrate: 372.466
+Elapsed time: 22.308s, Frame rate: 52.4309, Bitrate: 557.667
+[SCTP][FILE][Receiver] label='Prompt' time_ms=51987366 file_bytes=1024 total_data_bytes=2048 seq=1 send_time_ms=5000 delivery_delay_ms=18021.000 chunks=1 slo_ms=200 satisfied=false ratio=0.500
+[SCTP][FILE][Receiver] label='Prompt' time_ms=51987369 file_bytes=1024 total_data_bytes=3072 seq=2 send_time_ms=10000 delivery_delay_ms=13024.000 chunks=1 slo_ms=200 satisfied=false ratio=0.333
+Elapsed time: 23.357s, Frame rate: 27.6454, Bitrate: 289.882
+Elapsed time: 24.509s, Frame rate: 10.4167, Bitrate: 97.2494
+Elapsed time: 25.586s, Frame rate: 6.49954, Bitrate: 62.8917
+Elapsed time: 27.836s, Frame rate: 3.11111, Bitrate: 49.1944
+Elapsed time: 38.875s, Frame rate: 0.181176, Bitrate: 2.93066
+Elapsed time: 41.084s, Frame rate: 0.905387, Bitrate: 7.00614
+Elapsed time: 42.117s, Frame rate: 24.2014, Bitrate: 229.353
+Elapsed time: 43.217s, Frame rate: 21.8182, Bitrate: 217.372
+Elapsed time: 44.224s, Frame rate: 0.993049, Bitrate: 45.5561
+Elapsed time: 45.515s, Frame rate: 6.19675, Bitrate: 50.4272
+Elapsed time: 46.716s, Frame rate: 3.33056, Bitrate: 33.9301
+Elapsed time: 47.908s, Frame rate: 5.87248, Bitrate: 50.1389
+Elapsed time: 49.008s, Frame rate: 4.54545, Bitrate: 56.6903
+Elapsed time: 50.02s, Frame rate: 3.95257, Bitrate: 50.3644
+Elapsed time: 51.039s, Frame rate: 5.88813, Bitrate: 49.9264
+Elapsed time: 52.633s, Frame rate: 3.76412, Bitrate: 43.802
+Elapsed time: 53.989s, Frame rate: 2.94985, Bitrate: 35.2369
+Elapsed time: 55.13s, Frame rate: 1.75285, Bitrate: 11.3319
+Elapsed time: 59.436s, Frame rate: 0.464468, Bitrate: 6.22496
+[2025/09/30 09:40:07:3107] N: rops_handle_POLLIN_netlink: DELADDR
+[2025/09/30 10:56:00:8931] N: rops_handle_POLLIN_netlink: DELADDR
+[2025/09/30 10:56:11:0999] N: rops_handle_POLLIN_netlink: DELADDR
