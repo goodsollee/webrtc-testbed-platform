@@ -137,13 +137,12 @@ run_single_trace() {
     mkdir -p "$run_stdout_dir"
 
     local emulator_stdout="$run_stdout_dir/network_emulator.log"
-    (
-        cd "$SCRIPT_DIR/network_emulation"
-        sudo ./network_emulator --profile_path="$profile_csv" --interface_name="$INTERFACE_NAME" > "$emulator_stdout" 2>&1 &
-        echo $! > "$run_stdout_dir/emulator.pid"
-    )
-    local emulator_pid
-    emulator_pid=$(cat "$run_stdout_dir/emulator.pid")
+    local previous_dir="$PWD"
+    cd "$SCRIPT_DIR/network_emulation"
+    sudo ./network_emulator --profile_path="$profile_csv" --interface_name="$INTERFACE_NAME" > "$emulator_stdout" 2>&1 &
+    local emulator_pid=$!
+    cd "$previous_dir"
+    echo "$emulator_pid" > "$run_stdout_dir/emulator.pid"
 
     local emulator_log_file="$SCRIPT_DIR/network_emulation/network_emulator.log"
     local wait_seconds=0
