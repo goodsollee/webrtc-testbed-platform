@@ -68,6 +68,52 @@ delay for each SCTP "file" transfer. The peer connection client records, for
 every SCTP payload, the observed delivery delay, whether the SLO was met, and
 the running satisfaction ratio.
 
+## Automated bandwidth experiments
+
+The `run_bandwidth_experiments.sh` helper automates end-to-end experiments that
+replay every trace under `./traces` through the network emulator while starting
+the sender inside the emulated namespace and the receiver on the host.
+
+### Usage
+
+```bash
+./run_bandwidth_experiments.sh \
+    --experiment-id my_batch \
+    --interface eth0 \
+    --traffic-config ./config/traffic_config.csv
+```
+
+The script performs the following steps for each `*.pitree-trace` file:
+
+1. Convert the trace into an emulator profile CSV using `convert_trace.py`.
+2. Launch the network emulator (`network_emulation/network_emulator`) against
+   the requested host interface (auto-detected if `--interface` is omitted).
+3. Start the sender inside `ns1` via `ip netns exec ns1 … --network_interface=veth_ns`.
+4. Start the receiver on the host using the shaped interface.
+5. Wait for both peers to finish, stop the emulator, and archive the logs.
+
+All logs are grouped under `./results/<experiment-id>`, with the WebRTC client
+artifacts saved in a single tree at `./results/<experiment-id>/webrtc_logs/<experiment-id>/<trace>/<role>`.
+Standard output for each process is captured under `./results/<experiment-id>/stdout`,
+and the raw emulator logs are copied to `./results/<experiment-id>/emulator_logs`.
+
+### Metrics analysis
+
+After running a batch you can generate plots for RTP and SCTP metrics with:
+
+```bash
+python3 analyze_metrics.py \
+    --input-dir ./results/<experiment-id>/webrtc_logs/<experiment-id> \
+    --output-dir ./results/<experiment-id>/analysis
+```
+
+The analysis script produces:
+
+- `rtp_metrics_cdf.png`: CDF plots for frame-level latency and bitrate.
+- `sctp_metrics.png`: Mean/standard deviation bar charts for each SCTP flow's
+  throughput and latency, plus the observed SLO satisfaction ratio (as defined
+  in `config/traffic_config.csv`).
+
 ## Dependencies
 
 - `pulseaudio` (auto-started if not running).
