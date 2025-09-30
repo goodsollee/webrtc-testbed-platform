@@ -110,37 +110,41 @@ int main(int argc, char* argv[]) {
         };
 
         auto wait_for_start = [&](bool interactive) {
-            while (true) {
-                std::string input;
-                if (interactive) {
-                    std::cout << "Type 'start' to begin traffic shaping: " << std::flush;
-                    if (!std::getline(std::cin, input)) {
-                        return false;
-                    }
-                } else {
-                    fd_set readfds;
-                    FD_ZERO(&readfds);
-                    FD_SET(STDIN_FILENO, &readfds);
+        while (true) {
+            std::string input;
+            if (interactive) {
+                std::cout << "Type 'start' to begin traffic shaping: " << std::flush;
+                if (!std::getline(std::cin, input)) {
+                    return false; // stdin closed
+                }
+            } else {
+                fd_set readfds;
+                FD_ZERO(&readfds);
+                FD_SET(STDIN_FILENO, &readfds);
 
-                    struct timeval timeout;
-                    timeout.tv_sec = 0;
-                    timeout.tv_usec = 100000; // 100ms timeout
+                struct timeval timeout;
+                timeout.tv_sec = 0;
+                timeout.tv_usec = 100000; // 100ms
 
-                    int ret = select(STDIN_FILENO + 1, &readfds, NULL, NULL, &timeout);
-                    if (ret <= 0 || !FD_ISSET(STDIN_FILENO, &readfds)) {
-                        continue;
-                    }
-
-                    if (!std::getline(std::cin, input)) {
-                        return false;
-                    }
+                int ret = select(STDIN_FILENO + 1, &readfds, NULL, NULL, &timeout);
+                if (ret <= 0 || !FD_ISSET(STDIN_FILENO, &readfds)) {
+                    continue; // nothing to read
                 }
 
-                if (normalize_input(input) == "start") {
-                    return true;
+                if (!std::getline(std::cin, input)) {
+                    return false; // stdin closed
                 }
             }
+
+            // Normalize and check
+            if (normalize_input(input) == "start") {
+                return true;
+            }
+
+            // Ignore everything else
+            }
         };
+
 
         // Check if stdin is a terminal (interactive) or redirected
         bool stdin_available = isatty(fileno(stdin));

@@ -156,6 +156,9 @@ void NetworkEmulator::Start() {
     if (is_running_)
         return;
 
+
+    std::this_thread::sleep_for(std::chrono::seconds(10));
+
     LOG_INFO(NETWORK_EMULATOR_MODULE_NAME, "Starting emulation loop");
     is_running_ = true;
     emulation_thread_ = std::thread(&NetworkEmulator::EmulationLoop, this);

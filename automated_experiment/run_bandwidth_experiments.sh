@@ -160,9 +160,22 @@ run_single_trace() {
     local emulator_stdout="$run_stdout_dir/network_emulator.log"
     local previous_dir="$PWD"
     cd "$SCRIPT_DIR/network_emulation"
-    sudo ./network_emulator --profile_path="$profile_csv" --interface_name="$INTERFACE_NAME" > "$emulator_stdout" 2>&1 &
+
+    # Create a FIFO for control if not already present
+    local fifo_path="$run_stdout_dir/emulator.fifo"
+    [[ -p "$fifo_path" ]] || mkfifo "$fifo_path"
+
+
+    # Start emulator with FIFO attached to stdin
+    sudo ./network_emulator \
+    --profile_path="$profile_csv" \
+    --interface_name="$INTERFACE_NAME" \
+    <"$fifo_path" >"$emulator_stdout" 2>&1 &
     local emulator_pid=$!
     cd "$previous_dir"
+
+    echo start > "$fifo_path"
+
     echo "$emulator_pid" > "$run_stdout_dir/emulator.pid"
 
     local wait_seconds=0
@@ -243,7 +256,8 @@ run_single_trace() {
     echo -e "\n=== STARTING EMULATION TRACE ==="
     sleep 1
     echo "Starting bandwidth emulation for trace: $trace_name"
-    printf 'start\n' | sudo tee /proc/$(cat "$run_stdout_dir/emulator.pid")/fd/0 > /dev/null 2>&1 || echo "Note: Could not send 'start' command to emulator"
+    echo start > "$fifo_path"
+    #printf 'start\n' | sudo tee /proc/$(cat "$run_stdout_dir/emulator.pid")/fd/0 > /dev/null 2>&1 || echo "Note: Could not send 'start' command to emulator"
 
     local exit_code=0
     wait "$receiver_pid" || exit_code=$?
