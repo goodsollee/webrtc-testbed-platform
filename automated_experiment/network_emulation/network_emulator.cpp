@@ -43,7 +43,8 @@ bool NetworkEmulator::Initialize(const std::string& profile_path,
         LOG_WARNING(NETWORK_EMULATOR_MODULE_NAME, "Profile parsing failed or no valid profiles found");
     }
 
-    LOG_INFO(NETWORK_EMULATOR_MODULE_NAME, "Press any key to start traffic shaping...");
+    LOG_INFO(NETWORK_EMULATOR_MODULE_NAME,
+             "Type 'start' to begin traffic shaping...");
 
     return true;
 }

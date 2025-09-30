@@ -2,6 +2,10 @@
 #include <iostream>
 #include <memory>
 #include <csignal>
+#include <algorithm>
+#include <cctype>
+#include <unistd.h>
+#include <sys/select.h>
 
 #include "absl/flags/flag.h"
 #include "absl/flags/parse.h"
@@ -88,6 +92,63 @@ int main(int argc, char* argv[]) {
         
         if (!g_emulator->Initialize(profile_path, interface_name, peer_name)) {
             LOG_ERROR("main", "Failed to initialize network emulator");
+            return 1;
+        }
+
+        LOG_INFO("main", "Waiting for 'start' command...");
+
+        auto normalize_input = [](std::string input) {
+            auto trim = [](const std::string& value) {
+                const auto first = value.find_first_not_of(" \t\r\n");
+                if (first == std::string::npos) {
+                    return std::string();
+                }
+                const auto last = value.find_last_not_of(" \t\r\n");
+                return value.substr(first, last - first + 1);
+            };
+
+            std::string trimmed = trim(input);
+            std::transform(trimmed.begin(), trimmed.end(), trimmed.begin(),
+                           [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+            return trimmed;
+        };
+
+        auto wait_for_start = [&](bool interactive) {
+            while (true) {
+                std::string input;
+                if (interactive) {
+                    std::cout << "Type 'start' to begin traffic shaping: " << std::flush;
+                    if (!std::getline(std::cin, input)) {
+                        return false;
+                    }
+                } else {
+                    fd_set readfds;
+                    FD_ZERO(&readfds);
+                    FD_SET(STDIN_FILENO, &readfds);
+
+                    struct timeval timeout;
+                    timeout.tv_sec = 0;
+                    timeout.tv_usec = 100000; // 100ms timeout
+
+                    int ret = select(STDIN_FILENO + 1, &readfds, NULL, NULL, &timeout);
+                    if (ret <= 0 || !FD_ISSET(STDIN_FILENO, &readfds)) {
+                        continue;
+                    }
+
+                    if (!std::getline(std::cin, input)) {
+                        return false;
+                    }
+                }
+
+                if (normalize_input(input) == "start") {
+                    return true;
+                }
+            }
+        };
+
+        bool stdin_available = isatty(fileno(stdin));
+        if (!wait_for_start(stdin_available)) {
+            LOG_ERROR("main", "Failed to receive 'start' command from stdin");
             return 1;
         }
 
