@@ -409,7 +409,7 @@ void Sender::SendFileBatched(size_t file_bytes) {
     const size_t chunk_bytes =
         std::min(max_chunk_payload, remaining_bytes);
 
-    const auto chunk_time = clock::now();
+    //const auto chunk_time = clock::now();
 
     PayloadMetadata metadata;
     metadata.sequence = sequence;

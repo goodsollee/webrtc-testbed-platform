@@ -49,7 +49,7 @@ void Receiver::Attach(Conductor& c) {
           "timestamp_ms,file_bytes,total_data_bytes,sequence,chunk_count,send_time_ms,";
       csv_file_ <<
           "transmit_start_time_ms,transmit_end_time_ms,delivery_delay_ms,";
-      csv_file_ << "slo_ms,slo_satisfied,slo_satisfaction_ratio\n";
+      csv_file_ << "throughput_mbps,slo_ms,slo_satisfied,slo_satisfaction_ratio\n";
       csv_file_.flush();
       std::cout << "[SCTP][FILE][Receiver] Logging performance for '" << label_
                 << "' to '" << path << "'";
@@ -136,6 +136,7 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
   uint64_t slo_met = 0;
   bool slo_satisfied = true;
   double slo_ratio = 0.0;
+  double throughput_mbps = 0.0;
   bool completed_file = false;
   uint32_t chunk_count = header.chunk_count;
   uint64_t file_bytes = header.file_size_bytes;
@@ -247,6 +248,11 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
                   static_cast<double>(files_received);
     }
     file_bytes = pending.file_size_bytes;
+    if (delivery_delay_ms > 0) {
+      throughput_mbps =
+          (static_cast<double>(file_bytes) * 8.0) /
+          (delivery_delay_ms * 1000.0);
+    }
     if (csv_file_.is_open()) {
       csv_file_ << arrival_time_ms << "," << pending.received_bytes << ","
                 << total_data_bytes << "," << sequence << ","
@@ -254,7 +260,8 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
                 << transmit_start_time_ms << ","
                 << transmit_end_time_ms << ","
                 << std::fixed << std::setprecision(3) << delivery_delay_ms
-                << "," << slo_ms_ << ","
+                << "," << std::fixed << std::setprecision(6)
+                << throughput_mbps << "," << slo_ms_ << ","
                 << (slo_satisfied ? "true" : "false") << ","
                 << std::fixed << std::setprecision(6) << slo_ratio << "\n";
       csv_file_.flush();
@@ -273,7 +280,9 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
       << total_data_bytes << " seq=" << sequence
       << " send_time_ms=" << send_time_ms
       << " delivery_delay_ms=" << std::fixed << std::setprecision(3)
-      << delivery_delay_ms << " chunks=" << chunk_count;
+      << delivery_delay_ms << " throughput_mbps=" << std::fixed
+      << std::setprecision(3) << throughput_mbps << " chunks="
+      << chunk_count;
   oss << " slo_ms=" << slo_ms_ << " satisfied="
       << (slo_satisfied ? "true" : "false") << " ratio="
       << std::fixed << std::setprecision(3) << slo_ratio;
