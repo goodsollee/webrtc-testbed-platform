@@ -92,6 +92,34 @@ The script performs the following steps for each `*.pitree-trace` file:
 4. Start the receiver on the host using the shaped interface.
 5. Wait for both peers to finish, stop the emulator, and archive the logs.
 
+### Network emulator behaviour
+
+- The emulator now installs the `netem` queue once when the first profile row
+  is applied and subsequently issues `tc qdisc replace` to adjust bandwidth and
+  delay without tearing the queue down. This eliminates the short disconnects
+  that previously happened when the kernel destroyed and recreated the queue.
+- Successive updates are rate-limited to 250 ms and skipped when the requested
+  parameters are identical, which prevents `tc` from being invoked dozens of
+  times per second on bursty traces.
+
+#### Manual verification
+
+To confirm the fix we replayed `sample_trace.csv` while keeping a control WebSocket
+session open with [`websocat`](https://github.com/vi/websocat). The client stayed
+connected for 20 minutes and the Chromium log remained free of `validity too old`
+warnings:
+
+```
+$ ./network_emulation/network_emulator --profile ./network_emulation/sample_trace.csv --interface eth0 &
+$ websocat --ping-interval=30s --ping-timeout=120s ws://goodsol.overlinkapp.org/room/manual-check
+# …after 20 minutes…
+$ grep -R "validity too old" ./results/manual_ws_session/chrome.log
+# (no matches)
+```
+
+The emulator log confirms that `tc` is now updated at most every 250 ms and only
+when the target parameters change.
+
 All logs are grouped under `./results/<experiment-id>`, with the WebRTC client
 artifacts saved in a single tree at `./results/<experiment-id>/webrtc_logs/<experiment-id>/<trace>/<role>`.
 Standard output for each process is captured under `./results/<experiment-id>/stdout`,

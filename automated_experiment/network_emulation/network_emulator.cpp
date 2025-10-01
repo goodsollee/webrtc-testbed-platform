@@ -5,12 +5,18 @@
 #include <chrono>
 #include <cstdlib>
 #include <atomic>
+#include <cmath>
 
 
 static const char* NETWORK_EMULATOR_MODULE_NAME = "PHY";
 
-NetworkEmulator::NetworkEmulator() 
-    : is_running_(false), current_profile_index_(0) {
+NetworkEmulator::NetworkEmulator()
+    : is_running_(false),
+      current_profile_index_(0),
+      qdisc_installed_(false),
+      last_bandwidth_kbps_(0.0),
+      last_latency_ms_(0.0),
+      last_update_time_(std::chrono::steady_clock::time_point::min()) {
     LOG_INFO(NETWORK_EMULATOR_MODULE_NAME, "NetworkEmulator initialized");
 }
 
@@ -281,24 +287,51 @@ void NetworkEmulator::EmulationLoop() {
 }
 
 void NetworkEmulator::ApplyNetworkConditions(double bandwidth_kbps, double latency_ms) {
-    // Apply tc rules to veth_ns in namespace
-    std::string cmd = "sudo ip netns exec ns1 tc qdisc change dev veth_ns root netem rate " + 
-                     std::to_string(bandwidth_kbps) + "kbit delay " + 
-                     std::to_string(latency_ms) + "ms limit 50000";
-    
-    if (system(cmd.c_str()) != 0) {
-        // If change fails, try to add the qdisc
-        cmd = "sudo ip netns exec ns1 tc qdisc add dev veth_ns root netem rate " + 
-              std::to_string(bandwidth_kbps) + "kbit delay " + 
-              std::to_string(latency_ms) + "ms limit 50000";
-        
-        if (system(cmd.c_str()) != 0) {
-            LOG_ERROR(NETWORK_EMULATOR_MODULE_NAME, "Failed to apply tc rules to veth_ns");
+    constexpr double kEpsilon = 1e-3;
+    const auto now = std::chrono::steady_clock::now();
+
+    if (qdisc_installed_) {
+        if (std::fabs(bandwidth_kbps - last_bandwidth_kbps_) < kEpsilon &&
+            std::fabs(latency_ms - last_latency_ms_) < kEpsilon) {
+            LOG_INFO(NETWORK_EMULATOR_MODULE_NAME,
+                     "Skipping tc update: parameters unchanged");
+            return;
+        }
+
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_update_time_);
+        if (elapsed < std::chrono::milliseconds(250)) {
+            LOG_INFO(NETWORK_EMULATOR_MODULE_NAME,
+                     "Skipping tc update: rate limited (", elapsed.count(),
+                     " ms since last change)");
             return;
         }
     }
 
-    LOG_INFO(NETWORK_EMULATOR_MODULE_NAME, "Applied to veth_ns - Rate: ", 
+    std::string cmd;
+    if (!qdisc_installed_) {
+        cmd = "sudo ip netns exec ns1 tc qdisc add dev veth_ns root netem rate " +
+              std::to_string(bandwidth_kbps) + "kbit delay " +
+              std::to_string(latency_ms) + "ms limit 50000";
+        if (system(cmd.c_str()) != 0) {
+            LOG_ERROR(NETWORK_EMULATOR_MODULE_NAME, "Failed to install initial tc qdisc on veth_ns");
+            return;
+        }
+        qdisc_installed_ = true;
+    } else {
+        cmd = "sudo ip netns exec ns1 tc qdisc replace dev veth_ns root netem rate " +
+              std::to_string(bandwidth_kbps) + "kbit delay " +
+              std::to_string(latency_ms) + "ms limit 50000";
+        if (system(cmd.c_str()) != 0) {
+            LOG_ERROR(NETWORK_EMULATOR_MODULE_NAME, "Failed to update tc qdisc on veth_ns");
+            return;
+        }
+    }
+
+    last_update_time_ = now;
+    last_bandwidth_kbps_ = bandwidth_kbps;
+    last_latency_ms_ = latency_ms;
+
+    LOG_INFO(NETWORK_EMULATOR_MODULE_NAME, "Applied to veth_ns - Rate: ",
              bandwidth_kbps, " kbps, Delay: ", latency_ms, " ms");
 
     // Log the tc rules for verification

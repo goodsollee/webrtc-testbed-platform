@@ -7,6 +7,7 @@
 #include <vector>
 #include <memory>
 #include <algorithm> // For sorting
+#include <chrono>
 #include "../../logger/Logger.h"
 
 class NetworkEmulator {
@@ -50,6 +51,10 @@ private:
     std::thread emulation_thread_;
     std::atomic<bool> is_running_;
     size_t current_profile_index_;
+    bool qdisc_installed_;
+    double last_bandwidth_kbps_;
+    double last_latency_ms_;
+    std::chrono::steady_clock::time_point last_update_time_;
 };
 
 #endif // NETWORK_EMULATOR_H_
