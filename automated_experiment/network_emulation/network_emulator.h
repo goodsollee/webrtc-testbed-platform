@@ -8,6 +8,10 @@
 #include <memory>
 #include <algorithm> // For sorting
 #include <chrono>
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+#include <functional>
 #include "../../logger/Logger.h"
 
 class NetworkEmulator {
@@ -44,6 +48,12 @@ private:
     void EmulationLoop();
     void ApplyNetworkConditions(double bandwidth_kbps, double latency_ms);
 
+    // Async TC command execution
+    void TcWorkerLoop();
+    void EnqueueTcCommand(std::function<void()> command);
+    void ApplyNetworkConditionsAsync(double bandwidth_kbps, double latency_ms);
+    void ApplyNetworkConditionsSync(double bandwidth_kbps, double latency_ms, int limit);
+
     std::string profile_path_;
     std::string interface_name_;
     std::string peer_interface_name_;
@@ -55,6 +65,13 @@ private:
     double last_bandwidth_kbps_;
     double last_latency_ms_;
     std::chrono::steady_clock::time_point last_update_time_;
+
+    // Async TC command execution members
+    std::thread tc_worker_thread_;
+    std::queue<std::function<void()>> tc_command_queue_;
+    std::mutex tc_queue_mutex_;
+    std::condition_variable tc_queue_cv_;
+    std::atomic<bool> tc_worker_running_;
 };
 
 #endif // NETWORK_EMULATOR_H_

@@ -2,3 +2,4 @@
 *.log
 results/*
 webrtc_logs/*
+plots/*

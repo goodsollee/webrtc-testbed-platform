@@ -126,11 +126,12 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
   }
 
   const uint64_t sequence = header.sequence;
-  const uint64_t send_time_ms = header.send_time_ms;
+  const uint64_t chunk_send_time_ms = header.send_time_ms;
   double delivery_delay_ms = 0.0;
   int64_t arrival_time_ms = rtc::TimeMillis();
   int64_t transmit_start_time_ms = 0;
   int64_t transmit_end_time_ms = 0;
+  uint64_t send_time_ms = 0;  // File generation time (first chunk send time)
   uint64_t total_data_bytes = 0;
   uint64_t files_received = 0;
   uint64_t slo_met = 0;
@@ -149,12 +150,12 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
 
     if (!sender_time_initialized_) {
       sender_time_initialized_ = true;
-      first_sender_timestamp_ms_ = send_time_ms;
+      first_sender_timestamp_ms_ = chunk_send_time_ms;
     }
     int64_t sender_relative_ms = 0;
-    if (send_time_ms >= first_sender_timestamp_ms_) {
+    if (chunk_send_time_ms >= first_sender_timestamp_ms_) {
       sender_relative_ms =
-          static_cast<int64_t>(send_time_ms - first_sender_timestamp_ms_);
+          static_cast<int64_t>(chunk_send_time_ms - first_sender_timestamp_ms_);
     }
     if (!sender_start_time_initialized_) {
       sender_start_time_initialized_ = true;
@@ -162,13 +163,15 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
     }
 
     PendingFile& pending = in_flight_files_[sequence];
-    
+
     // First chunk for this sequence - initialize
     if (pending.chunk_count == 0) {
       pending.file_size_bytes = file_bytes;
       pending.chunk_count = chunk_count;
       pending.received_chunks.resize(chunk_count, false);
       pending.chunks_received = 0;
+      pending.first_send_time_ms = chunk_send_time_ms;
+      pending.first_arrival_time_ms = arrival_time_ms;
     }
     
     // Validate header consistency
@@ -199,7 +202,7 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
     pending.received_chunks[header.chunk_index] = true;
     pending.chunks_received++;
     pending.received_bytes += chunk_bytes;
-    pending.latest_send_time_ms = std::max(pending.latest_send_time_ms, send_time_ms);
+    pending.latest_send_time_ms = std::max(pending.latest_send_time_ms, chunk_send_time_ms);
     pending.last_arrival_time_ms = arrival_time_ms;
 
     // per-chunk logs
@@ -215,13 +218,16 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
 
     completed_file = true;
 
-    sender_relative_ms = 0;
-    if (pending.latest_send_time_ms >= first_sender_timestamp_ms_) {
-      sender_relative_ms = static_cast<int64_t>(
-          pending.latest_send_time_ms - first_sender_timestamp_ms_);
-    }
-    transmit_start_time_ms = sender_start_time_ms_;
-    transmit_end_time_ms = sender_start_time_ms_ + sender_relative_ms;
+    // Use first chunk send time as the file generation time
+    send_time_ms = pending.first_send_time_ms;
+
+    // Use first chunk arrival as transmit start time
+    transmit_start_time_ms = pending.first_arrival_time_ms;
+
+    // Use last chunk arrival as transmit end time
+    transmit_end_time_ms = pending.last_arrival_time_ms;
+
+    // Calculate delivery delay from first send to last arrival
     delivery_delay_ms =
         static_cast<double>(std::max<int64_t>(
             0, transmit_end_time_ms - send_time_ms));

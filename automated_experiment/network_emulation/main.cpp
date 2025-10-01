@@ -93,17 +93,16 @@ int main(int argc, char* argv[]) {
         // Wait for external trigger to start
         LOG_INFO("main", "Waiting for 'start' command...");
 
-        auto normalize_input = [](std::string input) {
-            auto trim = [](const std::string& value) {
-                const auto first = value.find_first_not_of(" \t\r\n");
-                if (first == std::string::npos) {
-                    return std::string();
-                }
-                const auto last = value.find_last_not_of(" \t\r\n");
-                return value.substr(first, last - first + 1);
-            };
+        auto normalize_input = [](const std::string& input) -> std::string {
+            // Trim whitespace
+            const auto first = input.find_first_not_of(" \t\r\n");
+            if (first == std::string::npos) {
+                return std::string();
+            }
+            const auto last = input.find_last_not_of(" \t\r\n");
+            std::string trimmed = input.substr(first, last - first + 1);
 
-            std::string trimmed = trim(input);
+            // Convert to lowercase
             std::transform(trimmed.begin(), trimmed.end(), trimmed.begin(),
                            [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
             return trimmed;
@@ -161,6 +160,13 @@ int main(int argc, char* argv[]) {
         // Keep the main thread alive
         while (g_emulator && g_emulator->IsRunning()) {
             std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+
+        // Emulation completed naturally, clean up properly
+        LOG_INFO("main", "Emulation completed, cleaning up...");
+        if (g_emulator) {
+            g_emulator->Stop();
+            g_emulator.reset();
         }
 
     } catch (const std::exception& e) {

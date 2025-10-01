@@ -34,7 +34,9 @@ class Receiver final : public sctp::Receiver {
     uint32_t chunks_received = 0;  // Added: Count of chunks received so far
     std::vector<bool> received_chunks;  // Added: Bitmap to track which chunks we've received
     uint64_t received_bytes = 0;
+    uint64_t first_send_time_ms = 0;  // send_time_ms of first chunk
     uint64_t latest_send_time_ms = 0;
+    int64_t first_arrival_time_ms = 0;  // arrival time of first chunk
     int64_t last_arrival_time_ms = 0;
   };
 
