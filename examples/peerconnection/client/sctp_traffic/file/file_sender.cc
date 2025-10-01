@@ -365,6 +365,7 @@ void Sender::SendFileBatched(size_t file_bytes) {
 
   const uint64_t sequence = next_sequence_++;
   const auto file_send_start_time = now;
+  const uint64_t send_time_ms = rtc::TimeMillis();
 
   const auto kind_enum = static_cast<Conductor::TrafficKind>(kind_);
 
@@ -409,10 +410,6 @@ void Sender::SendFileBatched(size_t file_bytes) {
         std::min(max_chunk_payload, remaining_bytes);
 
     const auto chunk_time = clock::now();
-    const uint64_t send_time_ms =
-        std::chrono::duration_cast<std::chrono::milliseconds>(
-            chunk_time - flow_start_time_)
-            .count();
 
     PayloadMetadata metadata;
     metadata.sequence = sequence;

@@ -223,7 +223,7 @@ void Receiver::HandlePayload(absl::Span<const uint8_t> bytes) {
     transmit_end_time_ms = sender_start_time_ms_ + sender_relative_ms;
     delivery_delay_ms =
         static_cast<double>(std::max<int64_t>(
-            0, pending.last_arrival_time_ms - transmit_end_time_ms));
+            0, transmit_end_time_ms - send_time_ms));
 
     ++total_files_received_;
     if (slo_ms_ > 0) {

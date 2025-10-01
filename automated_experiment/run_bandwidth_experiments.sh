@@ -37,7 +37,7 @@ REPO_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
 
 RUN_START_TS="$(date +%Y%m%dT%H%M%S)"
 
-TRACES_DIR="$SCRIPT_DIR/traces"
+TRACES_DIR="$SCRIPT_DIR/test_traces"
 TRAFFIC_DIR="$SCRIPT_DIR/config"
 TRAFFIC_CONFIG=""
 OUTPUT_DIR="$SCRIPT_DIR/results"
@@ -147,7 +147,11 @@ run_single_trace() {
     local trace_file
     trace_file=$(basename "$trace_path")
     local trace_name="${trace_file%.pitree-trace}"
-    local room_id="${RUN_START_TS}_${trace_name}"
+
+    local traffic_base="${traffic_config##*/}"   
+    traffic_base="${traffic_base%.*}"           
+
+    local room_id="${RUN_START_TS}_${trace_name}_${traffic_base}"
 
     echo -e "\n=== Running trace: $trace_name (room_id=${room_id}) ==="
 
@@ -165,7 +169,6 @@ run_single_trace() {
     local fifo_path="$run_stdout_dir/emulator.fifo"
     [[ -p "$fifo_path" ]] || mkfifo "$fifo_path"
 
-
     # Start emulator with FIFO attached to stdin
     sudo ./network_emulator \
     --profile_path="$profile_csv" \
@@ -173,7 +176,6 @@ run_single_trace() {
     <"$fifo_path" >"$emulator_stdout" 2>&1 &
     local emulator_pid=$!
     cd "$previous_dir"
-
     echo start > "$fifo_path"
 
     echo "$emulator_pid" > "$run_stdout_dir/emulator.pid"
@@ -198,7 +200,6 @@ run_single_trace() {
 
     local common_args=(
         --room_id="$room_id"
-        --log_date="$EXPERIMENT_ID"
         --log_root="$LOG_ROOT"
         --sctp_csv="$traffic_config"
         --server="$SERVER_HOST"
@@ -229,6 +230,7 @@ run_single_trace() {
 
     sleep 3
 
+    sudo pulseaudio --start
     "${receiver_args[@]}" > "$receiver_log" 2>&1 &
     local receiver_pid=$!
 
@@ -256,34 +258,78 @@ run_single_trace() {
     echo -e "\n=== STARTING EMULATION TRACE ==="
     sleep 1
     echo "Starting bandwidth emulation for trace: $trace_name"
-    echo start > "$fifo_path"
-    #printf 'start\n' | sudo tee /proc/$(cat "$run_stdout_dir/emulator.pid")/fd/0 > /dev/null 2>&1 || echo "Note: Could not send 'start' command to emulator"
 
+    # Wait for emulator to complete (primary termination signal)
+    echo "Waiting for network emulator to complete..."
     local exit_code=0
-    wait "$receiver_pid" || exit_code=$?
-    wait "$sender_pid" || exit_code=$?
+    wait "$emulator_pid" || exit_code=$?
+    echo "Network emulator finished with exit code: $exit_code"
 
     # End emulation trace
     echo -e "\n=== ENDING EMULATION TRACE ==="
-    sleep 1
     echo "Bandwidth emulation completed for trace: $trace_name"
 
-    if kill -0 "$emulator_pid" 2>/dev/null; then
-        sudo kill -INT "$emulator_pid"
-        wait "$emulator_pid" || true
+    # Clean up sender and receiver processes
+    echo "Cleaning up sender and receiver processes..."
+
+    # Send SIGTERM to sender
+    if kill -0 "$sender_pid" 2>/dev/null; then
+        echo "Sending SIGTERM to sender (PID: $sender_pid)"
+        sudo kill -TERM "$sender_pid" 2>/dev/null || true
     fi
+
+    # Send SIGTERM to receiver
+    if kill -0 "$receiver_pid" 2>/dev/null; then
+        echo "Sending SIGTERM to receiver (PID: $receiver_pid)"
+        sudo kill -TERM "$receiver_pid" 2>/dev/null || true
+    fi
+
+    # Wait up to 5 seconds for graceful shutdown
+    local cleanup_wait=0
+    while [[ $cleanup_wait -lt 5 ]]; do
+        local sender_alive=0
+        local receiver_alive=0
+
+        kill -0 "$sender_pid" 2>/dev/null && sender_alive=1
+        kill -0 "$receiver_pid" 2>/dev/null && receiver_alive=1
+
+        if [[ $sender_alive -eq 0 && $receiver_alive -eq 0 ]]; then
+            echo "Sender and receiver exited gracefully"
+            break
+        fi
+
+        sleep 1
+        cleanup_wait=$((cleanup_wait + 1))
+    done
+
+    # Escalate to SIGKILL if still alive
+    if kill -0 "$sender_pid" 2>/dev/null; then
+        echo "Sender did not exit gracefully, sending SIGKILL"
+        sudo kill -9 "$sender_pid" 2>/dev/null || true
+    fi
+
+    if kill -0 "$receiver_pid" 2>/dev/null; then
+        echo "Receiver did not exit gracefully, sending SIGKILL"
+        sudo kill -9 "$receiver_pid" 2>/dev/null || true
+    fi
+
+    # Final wait to collect process exit codes
+    wait "$sender_pid" 2>/dev/null || true
+    wait "$receiver_pid" 2>/dev/null || true
 
     if [[ -f "$emulator_stdout" ]]; then
         cp "$emulator_stdout" "$EMULATOR_LOG_DIR/${trace_name}.log"
     fi
 
-    if [[ $exit_code -ne 0 ]]; then
-        echo "Trace $trace_name finished with errors." >&2
-        return $exit_code
-    fi
+    #if [[ $exit_code -ne 0 ]]; then
+    #    echo "Trace $trace_name finished with errors." >&2
+    #    return $exit_code
+    #fi
 
-    echo "Trace $trace_name completed successfully. Logs stored under $LOG_ROOT/$EXPERIMENT_ID/$trace_name"
-    return 0
+    echo "Trace $trace_name completed successfully. Logs stored under $LOG_ROOT"
+
+    sleep 3
+    #return 0
 }
 
 # Create main experiment root
