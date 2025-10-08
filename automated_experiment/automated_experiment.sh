@@ -14,9 +14,9 @@ Required arguments:
 Optional arguments:
   --traces-dir DIR             Directory containing *.pitree-trace files
                                [default: <repo>/automated_experiment/traces]
-  --traffic-dir DIR            Directory containing traffic config CSV files
+  --traffic-dir DIR            Directory containing traffic config sets (subdirectories)
                                [default: <repo>/automated_experiment/config]
-  --traffic-config PATH        Single SCTP traffic CSV (overrides --traffic-dir)
+  --traffic-config PATH        Single traffic config set directory (overrides --traffic-dir)
   --output-dir DIR             Root directory where experiment artifacts are stored
                                [default: <repo>/automated_experiment/results]
   --latency-ms N               Fixed latency (ms) applied when converting traces [default: 30]
@@ -95,27 +95,27 @@ fi
 # Build list of traffic configs
 TRAFFIC_CONFIGS=()
 if [[ -n "$TRAFFIC_CONFIG" ]]; then
-    # Single config specified
-    if [[ ! -f "$TRAFFIC_CONFIG" ]]; then
-        echo "Error: traffic config not found: $TRAFFIC_CONFIG" >&2
+    # Single config set directory specified
+    if [[ ! -d "$TRAFFIC_CONFIG" ]]; then
+        echo "Error: traffic config directory not found: $TRAFFIC_CONFIG" >&2
         exit 1
     fi
     TRAFFIC_CONFIGS=("$TRAFFIC_CONFIG")
 else
-    # Discover all CSV files in traffic directory
+    # Discover all traffic config directories in traffic directory
     if [[ ! -d "$TRAFFIC_DIR" ]]; then
         echo "Error: traffic directory not found: $TRAFFIC_DIR" >&2
         exit 1
     fi
-    while IFS= read -r -d '' config_file; do
-        TRAFFIC_CONFIGS+=("$config_file")
-    done < <(find "$TRAFFIC_DIR" -maxdepth 1 -type f -name '*.csv' -print0 | sort -z)
+    while IFS= read -r -d '' config_dir; do
+        TRAFFIC_CONFIGS+=("$config_dir")
+    done < <(find "$TRAFFIC_DIR" -mindepth 1 -maxdepth 1 -type d -print0 | sort -z)
 
     if [[ ${#TRAFFIC_CONFIGS[@]} -eq 0 ]]; then
-        echo "Error: no CSV files found in $TRAFFIC_DIR" >&2
+        echo "Error: no traffic config directories found in $TRAFFIC_DIR" >&2
         exit 1
     fi
-    echo "Found ${#TRAFFIC_CONFIGS[@]} traffic config(s) in $TRAFFIC_DIR"
+    echo "Found ${#TRAFFIC_CONFIGS[@]} traffic config set(s) in $TRAFFIC_DIR"
 fi
 
 if [[ -n "$Y4M_PATH" && ! -f "$Y4M_PATH" ]]; then
@@ -151,13 +151,15 @@ convert_trace() {
 
 run_single_trace() {
     local trace_path="$1"
-    local traffic_config="$2"
+    local sctp_config="$2"
+    local rtp_config="$3"
+    local traffic_label="$4"
     local trace_file
     trace_file=$(basename "$trace_path")
     local trace_name="${trace_file%.pitree-trace}"
 
-    local traffic_base="${traffic_config##*/}"   
-    traffic_base="${traffic_base%.*}"           
+    local traffic_base="${traffic_label:-traffic}"
+    traffic_base="${traffic_base// /_}"
 
     local room_id="${RUN_START_TS}_${trace_name}_${traffic_base}"
 
@@ -211,10 +213,16 @@ run_single_trace() {
     local common_args=(
         --room_id="$room_id"
         --log_root="$LOG_ROOT"
-        --sctp_csv="$traffic_config"
         --server="$SERVER_HOST"
         --port="$SERVER_PORT"
     )
+
+    if [[ -n "$sctp_config" ]]; then
+        common_args+=("--sctp_csv=$sctp_config")
+    fi
+    if [[ -n "$rtp_config" ]]; then
+        common_args+=("--rtp_csv=$rtp_config")
+    fi
 
     local sender_args=(
         sudo ip netns exec "$NS_NAME" "$REPO_ROOT/out/Default/peerconnection_client"
@@ -349,21 +357,40 @@ mkdir -p "$MAIN_EXPERIMENT_ROOT"
 TOTAL_TRACE_COUNT=0
 TOTAL_TRAFFIC_CONFIGS=${#TRAFFIC_CONFIGS[@]}
 
-for traffic_config in "${TRAFFIC_CONFIGS[@]}"; do
-    # Extract a unique name for this traffic config
-    traffic_name=$(basename "$traffic_config" .csv)
+for traffic_config_dir in "${TRAFFIC_CONFIGS[@]}"; do
+    # Extract a unique name for this traffic config set
+    traffic_name=$(basename "$traffic_config_dir")
 
     echo -e "\n========================================="
-    echo "Starting experiments with traffic config: $traffic_name"
-    echo "Config path: $traffic_config"
+    echo "Starting experiments with traffic config set: $traffic_name"
+    echo "Config path: $traffic_config_dir"
     echo "=========================================\n"
 
     # Create traffic config subdirectory under main experiment root
     TRAFFIC_ROOT="$MAIN_EXPERIMENT_ROOT/$traffic_name"
     mkdir -p "$TRAFFIC_ROOT"
 
-    # Save traffic config copy to traffic root
-    cp "$traffic_config" "$TRAFFIC_ROOT/traffic_config.csv"
+    local local_sctp_config=""
+    local local_rtp_config=""
+    if [[ -f "$traffic_config_dir/sctp.csv" ]]; then
+        local_sctp_config="$traffic_config_dir/sctp.csv"
+        cp "$local_sctp_config" "$TRAFFIC_ROOT/sctp.csv"
+    elif [[ -f "$traffic_config_dir/traffic_config.csv" ]]; then
+        local_sctp_config="$traffic_config_dir/traffic_config.csv"
+        cp "$local_sctp_config" "$TRAFFIC_ROOT/sctp.csv"
+    fi
+
+    if [[ -f "$traffic_config_dir/rtp.csv" ]]; then
+        local_rtp_config="$traffic_config_dir/rtp.csv"
+        cp "$local_rtp_config" "$TRAFFIC_ROOT/rtp.csv"
+    fi
+
+    if [[ -z "$local_sctp_config" ]]; then
+        echo "Warning: no SCTP config found in $traffic_config_dir (expected sctp.csv)."
+    fi
+    if [[ -z "$local_rtp_config" ]]; then
+        echo "Info: no RTP config found in $traffic_config_dir; defaults will be used."
+    fi
 
     TRACE_COUNT=0
 
@@ -379,18 +406,18 @@ for traffic_config in "${TRAFFIC_CONFIGS[@]}"; do
         STDOUT_DIR="$EXPERIMENT_ROOT/stdout"
         mkdir -p "$PROFILES_DIR" "$LOG_ROOT" "$EMULATOR_LOG_DIR" "$STDOUT_DIR"
 
-        run_single_trace "$trace_file" "$traffic_config"
+        run_single_trace "$trace_file" "$local_sctp_config" "$local_rtp_config" "$traffic_name"
         TRACE_COUNT=$((TRACE_COUNT + 1))
         TOTAL_TRACE_COUNT=$((TOTAL_TRACE_COUNT + 1))
     done < <(find "$TRACES_DIR" -maxdepth 1 -type f -name '*.pitree-trace' -print0 | sort -z)
 
-    echo -e "\nCompleted $TRACE_COUNT traces for traffic config: $traffic_name"
+    echo -e "\nCompleted $TRACE_COUNT traces for traffic config set: $traffic_name"
     echo "Results located at: $TRAFFIC_ROOT"
 done
 
 echo -e "\n========================================="
 echo "ALL EXPERIMENTS COMPLETED"
 echo "Total traces run: $TOTAL_TRACE_COUNT"
-echo "Total traffic configs: $TOTAL_TRAFFIC_CONFIGS"
+echo "Total traffic config sets: $TOTAL_TRAFFIC_CONFIGS"
 echo "Results directory: $MAIN_EXPERIMENT_ROOT"
 echo "=========================================\n"

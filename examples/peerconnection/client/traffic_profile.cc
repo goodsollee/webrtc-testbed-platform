@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <cctype>
 #include <fstream>
+#include <filesystem>
+#include <optional>
 #include <sstream>
 #include <vector>
 
@@ -72,4 +74,56 @@ std::vector<TrafficProfile> LoadProfiles(const std::string& path) {
     profiles.push_back(std::move(profile));
   }
   return profiles;
+}
+
+namespace {
+
+std::string ToUpper(std::string value) {
+  std::transform(value.begin(), value.end(), value.begin(),
+                 [](unsigned char ch) { return std::toupper(ch); });
+  return value;
+}
+
+}  // namespace
+
+std::vector<TrafficProfile> LoadSctpProfiles(const std::string& path) {
+  std::vector<TrafficProfile> all_profiles = LoadProfiles(path);
+  std::vector<TrafficProfile> sctp_profiles;
+  sctp_profiles.reserve(all_profiles.size());
+
+  for (auto& profile : all_profiles) {
+    if (ToUpper(profile.protocol) == "SCTP") {
+      sctp_profiles.push_back(std::move(profile));
+    }
+  }
+
+  return sctp_profiles;
+}
+
+std::optional<RtpTrafficConfig> LoadRtpConfig(const std::string& path) {
+  std::vector<TrafficProfile> all_profiles = LoadProfiles(path);
+  for (auto& profile : all_profiles) {
+    if (ToUpper(profile.protocol) != "RTP") {
+      continue;
+    }
+
+    RtpTrafficConfig config;
+    config.traffic_name = std::move(profile.traffic_name);
+    config.pattern = std::move(profile.pattern);
+    config.max_bitrate = profile.max_bitrate;
+    config.frame_rate = profile.frame_rate;
+    config.video_file_name = std::move(profile.video_file_name);
+
+    if (!config.video_file_name.empty()) {
+      std::filesystem::path csv_path(path);
+      std::filesystem::path resolved = std::filesystem::path(config.video_file_name);
+      if (resolved.is_relative()) {
+        resolved = csv_path.parent_path() / resolved;
+      }
+      config.video_file_name = resolved.lexically_normal().string();
+    }
+
+    return config;
+  }
+  return std::nullopt;
 }

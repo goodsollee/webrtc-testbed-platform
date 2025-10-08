@@ -100,7 +100,9 @@ class Conductor : public webrtc::PeerConnectionObserver,
 
   void SetLogDirectory(const std::string& log_dir) { log_dir_ = log_dir; }
 
-  void SetTrafficProfile(const std::string& path) { traffic_csv_path_ = path; }
+  void SetTrafficProfile(const std::string& path) { SetSctpTrafficProfile(path); }
+  void SetSctpTrafficProfile(const std::string& path) { sctp_csv_path_ = path; }
+  void SetRtpTrafficProfile(const std::string& path) { rtp_csv_path_ = path; }
 
   enum class TrafficKind {kKv, kMesh, kBulkTest, kControl};
   using PayloadHandler = std::function<void(absl::Span<const uint8_t>)>;
@@ -277,8 +279,14 @@ class Conductor : public webrtc::PeerConnectionObserver,
    std::string y4m_path_;
   std::string log_dir_;
 
-  std::string traffic_csv_path_;
-  std::vector<TrafficProfile> traffic_profiles_;
+  std::string sctp_csv_path_;
+  std::string rtp_csv_path_;
+  std::vector<TrafficProfile> sctp_profiles_;
+  std::optional<RtpTrafficConfig> rtp_config_;
+
+  int EncoderMaxBitrateBps() const;
+  int PeerConnectionMaxBitrateBps() const;
+  int TargetFrameRateFps() const;
 
    // juheon added
    bool headless_ = false;
