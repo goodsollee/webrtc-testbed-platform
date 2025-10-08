@@ -334,8 +334,16 @@ Conductor::~Conductor() {
 }
 
 void Conductor::Start () {
-  if (!traffic_csv_path_.empty()) {
-    traffic_profiles_ = LoadProfiles(traffic_csv_path_);
+  if (!sctp_csv_path_.empty()) {
+    sctp_profiles_ = LoadSctpProfiles(sctp_csv_path_);
+  } else {
+    sctp_profiles_.clear();
+  }
+
+  if (!rtp_csv_path_.empty()) {
+    rtp_config_ = LoadRtpConfig(rtp_csv_path_);
+  } else {
+    rtp_config_.reset();
   }
   client_->RegisterObserver(this);
   main_wnd_->RegisterObserver(this);
@@ -900,10 +908,13 @@ void Conductor::OnMessageFromPeer(int peer_id, const std::string& message) {
 
     // Set high quality bitrate for 4K
     webrtc::BitrateSettings bitrate_settings;
-    // For 4K video, use higher bitrates
-    bitrate_settings.min_bitrate_bps =    200000;    // 200 kbps min
-    bitrate_settings.start_bitrate_bps =  300000;  // 300 kbps start
-    bitrate_settings.max_bitrate_bps =  50000000;    // 50 Mbps max
+    const int pc_max_bitrate = PeerConnectionMaxBitrateBps();
+    const int start_bitrate = std::min(pc_max_bitrate, 300000);
+    const int min_bitrate = std::min(pc_max_bitrate,
+                                     std::min(start_bitrate, 200000));
+    bitrate_settings.min_bitrate_bps = min_bitrate;
+    bitrate_settings.start_bitrate_bps = start_bitrate;
+    bitrate_settings.max_bitrate_bps = pc_max_bitrate;
     peer_connection_->SetBitrate(bitrate_settings);
 
 
@@ -1186,6 +1197,14 @@ void Conductor::AddTracks() {
   }
 
   bool use_camera = true;
+  const int target_frame_rate = TargetFrameRateFps();
+  const int encoder_max_bitrate_bps = EncoderMaxBitrateBps();
+
+  std::string video_source_path = y4m_path_;
+  if (video_source_path.empty() && rtp_config_ &&
+      !rtp_config_->video_file_name.empty()) {
+    video_source_path = rtp_config_->video_file_name;
+  }
 
   // Before adding any tracks, create transceiver with RTP extensions configured
   webrtc::RtpTransceiverInit init;
@@ -1194,8 +1213,8 @@ void Conductor::AddTracks() {
 
   webrtc::RtpEncodingParameters svc;
   svc.scalability_mode = "L1T1";  // pick the mode you need
-  svc.max_bitrate_bps = 10000000;
-  svc.max_framerate   = 30;
+  svc.max_bitrate_bps = encoder_max_bitrate_bps;
+  svc.max_framerate = target_frame_rate;
   svc.scale_resolution_down_by = 1.0;
   init.send_encodings.push_back(svc);
 
@@ -1257,23 +1276,29 @@ void Conductor::AddTracks() {
   }
 
   // Try Y4M first if path is provided
-  if (!y4m_path_.empty()) {
-    RTC_LOG(LS_INFO) << "Attempting to use Y4M file from path: " << y4m_path_;
-    
+  if (!video_source_path.empty()) {
+    RTC_LOG(LS_INFO) << "Attempting to use Y4M file from path: "
+                     << video_source_path;
+
     std::unique_ptr<webrtc::test::Y4mFrameGenerator> frame_generator(
         new webrtc::test::Y4mFrameGenerator(
-            y4m_path_,
+            video_source_path,
             webrtc::test::Y4mFrameGenerator::RepeatMode::kLoop
         ));
 
     if (frame_generator) {
       auto resolution = frame_generator->GetResolution();
-      const int kTargetFps = frame_generator->fps().value_or(30);
-      
+      const int generator_fps =
+          frame_generator->fps().value_or(target_frame_rate);
+      int capture_fps = target_frame_rate > 0 ? target_frame_rate : generator_fps;
+      if (capture_fps <= 0) {
+        capture_fps = 30;
+      }
+
       auto video_capturer = std::make_unique<webrtc::test::FrameGeneratorCapturer>(
           webrtc::Clock::GetRealTimeClock(),
           std::move(frame_generator),
-          kTargetFps,
+          capture_fps,
           *task_queue_factory_
       );
 
@@ -1344,16 +1369,16 @@ void Conductor::AddTracks() {
             if (!e.scalability_mode.has_value()) {
               e.scalability_mode = "L1T1";  // 또는 "L3T3_KEY" 등 원하는 모드
             }
-            e.max_bitrate_bps = 10000000;
-            e.max_framerate   = 30;
+            e.max_bitrate_bps = encoder_max_bitrate_bps;
+            e.max_framerate = target_frame_rate;
             e.scale_resolution_down_by = 1.0;
           }
         } else {
           // 부득이 새로 만들 경우에도 scalability_mode 반드시 설정
           webrtc::RtpEncodingParameters e;
           e.scalability_mode = "L1T1";
-          e.max_bitrate_bps = 10000000;
-          e.max_framerate   = 30;
+          e.max_bitrate_bps = encoder_max_bitrate_bps;
+          e.max_framerate = target_frame_rate;
           e.scale_resolution_down_by = 1.0;
           parameters.encodings.push_back(e);
         }
@@ -1431,10 +1456,7 @@ void Conductor::AddSCTPs() {
   int next_id = 0;
   int next_kind = 100;  // Base value for dynamically created kinds.
 
-  for (const auto& profile : traffic_profiles_) {
-    if (profile.protocol != "SCTP")
-      continue;
-
+  for (const auto& profile : sctp_profiles_) {
     cfg.id = next_id++;
     TrafficKind kind = static_cast<TrafficKind>(next_kind++);
 
@@ -1467,6 +1489,27 @@ void Conductor::AddSCTPs() {
       }
     }
   }
+}
+
+int Conductor::EncoderMaxBitrateBps() const {
+  if (rtp_config_ && rtp_config_->max_bitrate > 0) {
+    return rtp_config_->max_bitrate;
+  }
+  return 10000000;
+}
+
+int Conductor::PeerConnectionMaxBitrateBps() const {
+  if (rtp_config_ && rtp_config_->max_bitrate > 0) {
+    return rtp_config_->max_bitrate;
+  }
+  return 50000000;
+}
+
+int Conductor::TargetFrameRateFps() const {
+  if (rtp_config_ && rtp_config_->frame_rate > 0) {
+    return rtp_config_->frame_rate;
+  }
+  return 30;
 }
 
 void Conductor::OnIceConnectionChange(

@@ -59,4 +59,14 @@ ABSL_FLAG(std::string,
           "",
           "CSV file describing traffic profiles");
 
+ABSL_FLAG(std::string,
+          sctp_csv,
+          "",
+          "CSV file describing SCTP traffic profiles");
+
+ABSL_FLAG(std::string,
+          rtp_csv,
+          "",
+          "CSV file describing RTP traffic profile");
+
 #endif  // EXAMPLES_PEERCONNECTION_CLIENT_FLAG_DEFS_H_

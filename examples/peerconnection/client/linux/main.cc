@@ -37,9 +37,6 @@ ABSL_FLAG(std::string, network_interface, "",
     "Network interface to use (empty for default)");
 ABSL_FLAG(std::string, y4m_path, "", 
     "Path to Y4M file to use as video source (empty for test pattern)");
-  ABSL_FLAG(std::string, sctp_csv, "",
-        "Path to SCTP traffic CSV to drive traffic");
-// In flag_defs.h, add:
 ABSL_FLAG(std::string, log_date, "", "Date for log folder (YYYY-MM-DD)");
 ABSL_FLAG(std::string,
           log_root,
@@ -112,6 +109,11 @@ Video Source Options:
 
 SCTP Traffic Options:
   --sctp_csv=<path>         Path to SCTP traffic CSV to drive traffic
+
+  --traffic_csv=<path>      Legacy alias for --sctp_csv
+
+RTP Traffic Options:
+  --rtp_csv=<path>          Path to RTP traffic CSV to configure media
 
 Example Commands:
   # Run as video sender using Y4M file:
@@ -189,9 +191,17 @@ Example Commands:
   auto conductor = rtc::make_ref_counted<Conductor>(&client, &wnd, absl::GetFlag(FLAGS_headless));
 
   std::string sctp_csv = absl::GetFlag(FLAGS_sctp_csv);
+  if (sctp_csv.empty()) {
+    sctp_csv = absl::GetFlag(FLAGS_traffic_csv);
+  }
   if (!sctp_csv.empty()) {
-    conductor->SetTrafficProfile(sctp_csv);
-  } 
+    conductor->SetSctpTrafficProfile(sctp_csv);
+  }
+
+  std::string rtp_csv = absl::GetFlag(FLAGS_rtp_csv);
+  if (!rtp_csv.empty()) {
+    conductor->SetRtpTrafficProfile(rtp_csv);
+  }
 
   conductor->SetRoomId(absl::GetFlag(FLAGS_room_id));
 
