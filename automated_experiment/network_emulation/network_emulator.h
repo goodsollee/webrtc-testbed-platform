@@ -26,9 +26,10 @@ public:
     ~NetworkEmulator();
 
     // Initialize emulator with network profile and interface names
-    bool Initialize(const std::string& profile_path, 
+    bool Initialize(const std::string& profile_path,
                    const std::string& interface_name,
-                   const std::string& peer_interface_name);
+                   const std::string& peer_interface_name,
+                   const std::string& bandwidth_log_path = "");
 
     // Interface management
     bool CreateVirtualInterface();
@@ -53,10 +54,12 @@ private:
     void EnqueueTcCommand(std::function<void()> command);
     void ApplyNetworkConditionsAsync(double bandwidth_kbps, double latency_ms);
     void ApplyNetworkConditionsSync(double bandwidth_kbps, double latency_ms, int limit);
+    void LogBandwidthChange(double bandwidth_kbps, double latency_ms);
 
     std::string profile_path_;
     std::string interface_name_;
     std::string peer_interface_name_;
+    std::string bandwidth_log_path_;
     std::vector<NetworkProfile> network_profiles_;
     std::thread emulation_thread_;
     std::atomic<bool> is_running_;
@@ -65,6 +68,10 @@ private:
     double last_bandwidth_kbps_;
     double last_latency_ms_;
     std::chrono::steady_clock::time_point last_update_time_;
+    std::chrono::steady_clock::time_point start_time_;
+    bool start_time_initialized_;
+    bool bandwidth_log_header_written_;
+    std::mutex bandwidth_log_mutex_;
 
     // Async TC command execution members
     std::thread tc_worker_thread_;
