@@ -17,6 +17,9 @@ NetworkEmulator::NetworkEmulator()
       last_bandwidth_kbps_(0.0),
       last_latency_ms_(0.0),
       last_update_time_(std::chrono::steady_clock::time_point::min()),
+      start_time_(std::chrono::steady_clock::time_point::min()),
+      start_time_initialized_(false),
+      bandwidth_log_header_written_(false),
       tc_worker_running_(false) {
     LOG_INFO(NETWORK_EMULATOR_MODULE_NAME, "NetworkEmulator initialized");
 }
@@ -29,10 +32,13 @@ NetworkEmulator::~NetworkEmulator() {
 
 bool NetworkEmulator::Initialize(const std::string& profile_path,
                                   const std::string& interface_name,
-                                  const std::string& peer_interface_name) {
+                                  const std::string& peer_interface_name,
+                                  const std::string& bandwidth_log_path) {
     profile_path_ = profile_path;
     interface_name_ = interface_name;
     peer_interface_name_ = peer_interface_name;
+    bandwidth_log_path_ = bandwidth_log_path;
+    bandwidth_log_header_written_ = false;
 
     LOG_INFO(NETWORK_EMULATOR_MODULE_NAME, "Initializing NetworkEmulator");
     if (!profile_path_.empty()) {
@@ -48,6 +54,20 @@ bool NetworkEmulator::Initialize(const std::string& profile_path,
 
     if (!profile_path_.empty() && !ParseProfileFile()) {
         LOG_WARNING(NETWORK_EMULATOR_MODULE_NAME, "Profile parsing failed or no valid profiles found");
+    }
+
+    if (!bandwidth_log_path_.empty()) {
+        std::lock_guard<std::mutex> lock(bandwidth_log_mutex_);
+        std::ofstream file(bandwidth_log_path_, std::ios::out | std::ios::trunc);
+        if (file.is_open()) {
+            file << "elapsed_ms,bandwidth_kbps,latency_ms" << std::endl;
+            bandwidth_log_header_written_ = true;
+            LOG_INFO(NETWORK_EMULATOR_MODULE_NAME,
+                     "Bandwidth changes will be logged to ", bandwidth_log_path_);
+        } else {
+            LOG_ERROR(NETWORK_EMULATOR_MODULE_NAME,
+                      "Failed to open bandwidth log file: ", bandwidth_log_path_);
+        }
     }
 
     LOG_INFO(NETWORK_EMULATOR_MODULE_NAME,
@@ -168,6 +188,8 @@ void NetworkEmulator::Start() {
     LOG_INFO(NETWORK_EMULATOR_MODULE_NAME, "Starting emulation loop");
     is_running_ = true;
     tc_worker_running_ = true;
+    start_time_ = std::chrono::steady_clock::now();
+    start_time_initialized_ = true;
 
     // Start TC worker thread first
     tc_worker_thread_ = std::thread(&NetworkEmulator::TcWorkerLoop, this);
@@ -432,10 +454,38 @@ void NetworkEmulator::ApplyNetworkConditionsSync(double bandwidth_kbps,
              " ms, Limit: ", limit, " packets (took ", duration.count(), " ms)");
 
     last_update_time_ = end;
+    LogBandwidthChange(bandwidth_kbps, latency_ms);
 }
 
 // Legacy synchronous method kept for compatibility
 void NetworkEmulator::ApplyNetworkConditions(double bandwidth_kbps, double latency_ms) {
     // Redirect to async version
     ApplyNetworkConditionsAsync(bandwidth_kbps, latency_ms);
+}
+
+void NetworkEmulator::LogBandwidthChange(double bandwidth_kbps, double latency_ms) {
+    if (bandwidth_log_path_.empty() || !start_time_initialized_) {
+        return;
+    }
+
+    auto now = std::chrono::steady_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start_time_);
+
+    std::lock_guard<std::mutex> lock(bandwidth_log_mutex_);
+    std::ofstream file;
+    std::ios_base::openmode mode = std::ios::out | std::ios::app;
+    file.open(bandwidth_log_path_, mode);
+
+    if (!file.is_open()) {
+        LOG_ERROR(NETWORK_EMULATOR_MODULE_NAME,
+                  "Unable to append bandwidth log entry to ", bandwidth_log_path_);
+        return;
+    }
+
+    if (!bandwidth_log_header_written_) {
+        file << "elapsed_ms,bandwidth_kbps,latency_ms" << std::endl;
+        bandwidth_log_header_written_ = true;
+    }
+
+    file << elapsed.count() << "," << bandwidth_kbps << "," << latency_ms << std::endl;
 }

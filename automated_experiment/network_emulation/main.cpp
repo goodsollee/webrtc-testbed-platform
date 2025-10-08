@@ -13,6 +13,7 @@
 // Define Abseil Flags
 ABSL_FLAG(std::string, profile_path, "", "Path to the network profile CSV file (optional)");
 ABSL_FLAG(std::string, interface_name, "", "Network interface name to be emulated (mandatory)");
+ABSL_FLAG(std::string, bandwidth_log_path, "", "Path to CSV file for bandwidth change logs");
 
 // Global emulator instance
 std::unique_ptr<NetworkEmulator> g_emulator;
@@ -52,6 +53,7 @@ int main(int argc, char* argv[]) {
     // Retrieve flag values
     std::string profile_path = absl::GetFlag(FLAGS_profile_path);
     std::string interface_name = absl::GetFlag(FLAGS_interface_name);
+    std::string bandwidth_log_path = absl::GetFlag(FLAGS_bandwidth_log_path);
 
     // Auto-detect if not specified
     if (interface_name.empty()) {
@@ -85,7 +87,7 @@ int main(int argc, char* argv[]) {
         // Generate a unique name for the peer interface
         std::string peer_name = interface_name + "_peer";
         
-        if (!g_emulator->Initialize(profile_path, interface_name, peer_name)) {
+        if (!g_emulator->Initialize(profile_path, interface_name, peer_name, bandwidth_log_path)) {
             LOG_ERROR("main", "Failed to initialize network emulator");
             return 1;
         }

@@ -170,6 +170,7 @@ run_single_trace() {
     mkdir -p "$run_stdout_dir"
 
     local emulator_stdout="$run_stdout_dir/network_emulator.log"
+    local bandwidth_csv="$EMULATOR_LOG_DIR/${trace_name}_bandwidth.csv"
     local previous_dir="$PWD"
     cd "$SCRIPT_DIR/network_emulation"
 
@@ -181,6 +182,7 @@ run_single_trace() {
     sudo ./network_emulator \
     --profile_path="$profile_csv" \
     --interface_name="$INTERFACE_NAME" \
+    --bandwidth_log_path="$bandwidth_csv" \
     <"$fifo_path" >"$emulator_stdout" 2>&1 &
     local emulator_pid=$!
     cd "$previous_dir"
