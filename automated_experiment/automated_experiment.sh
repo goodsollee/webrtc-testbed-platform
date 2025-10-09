@@ -204,7 +204,6 @@ run_single_trace() {
 
     local emulator_pid=$!
     cd "$previous_dir"
-    echo start > "$fifo_path"
 
     echo "$emulator_pid" > "$run_stdout_dir/emulator.pid"
 
@@ -291,6 +290,7 @@ run_single_trace() {
     # Start emulation trace
     echo -e "\n=== STARTING EMULATION TRACE ==="
     sleep 1
+    echo start > "$fifo_path"
     echo "Starting bandwidth emulation for trace: $trace_name"
 
     # Wait for emulator to complete (primary termination signal)

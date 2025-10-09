@@ -127,7 +127,8 @@ int main(int argc, char* argv[]) {
         while (true) {
             std::string input;
             if (interactive) {
-                std::cout << "Type 'start' to begin traffic shaping: " << std::flush;
+                LOG_INFO("main",
+                        "Type 'start' to begin traffic shaping...");
                 if (!std::getline(std::cin, input)) {
                     return false; // stdin closed
                 }
