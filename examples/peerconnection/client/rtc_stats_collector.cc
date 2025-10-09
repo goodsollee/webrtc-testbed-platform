@@ -1,5 +1,6 @@
 #include "examples/peerconnection/client/rtc_stats_collector.h"
 
+#include <algorithm>
 #include <cctype>
 #include <iomanip>
 #include <ios>
@@ -48,16 +49,18 @@ std::string JoinPath(const std::string& base, const std::string& leaf) {
 
 std::string MakeDataChannelKey(
     const webrtc::RTCDataChannelStats& data_stats) {
-    std::string transport =
-        data_stats.transport_id.has_value() ? *data_stats.transport_id : "";
+    std::string label = data_stats.label.has_value() ? *data_stats.label : "";
+    if (!label.empty()) {
+        std::replace(label.begin(), label.end(), '|', '_');
+    }
     std::string channel_id = data_stats.data_channel_identifier.has_value()
                                   ? std::to_string(
                                         *data_stats.data_channel_identifier)
                                   : "";
 
-    if (!transport.empty() || !channel_id.empty()) {
+    if (!label.empty() || !channel_id.empty()) {
         std::ostringstream oss;
-        oss << transport << "|" << channel_id;
+        oss << label << "|" << channel_id;
         return oss.str();
     }
 
