@@ -68,6 +68,7 @@ std::string MakeDataChannelKey(
     // channel.
     return std::string(data_stats.id());
 }
+
 }  // namespace
 
 RTCStatsCollectorCallback::RTCStatsCollectorCallback(
@@ -612,16 +613,8 @@ void RTCStatsCollectorCallback::ProcessDataChannelStats(
     }
 
     if (!channel_state.csv_file.is_open()) {
-        std::string sanitized_id =
-            SanitizeForFilename(channel_state.unique_key);
+        // Use only the sanitized label for the filename to avoid duplication
         std::string filename = channel_state.sanitized_label;
-        if (!sanitized_id.empty()) {
-            if (!filename.empty()) {
-                filename += "_" + sanitized_id;
-            } else {
-                filename = sanitized_id;
-            }
-        }
         if (channel_state.data_channel_id >= 0) {
             filename += "_dc" + std::to_string(channel_state.data_channel_id);
         }
@@ -704,6 +697,128 @@ void RTCStatsCollectorCallback::ProcessDataChannelStats(
 }
 
 
+void RTCStatsCollectorCallback::ProcessTransportStats(
+    const webrtc::RTCStats& stats) {
+    const auto& transport_stats = stats.cast_to<webrtc::RTCTransportStats>();
+
+    uint64_t total_bytes_received = transport_stats.bytes_received.value_or(0);
+    uint64_t total_bytes_sent = transport_stats.bytes_sent.value_or(0);
+
+    std::lock_guard<std::mutex> lock(stats_mutex_);
+
+    if (persistent_stats_.log_directory_.empty()) {
+        RTC_LOG(LS_WARNING)
+            << "SCTP transport throughput logging skipped: log directory not set.";
+        return;
+    }
+
+    const std::string& transport_id = transport_stats.id();
+
+    // Log all transport stats to capture SCTP throughput at transport level
+    TransportLogState& transport_state =
+        persistent_stats_.transport_logs_[transport_id];
+
+    if (transport_state.transport_id.empty()) {
+        transport_state.transport_id = transport_id;
+    }
+
+    if (transport_state.sanitized_id.empty()) {
+        transport_state.sanitized_id =
+            SanitizeForFilename(transport_state.transport_id);
+        if (transport_state.sanitized_id.empty()) {
+            transport_state.sanitized_id = "sctp_transport";
+        }
+    }
+
+    if (!transport_state.csv_file.is_open()) {
+        std::string filename;
+        if (!persistent_stats_.sctp_flow_name_.empty()) {
+            filename = persistent_stats_.sctp_flow_name_ + "_throughput.csv";
+        } else {
+            filename = transport_state.sanitized_id + "_throughput.csv";
+        }
+        std::string path = JoinPath(persistent_stats_.log_directory_, filename);
+        transport_state.csv_file.open(path, std::ios::out | std::ios::trunc);
+        if (!transport_state.csv_file.is_open()) {
+            RTC_LOG(LS_WARNING)
+                << "Failed to open SCTP transport throughput log file: " << path;
+            persistent_stats_.transport_logs_.erase(transport_id);
+            return;
+        }
+        RTC_LOG(LS_INFO) << "Logging SCTP transport throughput for '"
+                          << transport_state.transport_id << "' to " << path;
+        transport_state.csv_file
+            << "timestamp_ms,interval_ms,bytes_received,total_bytes_received,"
+               "receive_throughput_bps,receive_throughput_mbps,bytes_sent,"
+               "total_bytes_sent,send_throughput_bps,send_throughput_mbps\n";
+        transport_state.csv_file.flush();
+    }
+
+    // Initialize period start if needed
+    int64_t current_time_ms = rtc::TimeMillis();
+    if (transport_state.period_start_time_ms == -1) {
+        transport_state.period_start_time_ms = current_time_ms;
+        transport_state.period_start_bytes_received = total_bytes_received;
+        transport_state.period_start_bytes_sent = total_bytes_sent;
+        transport_state.last_log_time_ms = current_time_ms;
+        return;
+    }
+
+    // Accumulate bytes received/sent in this collection cycle
+    if (total_bytes_received >= transport_state.period_start_bytes_received) {
+        uint64_t delta = total_bytes_received - transport_state.period_start_bytes_received;
+        transport_state.accumulated_bytes_received += delta;
+    }
+    if (total_bytes_sent >= transport_state.period_start_bytes_sent) {
+        uint64_t delta = total_bytes_sent - transport_state.period_start_bytes_sent;
+        transport_state.accumulated_bytes_sent += delta;
+    }
+    transport_state.period_start_bytes_received = total_bytes_received;
+    transport_state.period_start_bytes_sent = total_bytes_sent;
+
+    // Check if we should log (every 200ms)
+    int64_t time_since_last_log = current_time_ms - transport_state.last_log_time_ms;
+    constexpr int kLogIntervalMs = 200;
+
+    if (time_since_last_log >= kLogIntervalMs) {
+        // Calculate throughput over the 200ms interval
+        double interval_sec = static_cast<double>(time_since_last_log) / 1000.0;
+        double recv_throughput_bps = 0.0;
+        double send_throughput_bps = 0.0;
+
+        if (interval_sec > 0) {
+            recv_throughput_bps = (transport_state.accumulated_bytes_received * 8.0) / interval_sec;
+            send_throughput_bps = (transport_state.accumulated_bytes_sent * 8.0) / interval_sec;
+        }
+
+        double recv_throughput_mbps = recv_throughput_bps / 1'000'000.0;
+        double send_throughput_mbps = send_throughput_bps / 1'000'000.0;
+
+        std::ostringstream line;
+        line.imbue(std::locale::classic());
+        line << current_time_ms << ","
+             << time_since_last_log << ","
+             << transport_state.accumulated_bytes_received << ","
+             << total_bytes_received << ","
+             << recv_throughput_bps << ","
+             << std::fixed << std::setprecision(6) << recv_throughput_mbps << ","
+             << std::defaultfloat
+             << transport_state.accumulated_bytes_sent << ","
+             << total_bytes_sent << ","
+             << send_throughput_bps << ","
+             << std::fixed << std::setprecision(6) << send_throughput_mbps;
+
+        transport_state.csv_file << line.str() << "\n";
+        transport_state.csv_file.flush();
+
+        // Reset accumulators for next period
+        transport_state.accumulated_bytes_received = 0;
+        transport_state.accumulated_bytes_sent = 0;
+        transport_state.last_log_time_ms = current_time_ms;
+    }
+}
+
+
 void RTCStatsCollectorCallback::OnStatsDeliveredOnSignalingThread(
     rtc::scoped_refptr<const webrtc::RTCStatsReport> report) {
     RTC_LOG(LS_INFO) << "OnStatsDeliveredOnSignalingThread called.";
@@ -717,6 +832,10 @@ void RTCStatsCollectorCallback::OnStatsDeliveredOnSignalingThread(
         std::string stats_type(stats.type());
         if (stats_type == webrtc::RTCDataChannelStats::kType) {
             ProcessDataChannelStats(stats);
+            continue;
+        }
+        if (stats_type == webrtc::RTCTransportStats::kType) {
+            ProcessTransportStats(stats);
             continue;
         }
 
@@ -845,6 +964,12 @@ bool RTCStatsCollector::OpenStatsFile(const std::string& foldername) {
         }
     }
     persistent_stats_.data_channel_logs_.clear();
+    for (auto& entry : persistent_stats_.transport_logs_) {
+        if (entry.second.csv_file.is_open()) {
+            entry.second.csv_file.close();
+        }
+    }
+    persistent_stats_.transport_logs_.clear();
     persistent_stats_.log_directory_ = foldername;
 
     return true;
@@ -869,7 +994,14 @@ void RTCStatsCollector::CloseStatsFile() {
             entry.second.csv_file.close();
         }
     }
+    for (auto& entry : persistent_stats_.transport_logs_) {
+        if (entry.second.csv_file.is_open()) {
+            entry.second.csv_file.flush();
+            entry.second.csv_file.close();
+        }
+    }
     persistent_stats_.data_channel_logs_.clear();
+    persistent_stats_.transport_logs_.clear();
     persistent_stats_.log_directory_.clear();
 }
 
@@ -899,4 +1031,3 @@ void RTCStatsCollector::CollectStats() {
 
     peer_connection_->GetStats(stats_callback.get());
 }
-

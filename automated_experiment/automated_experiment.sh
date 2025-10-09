@@ -259,6 +259,8 @@ run_single_trace() {
     echo "✓ Emulator ready! (${wait_seconds}s)"
     rm -f "$signal_file"  # ← 사용 후 삭제
 
+    echo "start" >&3  # fd 3으로 쓰기
+
     # Sender/Receiver 설정
     local sender_log="$run_stdout_dir/sender.log"
     local receiver_log="$run_stdout_dir/receiver.log"
@@ -350,8 +352,8 @@ run_single_trace() {
 
     # 트래픽이 시작된 후 emulator에 start 명령 전송
     echo -e "\n=== STARTING BANDWIDTH EMULATION ==="
-    sleep 1
-    echo "start" >&3  # fd 3으로 쓰기
+    #sleep 1
+    #echo "start" >&3  # fd 3으로 쓰기
     echo "✓ Start signal sent to emulator for trace: $trace_name"
 
     # Emulator 완료 대기

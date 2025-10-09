@@ -69,6 +69,13 @@ class ExperimentAnalyzer:
                     if profile_file.exists():
                         self.data[config_name][trace_name]['profile'] = pd.read_csv(profile_file)
 
+                # Load bandwidth data from emulator_logs
+                emulator_logs_dir = trace_folder / "emulator_logs"
+                if emulator_logs_dir.exists():
+                    bandwidth_file = emulator_logs_dir / f"{trace_name}_bandwidth.csv"
+                    if bandwidth_file.exists():
+                        self.data[config_name][trace_name]['bandwidth'] = pd.read_csv(bandwidth_file)
+
                 # Find receiver directory
                 receiver_dir = self.find_receiver_logs(trace_folder)
                 if not receiver_dir:
@@ -91,6 +98,21 @@ class ExperimentAnalyzer:
                 prompt_file = receiver_dir / "Prompt_rx.csv"
                 if prompt_file.exists():
                     self.data[config_name][trace_name]['prompt'] = pd.read_csv(prompt_file)
+
+                # Load RTP throughput (T01_throughput.csv)
+                rtp_throughput_file = receiver_dir / "T01_throughput.csv"
+                if rtp_throughput_file.exists():
+                    self.data[config_name][trace_name]['rtp_throughput'] = pd.read_csv(rtp_throughput_file)
+
+                # Load SCTP throughput files (KVCache and Prompt)
+                sctp_throughput_files = list(receiver_dir.glob("*_dc*_throughput.csv"))
+                if sctp_throughput_files:
+                    sctp_data = {}
+                    for sctp_file in sctp_throughput_files:
+                        # Extract flow name from filename (e.g., KVCache1_dc0, Prompt_dc2)
+                        flow_name = sctp_file.stem.replace('_throughput', '')
+                        sctp_data[flow_name] = pd.read_csv(sctp_file)
+                    self.data[config_name][trace_name]['sctp_throughput'] = sctp_data
 
         print("Data loading complete!")
         return self.data
@@ -312,6 +334,119 @@ class ExperimentAnalyzer:
             print(f"Saved: {out}")
             plt.close()
 
+    def plot_throughput_timeline(self, output_dir="plots"):
+        """
+        Plot throughput timeline graphs for RTP and SCTP flows.
+        Creates two separate timeline plots for each experiment (config + trace combination):
+        1. Available bandwidth, RTP total, and SCTP total (aggregated)
+        2. Individual SCTP flows breakdown
+        Plots are saved in: plots/{result_name}/timeline/{exp_name}_*.png
+        """
+        output_path = Path(output_dir)
+        output_path.mkdir(exist_ok=True)
+
+        print("\nGenerating throughput timeline plots...")
+
+        for config_name in sorted(self.data.keys()):
+            # Create config-specific output directory
+            config_output_dir = output_path / config_name / "timeline"
+            config_output_dir.mkdir(parents=True, exist_ok=True)
+
+            for trace_name in sorted(self.data[config_name].keys()):
+                if trace_name.startswith('_'):  # Skip metadata entries
+                    continue
+
+                exp_name = f"{config_name}_{trace_name}"
+                trace_data = self.data[config_name][trace_name]
+
+                # Check if we have data
+                has_bandwidth = 'bandwidth' in trace_data
+                has_rtp = 'average_stats' in trace_data
+                has_sctp = 'sctp_throughput' in trace_data
+
+                if not (has_bandwidth or has_rtp or has_sctp):
+                    continue
+
+                # Use RTP video timeline as the reference time range
+                if not has_rtp or 'timestamp_ms' not in trace_data['average_stats'].columns:
+                    continue
+
+                min_time_ms = trace_data['average_stats']['timestamp_ms'].min()
+                max_time_ms = trace_data['average_stats']['timestamp_ms'].max()
+                max_time_s = (max_time_ms - min_time_ms) / 1000.0
+
+                # ============================================================
+                # PLOT 1: Available Bandwidth + RTP Total + SCTP Total
+                # ============================================================
+                fig1, ax1 = plt.subplots(figsize=(14, 6))
+
+                # Plot Available Bandwidth
+                if has_bandwidth:
+                    df_bw = trace_data['bandwidth']
+                    if 'elapsed_ms' in df_bw.columns and 'bandwidth_kbps' in df_bw.columns:
+                        time_s = (df_bw['elapsed_ms'] - min_time_ms) / 1000.0
+                        bandwidth_mbps = df_bw['bandwidth_kbps'] / 1000.0
+                        ax1.plot(time_s, bandwidth_mbps, linewidth=2, label='Available Bandwidth',
+                                color='#808080', linestyle='--', alpha=0.8)
+
+                # Plot RTP Total Bitrate
+                if has_rtp and 'bitrates' in trace_data['average_stats'].columns:
+                    df_rtp = trace_data['average_stats']
+                    if 'timestamp_ms' in df_rtp.columns:
+                        time_s = (df_rtp['timestamp_ms'] - min_time_ms) / 1000.0
+                        bitrates_mbps = df_rtp['bitrates'] / 1_000_000
+                        ax1.plot(time_s, bitrates_mbps, linewidth=2, label='RTP Total',
+                                color='#1f77b4')
+
+                # Plot SCTP Total Throughput (from T01_throughput.csv)
+                if 'rtp_throughput' in trace_data:
+                    df_sctp_total = trace_data['rtp_throughput']
+                    if 'timestamp_ms' in df_sctp_total.columns and 'receive_throughput_mbps' in df_sctp_total.columns:
+                        time_s = (df_sctp_total['timestamp_ms'] - min_time_ms) / 1000.0
+                        sctp_throughput_mbps = df_sctp_total['receive_throughput_mbps']
+                        ax1.plot(time_s, sctp_throughput_mbps, linewidth=2, label='SCTP Total',
+                                color='#ff7f0e')
+
+                ax1.set_xlabel('Time (s)', fontsize=12)
+                ax1.set_ylabel('Throughput (Mbps)', fontsize=12)
+                ax1.set_title(f'Bandwidth and Total Throughput Timeline — {exp_name}', fontsize=14, fontweight='bold')
+                ax1.set_xlim(0, max_time_s)
+                ax1.grid(True, alpha=0.3)
+                ax1.legend(loc='best')
+                plt.tight_layout()
+                output_file1 = config_output_dir / f"{exp_name}_overview_timeline.png"
+                plt.savefig(output_file1, dpi=300, bbox_inches='tight')
+                print(f"  Saved: {output_file1}")
+                plt.close()
+
+                # ============================================================
+                # PLOT 2: Individual SCTP Flows
+                # ============================================================
+                if has_sctp:
+                    fig2, ax2 = plt.subplots(figsize=(14, 6))
+                    colors = ['#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f']
+                    color_idx = 0
+
+                    for flow_name, df_sctp in sorted(trace_data['sctp_throughput'].items()):
+                        if 'timestamp_ms' in df_sctp.columns and 'receive_throughput_mbps' in df_sctp.columns:
+                            time_s = (df_sctp['timestamp_ms'] - min_time_ms) / 1000.0
+                            throughput_mbps = df_sctp['receive_throughput_mbps']
+                            ax2.plot(time_s, throughput_mbps, linewidth=2,
+                                   label=flow_name, color=colors[color_idx % len(colors)])
+                            color_idx += 1
+
+                    ax2.set_xlabel('Time (s)', fontsize=12)
+                    ax2.set_ylabel('Throughput (Mbps)', fontsize=12)
+                    ax2.set_title(f'Individual SCTP Flow Throughput Timeline — {exp_name}', fontsize=14, fontweight='bold')
+                    ax2.set_xlim(0, max_time_s)
+                    ax2.grid(True, alpha=0.3)
+                    ax2.legend(loc='best')
+                    plt.tight_layout()
+                    output_file2 = config_output_dir / f"{exp_name}_sctp_flows_timeline.png"
+                    plt.savefig(output_file2, dpi=300, bbox_inches='tight')
+                    print(f"  Saved: {output_file2}")
+                    plt.close()
+
     def generate_all_plots(self, output_dir="plots"):
         """Generate all analysis plots."""
         output_path = Path(output_dir)
@@ -353,6 +488,9 @@ class ExperimentAnalyzer:
 
         # 5. Frame rate CDFs (capped at 30 fps)
         self.plot_framerate_cdfs(output_dir=output_path)
+
+        # 6. Throughput timeline plots (RTP and SCTP)
+        self.plot_throughput_timeline(output_dir=output_path)
 
         print("\nAll plots generated successfully!")
 

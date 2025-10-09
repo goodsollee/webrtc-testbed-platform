@@ -27,6 +27,18 @@ struct DataChannelLogState {
     std::ofstream csv_file;
 };
 
+struct TransportLogState {
+    std::string transport_id;
+    std::string sanitized_id;
+    int64_t period_start_time_ms = -1;
+    uint64_t period_start_bytes_received = 0;
+    uint64_t period_start_bytes_sent = 0;
+    uint64_t accumulated_bytes_received = 0;
+    uint64_t accumulated_bytes_sent = 0;
+    int64_t last_log_time_ms = -1;
+    std::ofstream csv_file;
+};
+
 struct PersistentStats {
     int64_t frame_timing_count_ = 0;
     int64_t last_render_time_ms_ = -1;
@@ -84,7 +96,12 @@ struct PersistentStats {
 
     // Data channel (SCTP) throughput logging
     std::map<std::string, DataChannelLogState> data_channel_logs_;
+    // Underlying transport throughput logging keyed by RTCTransportStats.id().
+    std::map<std::string, TransportLogState> transport_logs_;
     std::string log_directory_;
+
+    // Flow name for SCTP transport logging
+    std::string sctp_flow_name_;
 };
 
 class RTCStatsCollectorCallback : public webrtc::RTCStatsCollectorCallback {
@@ -104,6 +121,7 @@ protected:
 private:
     void ProcessRemoteOutboundRTPStats(const webrtc::RTCStats& stats);
     void ProcessDataChannelStats(const webrtc::RTCStats& stats);
+    void ProcessTransportStats(const webrtc::RTCStats& stats);
     
     void OnStatsDeliveredOnSignalingThread(
         rtc::scoped_refptr<const webrtc::RTCStatsReport> report);
@@ -128,6 +146,11 @@ public:
     void Stop();
 
     bool IsRunning () { return is_running_;}
+
+    void SetSctpFlowName(const std::string& flow_name) {
+        std::lock_guard<std::mutex> lock(stats_mutex_);
+        persistent_stats_.sctp_flow_name_ = flow_name;
+    }
 
 private:
     void CollectStats();
