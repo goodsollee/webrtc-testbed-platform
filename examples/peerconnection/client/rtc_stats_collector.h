@@ -18,6 +18,7 @@
 struct DataChannelLogState {
     std::string label;
     std::string sanitized_label;
+    std::string unique_key;
     int data_channel_id = -1;
     int64_t first_timestamp_ms = -1;
     int64_t last_timestamp_ms = -1;

@@ -45,6 +45,26 @@ std::string JoinPath(const std::string& base, const std::string& leaf) {
     path += leaf;
     return path;
 }
+
+std::string MakeDataChannelKey(
+    const webrtc::RTCDataChannelStats& data_stats) {
+    std::string transport =
+        data_stats.transport_id.has_value() ? *data_stats.transport_id : "";
+    std::string channel_id = data_stats.data_channel_identifier.has_value()
+                                  ? std::to_string(
+                                        *data_stats.data_channel_identifier)
+                                  : "";
+
+    if (!transport.empty() || !channel_id.empty()) {
+        std::ostringstream oss;
+        oss << transport << "|" << channel_id;
+        return oss.str();
+    }
+
+    // Fall back to the raw stats id which is stable for the life of the data
+    // channel.
+    return std::string(data_stats.id());
+}
 }  // namespace
 
 RTCStatsCollectorCallback::RTCStatsCollectorCallback(
@@ -551,7 +571,7 @@ void RTCStatsCollectorCallback::ProcessDataChannelStats(
     std::string label = data_stats.label.has_value()
                             ? *data_stats.label
                             : std::string(stats.id());
-    std::string key = std::string(stats.id());
+    std::string key = MakeDataChannelKey(data_stats);
 
     uint64_t total_bytes_received =
         data_stats.bytes_received.value_or(0);
@@ -572,6 +592,10 @@ void RTCStatsCollectorCallback::ProcessDataChannelStats(
     if (channel_state.label.empty()) {
         channel_state.label = label;
     }
+    if (channel_state.unique_key.empty()) {
+        channel_state.unique_key = key;
+    }
+
     if (channel_state.sanitized_label.empty()) {
         channel_state.sanitized_label = SanitizeForFilename(label);
         if (channel_state.sanitized_label.empty()) {
@@ -585,7 +609,8 @@ void RTCStatsCollectorCallback::ProcessDataChannelStats(
     }
 
     if (!channel_state.csv_file.is_open()) {
-        std::string sanitized_id = SanitizeForFilename(key);
+        std::string sanitized_id =
+            SanitizeForFilename(channel_state.unique_key);
         std::string filename = channel_state.sanitized_label;
         if (!sanitized_id.empty()) {
             if (!filename.empty()) {
@@ -606,7 +631,8 @@ void RTCStatsCollectorCallback::ProcessDataChannelStats(
             return;
         }
         RTC_LOG(LS_INFO) << "Logging SCTP throughput for '" << label
-                          << "' to " << path;
+                          << "' (key: '" << channel_state.unique_key
+                          << "') to " << path;
         channel_state.csv_file
             << "timestamp_ms,interval_ms,bytes_received,total_bytes_received,"
                "receive_throughput_bps,receive_throughput_mbps,"
