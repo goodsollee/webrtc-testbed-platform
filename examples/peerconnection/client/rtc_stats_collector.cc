@@ -1,9 +1,70 @@
 #include "examples/peerconnection/client/rtc_stats_collector.h"
+
+#include <cctype>
+#include <iomanip>
+#include <ios>
+#include <locale>
+#include <sstream>
+
+#include "api/stats/rtcstats_objects.h"
 #include "rtc_base/logging.h"
 #include "rtc_base/time_utils.h"
 
 namespace {
 constexpr int kAverageStatsIntervalMs = 200;
+
+std::string SanitizeForFilename(const std::string& input) {
+    if (input.empty()) {
+        return "sctp_flow";
+    }
+
+    std::string sanitized;
+    sanitized.reserve(input.size());
+    for (char ch : input) {
+        unsigned char uch = static_cast<unsigned char>(ch);
+        if (std::isalnum(uch) || ch == '-' || ch == '_') {
+            sanitized.push_back(ch);
+        } else {
+            sanitized.push_back('_');
+        }
+    }
+    if (sanitized.empty()) {
+        return "sctp_flow";
+    }
+    return sanitized;
+}
+
+std::string JoinPath(const std::string& base, const std::string& leaf) {
+    if (base.empty()) {
+        return leaf;
+    }
+    std::string path = base;
+    if (!path.empty() && path.back() != '/' && path.back() != '\\') {
+        path.push_back('/');
+    }
+    path += leaf;
+    return path;
+}
+
+std::string MakeDataChannelKey(
+    const webrtc::RTCDataChannelStats& data_stats) {
+    std::string transport =
+        data_stats.transport_id.has_value() ? *data_stats.transport_id : "";
+    std::string channel_id = data_stats.data_channel_identifier.has_value()
+                                  ? std::to_string(
+                                        *data_stats.data_channel_identifier)
+                                  : "";
+
+    if (!transport.empty() || !channel_id.empty()) {
+        std::ostringstream oss;
+        oss << transport << "|" << channel_id;
+        return oss.str();
+    }
+
+    // Fall back to the raw stats id which is stable for the life of the data
+    // channel.
+    return std::string(data_stats.id());
+}
 }  // namespace
 
 RTCStatsCollectorCallback::RTCStatsCollectorCallback(
@@ -503,6 +564,142 @@ void RTCStatsCollectorCallback::ProcessRemoteOutboundRTPStats(
     persistent_stats_.last_remote_retx_bytes_sent_ = retx_bytes_sent;
 }
 
+void RTCStatsCollectorCallback::ProcessDataChannelStats(
+    const webrtc::RTCStats& stats) {
+    const auto& data_stats = stats.cast_to<webrtc::RTCDataChannelStats>();
+
+    std::string label = data_stats.label.has_value()
+                            ? *data_stats.label
+                            : std::string(stats.id());
+    std::string key = MakeDataChannelKey(data_stats);
+
+    uint64_t total_bytes_received =
+        data_stats.bytes_received.value_or(0);
+    uint64_t total_bytes_sent = data_stats.bytes_sent.value_or(0);
+    int64_t timestamp_ms = data_stats.timestamp().ms();
+
+    std::lock_guard<std::mutex> lock(stats_mutex_);
+
+    if (persistent_stats_.log_directory_.empty()) {
+        RTC_LOG(LS_WARNING)
+            << "SCTP throughput logging skipped: log directory not set.";
+        return;
+    }
+
+    DataChannelLogState& channel_state =
+        persistent_stats_.data_channel_logs_[key];
+
+    if (channel_state.label.empty()) {
+        channel_state.label = label;
+    }
+    if (channel_state.unique_key.empty()) {
+        channel_state.unique_key = key;
+    }
+
+    if (channel_state.sanitized_label.empty()) {
+        channel_state.sanitized_label = SanitizeForFilename(label);
+        if (channel_state.sanitized_label.empty()) {
+            channel_state.sanitized_label = SanitizeForFilename(key);
+        }
+    }
+    if (channel_state.data_channel_id == -1 &&
+        data_stats.data_channel_identifier.has_value()) {
+        channel_state.data_channel_id =
+            data_stats.data_channel_identifier.value();
+    }
+
+    if (!channel_state.csv_file.is_open()) {
+        std::string sanitized_id =
+            SanitizeForFilename(channel_state.unique_key);
+        std::string filename = channel_state.sanitized_label;
+        if (!sanitized_id.empty()) {
+            if (!filename.empty()) {
+                filename += "_" + sanitized_id;
+            } else {
+                filename = sanitized_id;
+            }
+        }
+        if (channel_state.data_channel_id >= 0) {
+            filename += "_dc" + std::to_string(channel_state.data_channel_id);
+        }
+        filename += "_throughput.csv";
+        std::string path = JoinPath(persistent_stats_.log_directory_, filename);
+        channel_state.csv_file.open(path, std::ios::out | std::ios::trunc);
+        if (!channel_state.csv_file.is_open()) {
+            RTC_LOG(LS_WARNING)
+                << "Failed to open SCTP throughput log file: " << path;
+            return;
+        }
+        RTC_LOG(LS_INFO) << "Logging SCTP throughput for '" << label
+                          << "' (key: '" << channel_state.unique_key
+                          << "') to " << path;
+        channel_state.csv_file
+            << "timestamp_ms,interval_ms,bytes_received,total_bytes_received,"
+               "receive_throughput_bps,receive_throughput_mbps,"
+               "bytes_sent,total_bytes_sent,send_throughput_bps,"
+               "send_throughput_mbps\n";
+        channel_state.csv_file.flush();
+    }
+
+    if (channel_state.first_timestamp_ms == -1) {
+        channel_state.first_timestamp_ms = timestamp_ms;
+    }
+
+    bool has_previous = channel_state.last_timestamp_ms >= 0;
+    int64_t interval_ms = has_previous
+                              ? (timestamp_ms - channel_state.last_timestamp_ms)
+                              : 0;
+
+    if (has_previous && interval_ms <= 0) {
+        channel_state.last_timestamp_ms = timestamp_ms;
+        channel_state.last_bytes_received = total_bytes_received;
+        channel_state.last_bytes_sent = total_bytes_sent;
+        return;
+    }
+
+    uint64_t delta_bytes_received = 0;
+    uint64_t delta_bytes_sent = 0;
+    if (has_previous) {
+        if (total_bytes_received >= channel_state.last_bytes_received) {
+            delta_bytes_received =
+                total_bytes_received - channel_state.last_bytes_received;
+        }
+        if (total_bytes_sent >= channel_state.last_bytes_sent) {
+            delta_bytes_sent = total_bytes_sent - channel_state.last_bytes_sent;
+        }
+    }
+
+    double recv_throughput_bps = 0.0;
+    double send_throughput_bps = 0.0;
+    if (interval_ms > 0) {
+        const double interval_sec =
+            static_cast<double>(interval_ms) / 1000.0;
+        recv_throughput_bps =
+            interval_sec > 0 ? (delta_bytes_received * 8.0) / interval_sec : 0.0;
+        send_throughput_bps =
+            interval_sec > 0 ? (delta_bytes_sent * 8.0) / interval_sec : 0.0;
+    }
+
+    double recv_throughput_mbps = recv_throughput_bps / 1'000'000.0;
+    double send_throughput_mbps = send_throughput_bps / 1'000'000.0;
+
+    std::ostringstream line;
+    line.imbue(std::locale::classic());
+    line << timestamp_ms << "," << interval_ms << "," << delta_bytes_received
+         << "," << total_bytes_received << "," << recv_throughput_bps << ","
+         << std::fixed << std::setprecision(6) << recv_throughput_mbps << ","
+         << std::defaultfloat << delta_bytes_sent << "," << total_bytes_sent
+         << "," << send_throughput_bps << "," << std::fixed
+         << std::setprecision(6) << send_throughput_mbps;
+
+    channel_state.csv_file << line.str() << "\n";
+    channel_state.csv_file.flush();
+
+    channel_state.last_timestamp_ms = timestamp_ms;
+    channel_state.last_bytes_received = total_bytes_received;
+    channel_state.last_bytes_sent = total_bytes_sent;
+}
+
 
 void RTCStatsCollectorCallback::OnStatsDeliveredOnSignalingThread(
     rtc::scoped_refptr<const webrtc::RTCStatsReport> report) {
@@ -514,6 +711,12 @@ void RTCStatsCollectorCallback::OnStatsDeliveredOnSignalingThread(
     }
 
     for (const auto& stats : *report) {
+        std::string stats_type(stats.type());
+        if (stats_type == webrtc::RTCDataChannelStats::kType) {
+            ProcessDataChannelStats(stats);
+            continue;
+        }
+
         std::vector<webrtc::Attribute> attributes = stats.Attributes();
         auto find_attribute = [&attributes](const std::string& name) -> const webrtc::Attribute* {
             for (const auto& attribute : attributes) {
@@ -608,19 +811,6 @@ bool RTCStatsCollector::OpenStatsFile(const std::string& foldername) {
     std::string per_frame_filename = foldername + "/per_frame_stats.csv";
     std::string average_filename = foldername + "/average_stats.csv";
 
-    // Open per-frame stats file
-    /*
-    per_frame_stats_file_.open(per_frame_filename);
-    if (!per_frame_stats_file_.is_open()) {
-        RTC_LOG(LS_ERROR) << "Failed to open per-frame stats file: " << per_frame_filename;
-        return false;
-    }
-    RTC_LOG(LS_INFO) << "Per-frame stats file opened successfully: " << per_frame_filename;
-    per_frame_stats_file_ << "timestamp_ms,rtp_timestamp,encoding_ms,network_ms,decoding_ms,rendering_ms,e2e_ms,"
-                          << "inter_frame_ms,intra_construction_ms\n";
-    per_frame_stats_file_.flush();
-    */
-
     // Open average stats file
     average_stats_file_.open(average_filename);
     if (!average_stats_file_.is_open()) {
@@ -645,6 +835,15 @@ bool RTCStatsCollector::OpenStatsFile(const std::string& foldername) {
                        "freeze_time_ratio\n";
     average_stats_file_.flush();
 
+    // Prepare SCTP throughput logging
+    for (auto& entry : persistent_stats_.data_channel_logs_) {
+        if (entry.second.csv_file.is_open()) {
+            entry.second.csv_file.close();
+        }
+    }
+    persistent_stats_.data_channel_logs_.clear();
+    persistent_stats_.log_directory_ = foldername;
+
     return true;
 }
 
@@ -660,6 +859,15 @@ void RTCStatsCollector::CloseStatsFile() {
         average_stats_file_.flush();
         average_stats_file_.close();
     }
+
+    for (auto& entry : persistent_stats_.data_channel_logs_) {
+        if (entry.second.csv_file.is_open()) {
+            entry.second.csv_file.flush();
+            entry.second.csv_file.close();
+        }
+    }
+    persistent_stats_.data_channel_logs_.clear();
+    persistent_stats_.log_directory_.clear();
 }
 
 void RTCStatsCollector::ThreadLoop() {
