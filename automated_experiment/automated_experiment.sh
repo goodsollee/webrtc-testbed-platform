@@ -46,7 +46,7 @@ REPO_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
 RUN_START_TS="$(date +%Y%m%dT%H%M%S)"
 
 TRACES_DIR="$SCRIPT_DIR/poc_traces"
-TRAFFIC_DIR="$SCRIPT_DIR/config"
+TRAFFIC_DIR="$SCRIPT_DIR/test_config"
 TRAFFIC_CONFIG=""
 OUTPUT_DIR="$SCRIPT_DIR/results"
 LATENCY_MS=30
@@ -138,6 +138,15 @@ if [[ ! -x "$NETWORK_EMULATOR_BIN" ]]; then
     (cd "$SCRIPT_DIR/network_emulation" && make)
 fi
 
+EMULATOR_SUPPORTS_BANDWIDTH_LOG=false
+EMULATOR_HELP_OUTPUT="$("$NETWORK_EMULATOR_BIN" --helpshort 2>&1 || true)"
+if grep -q -- '--bandwidth_log_path' <<<"$EMULATOR_HELP_OUTPUT"; then
+    EMULATOR_SUPPORTS_BANDWIDTH_LOG=true
+else
+    echo "Info: network_emulator does not support --bandwidth_log_path; bandwidth CSV logging disabled."
+fi
+
+
 if [[ ! -x "$REPO_ROOT/out/Default/peerconnection_client" ]]; then
     echo "Error: peerconnection_client binary not found at $REPO_ROOT/out/Default/peerconnection_client" >&2
     exit 1
@@ -181,11 +190,18 @@ run_single_trace() {
     [[ -p "$fifo_path" ]] || mkfifo "$fifo_path"
 
     # Start emulator with FIFO attached to stdin
-    sudo ./network_emulator \
-    --profile_path="$profile_csv" \
-    --interface_name="$INTERFACE_NAME" \
-    --bandwidth_log_path="$bandwidth_csv" \
-    <"$fifo_path" >"$emulator_stdout" 2>&1 &
+    local emulator_cmd=(
+        sudo ./network_emulator
+        "--profile_path=$profile_csv"
+        "--interface_name=$INTERFACE_NAME"
+    )
+
+    if [[ "$EMULATOR_SUPPORTS_BANDWIDTH_LOG" == "true" ]]; then
+        emulator_cmd+=("--bandwidth_log_path=$bandwidth_csv")
+    fi
+
+    "${emulator_cmd[@]}" <"$fifo_path" >"$emulator_stdout" 2>&1 &
+
     local emulator_pid=$!
     cd "$previous_dir"
     echo start > "$fifo_path"
@@ -370,8 +386,8 @@ for traffic_config_dir in "${TRAFFIC_CONFIGS[@]}"; do
     TRAFFIC_ROOT="$MAIN_EXPERIMENT_ROOT/$traffic_name"
     mkdir -p "$TRAFFIC_ROOT"
 
-    local local_sctp_config=""
-    local local_rtp_config=""
+    local_sctp_config=""
+    local_rtp_config=""
     if [[ -f "$traffic_config_dir/sctp.csv" ]]; then
         local_sctp_config="$traffic_config_dir/sctp.csv"
         cp "$local_sctp_config" "$TRAFFIC_ROOT/sctp.csv"
