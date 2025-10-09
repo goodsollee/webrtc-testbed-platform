@@ -471,7 +471,8 @@ void NetworkEmulator::LogBandwidthChange(double bandwidth_kbps, double latency_m
     }
 
     auto now = std::chrono::steady_clock::now();
-    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start_time_);
+    auto zero =  std::chrono::steady_clock::time_point{};
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - zero);
 
     std::lock_guard<std::mutex> lock(bandwidth_log_mutex_);
     std::ofstream file;
@@ -485,7 +486,7 @@ void NetworkEmulator::LogBandwidthChange(double bandwidth_kbps, double latency_m
     }
 
     if (!bandwidth_log_header_written_) {
-        file << "elapsed_ms,bandwidth_kbps,latency_ms" << std::endl;
+        file << "timestamp_ms,bandwidth_kbps,latency_ms" << std::endl;
         bandwidth_log_header_written_ = true;
     }
 
