@@ -49,6 +49,13 @@ std::string GetDefaultInterface() {
 
 
 int main(int argc, char* argv[]) {
+
+
+    std::cout.setf(std::ios::unitbuf);
+    std::cerr.setf(std::ios::unitbuf);
+    setvbuf(stdout, NULL, _IONBF, 0);
+    setvbuf(stderr, NULL, _IONBF, 0);
+
     // Configure help/usage output before parsing command-line arguments so
     // `--help`/`--helpshort` invocations provide meaningful information.
     absl::SetProgramUsageMessage(absl::StrCat(

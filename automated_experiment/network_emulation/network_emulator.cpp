@@ -75,6 +75,15 @@ bool NetworkEmulator::Initialize(const std::string& profile_path,
     LOG_INFO(NETWORK_EMULATOR_MODULE_NAME,
              "Type 'start' to begin traffic shaping...");
 
+    std::ofstream ready_file("/tmp/emulator_ready.signal");
+    if (ready_file.is_open()) {
+        ready_file << "ready" << std::endl;
+        ready_file.close();
+        LOG_INFO(NETWORK_EMULATOR_MODULE_NAME, "Signal file created at /tmp/emulator_ready.signal");
+    } else {
+        LOG_ERROR(NETWORK_EMULATOR_MODULE_NAME, "Failed to create signal file");
+    }
+
     return true;
 }
 

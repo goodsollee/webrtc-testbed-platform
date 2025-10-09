@@ -182,16 +182,23 @@ run_single_trace() {
 
     local emulator_stdout="$run_stdout_dir/network_emulator.log"
     local bandwidth_csv="$EMULATOR_LOG_DIR/${trace_name}_bandwidth.csv"
-    local previous_dir="$PWD"
-    cd "$SCRIPT_DIR/network_emulation"
 
-    # Create a FIFO for control if not already present
+    # ===== 시그널 파일 먼저 삭제 =====
+    local signal_file="/tmp/emulator_ready.signal"
+    rm -f "$signal_file"
+    # ============================
+
+    # FIFO 생성
     local fifo_path="$run_stdout_dir/emulator.fifo"
     [[ -p "$fifo_path" ]] || mkfifo "$fifo_path"
+    sudo chmod 666 "$fifo_path"
 
-    # Start emulator with FIFO attached to stdin
+    # FIFO를 fd 3으로 열기
+    exec 3<>"$fifo_path"
+
+    # Emulator 명령
     local emulator_cmd=(
-        sudo ./network_emulator
+        sudo "$NETWORK_EMULATOR_BIN"
         "--profile_path=$profile_csv"
         "--interface_name=$INTERFACE_NAME"
     )
@@ -200,28 +207,59 @@ run_single_trace() {
         emulator_cmd+=("--bandwidth_log_path=$bandwidth_csv")
     fi
 
-    "${emulator_cmd[@]}" <"$fifo_path" >"$emulator_stdout" 2>&1 &
-
+    echo "Starting emulator..."
+    
+    # Emulator 실행
+    "${emulator_cmd[@]}" <&3 >"$emulator_stdout" 2>&1 &
     local emulator_pid=$!
-    cd "$previous_dir"
+
+    sleep 1
+    
+    # 프로세스 확인
+    if ! kill -0 "$emulator_pid" 2>/dev/null; then
+        echo "ERROR: Emulator died!" >&2
+        exec 3>&-
+        return 1
+    fi
+    echo "✓ Emulator started (PID: $emulator_pid)"
 
     echo "$emulator_pid" > "$run_stdout_dir/emulator.pid"
 
+    # 시그널 파일 대기 (rm 제거!)
+    echo "Waiting for emulator initialization..."
     local wait_seconds=0
-
-    while [[ ! -f "$emulator_stdout" || -z $(grep -m1 "Type 'start' to begin traffic shaping..." "$emulator_stdout" 2>/dev/null) ]]; do
+    while [[ ! -f "$signal_file" ]]; do
+        # 디버깅: 파일 존재 확인
+        if [[ $((wait_seconds % 5)) -eq 0 ]]; then
+            ls -la "$signal_file" 2>&1 | sed 's/^/  DEBUG: /'
+        fi
+        
         if ! kill -0 "$emulator_pid" 2>/dev/null; then
-            echo "Emulator exited before becoming ready. Check $emulator_stdout" >&2
+            echo "ERROR: Emulator exited!" >&2
+            tail -n 50 "$emulator_stdout" >&2
+            exec 3>&-
             return 1
         fi
+        
         sleep 1
         wait_seconds=$((wait_seconds + 1))
+
+        if [[ $((wait_seconds % 5)) -eq 0 ]]; then
+            echo "  Still waiting... (${wait_seconds}s)"
+            tail -n 3 "$emulator_stdout" | sed 's/^/    /'
+        fi
+
         if [[ $wait_seconds -gt 30 ]]; then
-            echo "Timed out waiting for emulator to become ready." >&2
+            echo "ERROR: Timeout!" >&2
+            exec 3>&-
             return 1
         fi
     done
 
+    echo "✓ Emulator ready! (${wait_seconds}s)"
+    rm -f "$signal_file"  # ← 사용 후 삭제
+
+    # Sender/Receiver 설정
     local sender_log="$run_stdout_dir/sender.log"
     local receiver_log="$run_stdout_dir/receiver.log"
 
@@ -256,69 +294,90 @@ run_single_trace() {
         --headless="$RECEIVER_HEADLESS"
     )
 
-    sudo ip netns exec "$NS_NAME" pulseaudio --start
+    # PulseAudio 시작 및 클라이언트 실행
+    echo "Starting sender and receiver..."
+    sudo ip netns exec "$NS_NAME" pulseaudio --start >/dev/null 2>&1 || true
 
     "${sender_args[@]}" > "$sender_log" 2>&1 &
     local sender_pid=$!
+    echo "  Sender PID: $sender_pid"
 
     sleep 3
 
-    sudo pulseaudio --start
+    sudo pulseaudio --start >/dev/null 2>&1 || true
     "${receiver_args[@]}" > "$receiver_log" 2>&1 &
     local receiver_pid=$!
+    echo "  Receiver PID: $receiver_pid"
 
-    # Wait for traffic to appear in receiver.log
+    # Receiver에서 트래픽 감지 대기
     echo "Waiting for traffic in receiver.log..."
     local traffic_wait=0
     while [[ ! -f "$receiver_log" || -z $(grep -E "(Elapsed time|Frame rate|Bitrate)" "$receiver_log" 2>/dev/null) ]]; do
         if ! kill -0 "$receiver_pid" 2>/dev/null; then
-            echo "Receiver exited before traffic started. Check $receiver_log" >&2
+            echo "ERROR: Receiver exited before traffic started!" >&2
+            if [[ -f "$receiver_log" ]]; then
+                echo "=== Receiver log ===" >&2
+                tail -n 50 "$receiver_log" >&2
+            fi
             kill "$sender_pid" 2>/dev/null || true
+            exec 3>&-
             return 1
         fi
         sleep 1
         traffic_wait=$((traffic_wait + 1))
+
+        if [[ $((traffic_wait % 10)) -eq 0 ]]; then
+            echo "  Still waiting for traffic... (${traffic_wait}s)"
+        fi
+
         if [[ $traffic_wait -gt 60 ]]; then
-            echo "Timed out waiting for traffic in receiver.log" >&2
+            echo "ERROR: Timeout waiting for traffic (60s)!" >&2
+            if [[ -f "$receiver_log" ]]; then
+                echo "=== Receiver log ===" >&2
+                tail -n 50 "$receiver_log" >&2
+            fi
+            if [[ -f "$sender_log" ]]; then
+                echo "=== Sender log ===" >&2
+                tail -n 50 "$sender_log" >&2
+            fi
             kill "$sender_pid" 2>/dev/null || true
             kill "$receiver_pid" 2>/dev/null || true
+            exec 3>&-
             return 1
         fi
     done
-    echo "Traffic detected in receiver.log after ${traffic_wait}s"
+    echo "✓ Traffic detected! (${traffic_wait}s)"
 
-    # Start emulation trace
-    echo -e "\n=== STARTING EMULATION TRACE ==="
+    # 트래픽이 시작된 후 emulator에 start 명령 전송
+    echo -e "\n=== STARTING BANDWIDTH EMULATION ==="
     sleep 1
-    echo start > "$fifo_path"
-    echo "Starting bandwidth emulation for trace: $trace_name"
+    echo "start" >&3  # fd 3으로 쓰기
+    echo "✓ Start signal sent to emulator for trace: $trace_name"
 
-    # Wait for emulator to complete (primary termination signal)
+    # Emulator 완료 대기
     echo "Waiting for network emulator to complete..."
     local exit_code=0
     wait "$emulator_pid" || exit_code=$?
-    echo "Network emulator finished with exit code: $exit_code"
+    echo "✓ Network emulator finished (exit code: $exit_code)"
 
-    # End emulation trace
-    echo -e "\n=== ENDING EMULATION TRACE ==="
-    echo "Bandwidth emulation completed for trace: $trace_name"
+    # fd 닫기
+    exec 3>&-
 
-    # Clean up sender and receiver processes
-    echo "Cleaning up sender and receiver processes..."
+    # Sender/Receiver 정리
+    echo -e "\n=== CLEANING UP ==="
+    echo "Stopping sender and receiver..."
 
-    # Send SIGTERM to sender
     if kill -0 "$sender_pid" 2>/dev/null; then
-        echo "Sending SIGTERM to sender (PID: $sender_pid)"
+        echo "  Sending SIGTERM to sender (PID: $sender_pid)"
         sudo kill -TERM "$sender_pid" 2>/dev/null || true
     fi
 
-    # Send SIGTERM to receiver
     if kill -0 "$receiver_pid" 2>/dev/null; then
-        echo "Sending SIGTERM to receiver (PID: $receiver_pid)"
+        echo "  Sending SIGTERM to receiver (PID: $receiver_pid)"
         sudo kill -TERM "$receiver_pid" 2>/dev/null || true
     fi
 
-    # Wait up to 5 seconds for graceful shutdown
+    # 5초간 graceful shutdown 대기
     local cleanup_wait=0
     while [[ $cleanup_wait -lt 5 ]]; do
         local sender_alive=0
@@ -328,7 +387,7 @@ run_single_trace() {
         kill -0 "$receiver_pid" 2>/dev/null && receiver_alive=1
 
         if [[ $sender_alive -eq 0 && $receiver_alive -eq 0 ]]; then
-            echo "Sender and receiver exited gracefully"
+            echo "✓ Sender and receiver exited gracefully"
             break
         fi
 
@@ -336,34 +395,30 @@ run_single_trace() {
         cleanup_wait=$((cleanup_wait + 1))
     done
 
-    # Escalate to SIGKILL if still alive
+    # 강제 종료
     if kill -0 "$sender_pid" 2>/dev/null; then
-        echo "Sender did not exit gracefully, sending SIGKILL"
+        echo "  Sender did not exit gracefully, sending SIGKILL"
         sudo kill -9 "$sender_pid" 2>/dev/null || true
     fi
 
     if kill -0 "$receiver_pid" 2>/dev/null; then
-        echo "Receiver did not exit gracefully, sending SIGKILL"
+        echo "  Receiver did not exit gracefully, sending SIGKILL"
         sudo kill -9 "$receiver_pid" 2>/dev/null || true
     fi
 
-    # Final wait to collect process exit codes
+    # 프로세스 종료 대기
     wait "$sender_pid" 2>/dev/null || true
     wait "$receiver_pid" 2>/dev/null || true
 
+    # Emulator 로그 복사
     if [[ -f "$emulator_stdout" ]]; then
         cp "$emulator_stdout" "$EMULATOR_LOG_DIR/${trace_name}.log"
     fi
 
-    #if [[ $exit_code -ne 0 ]]; then
-    #    echo "Trace $trace_name finished with errors." >&2
-    #    return $exit_code
-    #fi
-
-    echo "Trace $trace_name completed successfully. Logs stored under $LOG_ROOT"
+    echo "✓ Trace $trace_name completed successfully"
+    echo "  Logs stored at: $LOG_ROOT"
 
     sleep 3
-    #return 0
 }
 
 # Create main experiment root
