@@ -2,6 +2,7 @@
 #define RTC_STATS_COLLECTOR_H_
 
 #include <fstream>
+#include <map>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -14,6 +15,17 @@
 
 
 // Add persistent stats structure
+struct DataChannelLogState {
+    std::string label;
+    std::string sanitized_label;
+    int data_channel_id = -1;
+    int64_t first_timestamp_ms = -1;
+    int64_t last_timestamp_ms = -1;
+    uint64_t last_bytes_received = 0;
+    uint64_t last_bytes_sent = 0;
+    std::ofstream csv_file;
+};
+
 struct PersistentStats {
     int64_t frame_timing_count_ = 0;
     int64_t last_render_time_ms_ = -1;
@@ -68,6 +80,10 @@ struct PersistentStats {
     // Freeze statistics
     int64_t last_freeze_count_ = -1;
     double  last_total_freezes_duration_ms_ = -1.0;
+
+    // Data channel (SCTP) throughput logging
+    std::map<std::string, DataChannelLogState> data_channel_logs_;
+    std::string log_directory_;
 };
 
 class RTCStatsCollectorCallback : public webrtc::RTCStatsCollectorCallback {
@@ -86,6 +102,7 @@ protected:
 
 private:
     void ProcessRemoteOutboundRTPStats(const webrtc::RTCStats& stats);
+    void ProcessDataChannelStats(const webrtc::RTCStats& stats);
     
     void OnStatsDeliveredOnSignalingThread(
         rtc::scoped_refptr<const webrtc::RTCStatsReport> report);
