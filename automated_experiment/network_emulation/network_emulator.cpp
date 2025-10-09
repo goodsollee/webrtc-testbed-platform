@@ -70,6 +70,8 @@ bool NetworkEmulator::Initialize(const std::string& profile_path,
         }
     }
 
+    ReportBandwidthLoggingStatus();
+
     LOG_INFO(NETWORK_EMULATOR_MODULE_NAME,
              "Type 'start' to begin traffic shaping...");
 
@@ -488,4 +490,20 @@ void NetworkEmulator::LogBandwidthChange(double bandwidth_kbps, double latency_m
     }
 
     file << elapsed.count() << "," << bandwidth_kbps << "," << latency_ms << std::endl;
+}
+
+void NetworkEmulator::ReportBandwidthLoggingStatus() const {
+    if (bandwidth_log_path_.empty()) {
+        LOG_INFO(NETWORK_EMULATOR_MODULE_NAME,
+                 "Bandwidth logging disabled; run with --bandwidth_log_path=<path> to enable CSV output.");
+        return;
+    }
+
+    if (bandwidth_log_header_written_) {
+        LOG_INFO(NETWORK_EMULATOR_MODULE_NAME,
+                 "Bandwidth logging initialized successfully.");
+    } else {
+        LOG_WARNING(NETWORK_EMULATOR_MODULE_NAME,
+                    "Bandwidth logging requested but the log file could not be prepared.");
+    }
 }

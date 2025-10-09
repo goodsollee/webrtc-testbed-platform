@@ -55,6 +55,7 @@ private:
     void ApplyNetworkConditionsAsync(double bandwidth_kbps, double latency_ms);
     void ApplyNetworkConditionsSync(double bandwidth_kbps, double latency_ms, int limit);
     void LogBandwidthChange(double bandwidth_kbps, double latency_ms);
+    void ReportBandwidthLoggingStatus() const;
 
     std::string profile_path_;
     std::string interface_name_;
