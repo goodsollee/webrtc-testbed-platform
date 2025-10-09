@@ -9,6 +9,8 @@
 
 #include "absl/flags/flag.h"
 #include "absl/flags/parse.h"
+#include "absl/flags/usage.h"
+#include "absl/strings/str_cat.h"
 
 // Define Abseil Flags
 ABSL_FLAG(std::string, profile_path, "", "Path to the network profile CSV file (optional)");
@@ -47,6 +49,17 @@ std::string GetDefaultInterface() {
 
 
 int main(int argc, char* argv[]) {
+    // Configure help/usage output before parsing command-line arguments so
+    // `--help`/`--helpshort` invocations provide meaningful information.
+    absl::SetProgramUsageMessage(absl::StrCat(
+        "Usage: ", argv[0], " [--profile_path=PATH] [--interface_name=IFACE]",
+        " [--bandwidth_log_path=PATH]\n\n",
+        "Runs the automated experiment network emulator.\n\n",
+        "Flags:\n",
+        "  --profile_path         Path to the network profile CSV file (optional).\n",
+        "  --interface_name       Network interface name to be emulated (mandatory).\n",
+        "  --bandwidth_log_path   Path to CSV file for bandwidth change logs.\n"));
+
     // Parse command-line arguments
     absl::ParseCommandLine(argc, argv);
 
