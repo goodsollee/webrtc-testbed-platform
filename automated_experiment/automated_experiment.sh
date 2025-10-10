@@ -158,11 +158,65 @@ convert_trace() {
     python3 "$SCRIPT_DIR/convert_trace.py" "$trace_file" "$output_file" --latency-ms "$LATENCY_MS"
 }
 
+cleanup_all_processes() {
+    echo "=== COMPREHENSIVE CLEANUP ==="
+
+    # 1. Kill all peerconnection_client processes (both in and out of namespace)
+    echo "  Killing all peerconnection_client processes..."
+    sudo pkill -9 -f peerconnection_client >/dev/null 2>&1 || true
+
+    # Also kill in namespace specifically
+    sudo ip netns exec "$NS_NAME" pkill -9 -f peerconnection_client >/dev/null 2>&1 || true
+
+    # 2. Kill any network_emulator processes
+    echo "  Killing network_emulator processes..."
+    sudo pkill -9 -f network_emulator >/dev/null 2>&1 || true
+
+    # 3. Kill PulseAudio in namespace and host
+    echo "  Stopping PulseAudio..."
+    sudo ip netns exec "$NS_NAME" pulseaudio --kill >/dev/null 2>&1 || true
+    sudo pulseaudio --kill >/dev/null 2>&1 || true
+
+    # 4. Clean up WebRTC-related files and caches
+    echo "  Cleaning WebRTC state..."
+    # Remove any stale WebRTC cache/state files
+    rm -rf /tmp/.org.chromium.Chromium.* >/dev/null 2>&1 || true
+    rm -rf /tmp/peerconnection_client_* >/dev/null 2>&1 || true
+    rm -f /tmp/emulator_ready.signal >/dev/null 2>&1 || true
+
+    # Clean namespace-specific temp files
+    sudo ip netns exec "$NS_NAME" bash -c 'rm -rf /tmp/.org.chromium.Chromium.* /tmp/peerconnection_client_*' >/dev/null 2>&1 || true
+
+    # 5. Wait for processes to actually die
+    echo "  Waiting for process cleanup..."
+    local wait_count=0
+    while pgrep -f peerconnection_client >/dev/null 2>&1; do
+        sleep 0.5
+        wait_count=$((wait_count + 1))
+        if [[ $wait_count -gt 10 ]]; then
+            echo "  WARNING: Some processes still alive after 5 seconds"
+            pgrep -af peerconnection_client || true
+            break
+        fi
+    done
+
+    # 6. Kill any lingering curl processes (stale HTTP connections)
+    echo "  Cleaning up stale HTTP connections..."
+    sudo pkill -9 curl >/dev/null 2>&1 || true
+    sudo ip netns exec "$NS_NAME" pkill -9 curl >/dev/null 2>&1 || true
+
+    # 7. Extra sleep to ensure ports are freed and connections cleaned
+    sleep 3
+
+    echo "✓ Cleanup complete"
+}
+
 run_single_trace() {
     local trace_path="$1"
     local sctp_config="$2"
     local rtp_config="$3"
     local traffic_label="$4"
+    local attempt_num="${5:-1}"  # Accept attempt number as 5th parameter
     local trace_file
     trace_file=$(basename "$trace_path")
     local trace_name="${trace_file%.pitree-trace}"
@@ -170,9 +224,15 @@ run_single_trace() {
     local traffic_base="${traffic_label:-traffic}"
     traffic_base="${traffic_base// /_}"
 
-    local room_id="${RUN_START_TS}_${trace_name}_${traffic_base}"
+    # Generate a fresh timestamp for each attempt
+    local current_ts="$(date +%Y%m%dT%H%M%S)"
+    local room_id="${current_ts}_${trace_name}_${traffic_base}_attempt${attempt_num}"
 
     echo -e "\n=== Running trace: $trace_name (room_id=${room_id}) ==="
+
+    # ===== CRITICAL: Clean up all processes before starting =====
+    cleanup_all_processes
+    # ============================================================
 
     local profile_csv="$PROFILES_DIR/${trace_name}.csv"
     convert_trace "$trace_path" "$profile_csv"
@@ -298,23 +358,58 @@ run_single_trace() {
 
     # PulseAudio 시작 및 클라이언트 실행
     echo "Starting sender and receiver..."
+
+    # Start PulseAudio with a clean state
+    sudo ip netns exec "$NS_NAME" pulseaudio --kill >/dev/null 2>&1 || true
+    sleep 1
     sudo ip netns exec "$NS_NAME" pulseaudio --start >/dev/null 2>&1 || true
 
+    # Start sender FIRST and wait for it to be ready
+    echo "  Starting sender..."
     "${sender_args[@]}" > "$sender_log" 2>&1 &
     local sender_pid=$!
     echo "  Sender PID: $sender_pid"
 
-    sleep 3
+    # Wait for sender to complete signaling server registration
+    local sender_wait=0
+    while [[ $sender_wait -lt 10 ]]; do
+        if ! kill -0 "$sender_pid" 2>/dev/null; then
+            echo "ERROR: Sender died during startup!" >&2
+            if [[ -f "$sender_log" ]]; then
+                tail -n 50 "$sender_log" >&2
+            fi
+            exec 3>&-
+            return 1
+        fi
 
+        # Check if sender has completed WebSocket/HTTP setup
+        if [[ -f "$sender_log" ]] && grep -q "lws_create_context" "$sender_log" 2>/dev/null; then
+            echo "  ✓ Sender initialized (${sender_wait}s)"
+            break
+        fi
+
+        sleep 1
+        sender_wait=$((sender_wait + 1))
+    done
+
+    # Extra delay to ensure sender is fully ready
+    sleep 5
+
+    # Now start receiver
+    echo "  Starting receiver..."
+    sudo pulseaudio --kill >/dev/null 2>&1 || true
+    sleep 1
     sudo pulseaudio --start >/dev/null 2>&1 || true
+
     "${receiver_args[@]}" > "$receiver_log" 2>&1 &
     local receiver_pid=$!
     echo "  Receiver PID: $receiver_pid"
 
-    # Receiver에서 트래픽 감지 대기
+    # Receiver에서 트래픽 감지 대기 (RTP or SCTP)
     echo "Waiting for traffic in receiver.log..."
     local traffic_wait=0
-    while [[ ! -f "$receiver_log" || -z $(grep -E "(Elapsed time|Frame rate|Bitrate)" "$receiver_log" 2>/dev/null) ]]; do
+    # Check for either RTP video traffic OR SCTP data channel traffic
+    while [[ ! -f "$receiver_log" || -z $(grep -E "(Elapsed time|Frame rate|Bitrate|\[SCTP\]\[FILE\]\[Receiver\])" "$receiver_log" 2>/dev/null) ]]; do
         if ! kill -0 "$receiver_pid" 2>/dev/null; then
             echo "ERROR: Receiver exited before traffic started!" >&2
             if [[ -f "$receiver_log" ]]; then
@@ -325,6 +420,19 @@ run_single_trace() {
             exec 3>&-
             return 1
         fi
+
+        # Also check sender is still alive
+        if ! kill -0 "$sender_pid" 2>/dev/null; then
+            echo "ERROR: Sender died while waiting for traffic!" >&2
+            if [[ -f "$sender_log" ]]; then
+                echo "=== Sender log ===" >&2
+                tail -n 50 "$sender_log" >&2
+            fi
+            kill "$receiver_pid" 2>/dev/null || true
+            exec 3>&-
+            return 1
+        fi
+
         sleep 1
         traffic_wait=$((traffic_wait + 1))
 
@@ -332,8 +440,8 @@ run_single_trace() {
             echo "  Still waiting for traffic... (${traffic_wait}s)"
         fi
 
-        if [[ $traffic_wait -gt 60 ]]; then
-            echo "ERROR: Timeout waiting for traffic (60s)!" >&2
+        if [[ $traffic_wait -gt 30 ]]; then
+            echo "ERROR: Timeout waiting for traffic (30s)!" >&2
             if [[ -f "$receiver_log" ]]; then
                 echo "=== Receiver log ===" >&2
                 tail -n 50 "$receiver_log" >&2
@@ -412,15 +520,122 @@ run_single_trace() {
     wait "$sender_pid" 2>/dev/null || true
     wait "$receiver_pid" 2>/dev/null || true
 
+    # VERIFY processes are actually dead
+    local verify_wait=0
+    while [[ $verify_wait -lt 10 ]]; do
+        local still_alive=0
+        if ps -p "$sender_pid" >/dev/null 2>&1; then
+            still_alive=1
+            echo "  WARNING: Sender still alive after SIGKILL"
+        fi
+        if ps -p "$receiver_pid" >/dev/null 2>&1; then
+            still_alive=1
+            echo "  WARNING: Receiver still alive after SIGKILL"
+        fi
+
+        if [[ $still_alive -eq 0 ]]; then
+            echo "✓ Verified: All processes terminated"
+            break
+        fi
+
+        sleep 0.5
+        verify_wait=$((verify_wait + 1))
+    done
+
+    # Kill any orphaned peerconnection_client processes
+    if pgrep -f peerconnection_client >/dev/null 2>&1; then
+        echo "  WARNING: Found orphaned peerconnection_client processes, cleaning up..."
+        sudo pkill -9 -f peerconnection_client >/dev/null 2>&1 || true
+        sudo ip netns exec "$NS_NAME" pkill -9 -f peerconnection_client >/dev/null 2>&1 || true
+    fi
+
+    # Stop PulseAudio to release resources
+    sudo ip netns exec "$NS_NAME" pulseaudio --kill >/dev/null 2>&1 || true
+    sudo pulseaudio --kill >/dev/null 2>&1 || true
+
     # Emulator 로그 복사
     if [[ -f "$emulator_stdout" ]]; then
         cp "$emulator_stdout" "$EMULATOR_LOG_DIR/${trace_name}.log"
+    fi
+
+    # Validate that receiver logs were created properly
+    echo "Validating experiment results..."
+    local validation_failed=false
+    local validation_msg=""
+
+    # Find the receiver directory
+    local receiver_dir=""
+    for ts_dir in "$LOG_ROOT"/*; do
+        if [[ -d "$ts_dir" ]]; then
+            for session_dir in "$ts_dir"/*; do
+                if [[ -d "$session_dir/receiver" ]]; then
+                    receiver_dir="$session_dir/receiver"
+                    break 2
+                fi
+            done
+        fi
+    done
+
+    if [[ -z "$receiver_dir" ]]; then
+        validation_failed=true
+        validation_msg="No receiver directory found in $LOG_ROOT"
+    else
+        # Check if average_stats.csv exists and has data (more than just header)
+        local avg_stats_file="$receiver_dir/average_stats.csv"
+        if [[ ! -f "$avg_stats_file" ]]; then
+            validation_failed=true
+            validation_msg="Missing average_stats.csv"
+        else
+            local line_count=$(wc -l < "$avg_stats_file")
+            if [[ $line_count -le 1 ]]; then
+                validation_failed=true
+                validation_msg="average_stats.csv has no data rows (only $line_count lines)"
+            fi
+        fi
+
+        # Check for crash indicators in receiver log
+        if [[ -f "$receiver_log" ]]; then
+            if grep -q -E "(malloc.*corrupt|segmentation fault|core dumped|assertion.*failed)" "$receiver_log" 2>/dev/null; then
+                validation_failed=true
+                validation_msg="Receiver crashed (detected error in log)"
+            fi
+        fi
+
+        # Check for connection/signaling failures
+        if [[ -f "$receiver_log" ]] && [[ -f "$sender_log" ]]; then
+            # Check for timeout in sender log (HTTP connection issue)
+            if grep -q "Operation timed out" "$sender_log" 2>/dev/null; then
+                validation_failed=true
+                validation_msg="Sender HTTP connection timeout (stale connection or network issue)"
+            fi
+
+            # Check for WebRTC connection failures
+            if grep -q -E "(Failed to set|Failed to create|Error.*ICE|Error.*DTLS)" "$receiver_log" 2>/dev/null || \
+               grep -q -E "(Failed to set|Failed to create|Error.*ICE|Error.*DTLS)" "$sender_log" 2>/dev/null; then
+                validation_failed=true
+                validation_msg="WebRTC connection establishment failed"
+            fi
+        fi
+    fi
+
+    if [[ "$validation_failed" == "true" ]]; then
+        echo "✗ Validation failed: $validation_msg"
+        if [[ -f "$receiver_log" ]]; then
+            echo "=== Last 30 lines of receiver log ===" >&2
+            tail -n 30 "$receiver_log" >&2
+        fi
+        if [[ -f "$sender_log" ]]; then
+            echo "=== Last 30 lines of sender log ===" >&2
+            tail -n 30 "$sender_log" >&2
+        fi
+        return 1
     fi
 
     echo "✓ Trace $trace_name completed successfully"
     echo "  Logs stored at: $LOG_ROOT"
 
     sleep 3
+    return 0
 }
 
 # Create main experiment root
@@ -477,11 +692,47 @@ for traffic_config_dir in "${TRAFFIC_CONFIGS[@]}"; do
         LOG_ROOT="$EXPERIMENT_ROOT/webrtc_logs"
         EMULATOR_LOG_DIR="$EXPERIMENT_ROOT/emulator_logs"
         STDOUT_DIR="$EXPERIMENT_ROOT/stdout"
-        mkdir -p "$PROFILES_DIR" "$LOG_ROOT" "$EMULATOR_LOG_DIR" "$STDOUT_DIR"
 
-        run_single_trace "$trace_file" "$local_sctp_config" "$local_rtp_config" "$traffic_name"
-        TRACE_COUNT=$((TRACE_COUNT + 1))
-        TOTAL_TRACE_COUNT=$((TOTAL_TRACE_COUNT + 1))
+        # Retry logic: up to 3 attempts
+        attempt=1
+        max_attempts=3
+        success=false
+
+        while [[ $attempt -le $max_attempts ]]; do
+            echo -e "\n>>> Attempt $attempt of $max_attempts for trace: $trace_name"
+
+            # Clean up and recreate directories for retry attempts
+            if [[ $attempt -gt 1 ]]; then
+                echo "  Cleaning up from previous failed attempt..."
+                rm -rf "$EXPERIMENT_ROOT"
+            fi
+
+            mkdir -p "$PROFILES_DIR" "$LOG_ROOT" "$EMULATOR_LOG_DIR" "$STDOUT_DIR"
+
+            if run_single_trace "$trace_file" "$local_sctp_config" "$local_rtp_config" "$traffic_name" "$attempt"; then
+                echo "✓ Trace $trace_name succeeded on attempt $attempt"
+                success=true
+                TRACE_COUNT=$((TRACE_COUNT + 1))
+                TOTAL_TRACE_COUNT=$((TOTAL_TRACE_COUNT + 1))
+                break
+            else
+                echo "✗ Trace $trace_name failed on attempt $attempt"
+                if [[ $attempt -lt $max_attempts ]]; then
+                    echo "  Will retry after 5 seconds..."
+                    sleep 5
+                fi
+                attempt=$((attempt + 1))
+            fi
+        done
+
+        if [[ "$success" == "false" ]]; then
+            echo -e "\n!!! ERROR: Trace $trace_name failed after $max_attempts attempts !!!"
+            echo "!!! Cleaning up failed experiment results !!!"
+            echo "  Removing directory: $EXPERIMENT_ROOT"
+            rm -rf "$EXPERIMENT_ROOT"
+            echo "!!! Stopping all experiments !!!"
+            exit 1
+        fi
     done < <(find "$TRACES_DIR" -maxdepth 1 -type f -name '*.pitree-trace' -print0 | sort -z)
 
     echo -e "\nCompleted $TRACE_COUNT traces for traffic config set: $traffic_name"

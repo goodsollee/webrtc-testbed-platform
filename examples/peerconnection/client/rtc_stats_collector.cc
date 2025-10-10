@@ -883,6 +883,8 @@ RTCStatsCollector::~RTCStatsCollector() {
         stats_thread_.join();  // Wait for the thread to finish
     }
 
+    CloseStatsFile();  // Flush and close all CSV files before destruction
+
     RTC_LOG(LS_INFO) << "RTCStatsCollector destroyed.";
 }
 

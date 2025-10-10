@@ -153,6 +153,17 @@ class ExperimentAnalyzer:
 
         return df['throughput_mbps'].mean(), df['throughput_mbps'].std()
 
+    def calculate_total_sctp_throughput(self, config_name, trace_name):
+        """Calculate average total SCTP throughput from T01_throughput.csv in Mbps."""
+        if 'rtp_throughput' not in self.data[config_name][trace_name]:
+            return None, None
+
+        df = self.data[config_name][trace_name]['rtp_throughput']
+        if 'receive_throughput_mbps' not in df.columns:
+            return None, None
+
+        return df['receive_throughput_mbps'].mean(), df['receive_throughput_mbps'].std()
+
     def calculate_prompt_delivery_time(self, config_name, trace_name):
         """Calculate average prompt delivery time in ms."""
         if 'prompt' not in self.data[config_name][trace_name]:
@@ -186,17 +197,23 @@ class ExperimentAnalyzer:
     def calculate_framerate_tail_percentiles(self, config_name, trace_name):
         """Calculate tail percentiles (p01, p0.1) for framerate."""
         if 'average_stats' not in self.data[config_name][trace_name]:
-            return None, None
+            return None, None, None
 
         df = self.data[config_name][trace_name]['average_stats']
         if 'framerate' not in df.columns:
-            return None, None
+            return None, None, None
 
         capped = np.minimum(df['framerate'].astype(float), 30.0)
+        capped_clean = capped.dropna()
+
+        # Check if we have any data after dropping NaN values
+        if len(capped_clean) == 0:
+            return None, None, None
+
         # Calculate percentiles (lower percentile = worse tail performance)
-        p05 = np.percentile(capped.dropna(), 5)
-        p01 = np.percentile(capped.dropna(), 1)   # 1st percentile
-        p0_1 = np.percentile(capped.dropna(), 0.1)  # 0.1st percentile
+        p05 = np.percentile(capped_clean, 5)
+        p01 = np.percentile(capped_clean, 1)   # 1st percentile
+        p0_1 = np.percentile(capped_clean, 0.1)  # 0.1st percentile
         return p05, p01, p0_1
 
     def get_capped_framerate_series(self, config_name, trace_name):
@@ -373,6 +390,12 @@ class ExperimentAnalyzer:
 
                 min_time_ms = trace_data['average_stats']['timestamp_ms'].min()
                 max_time_ms = trace_data['average_stats']['timestamp_ms'].max()
+
+                # Check if timestamps are valid
+                if pd.isna(min_time_ms) or pd.isna(max_time_ms):
+                    print(f"  Skipping {exp_name}: No valid timestamp data")
+                    continue
+
                 max_time_s = (max_time_ms - min_time_ms) / 1000.0
 
                 # ============================================================
@@ -470,12 +493,12 @@ class ExperimentAnalyzer:
             output_path / 'framerate_comparison.png'
         )
 
-        # 3. KV cache throughput comparison
+        # 3. Total SCTP throughput comparison
         self.plot_metric_comparison(
-            'kvcache_throughput',
+            'total_sctp_throughput',
             'Throughput (Mbps)',
-            'KV Cache Throughput Comparison Across Traces',
-            output_path / 'kvcache_throughput_comparison.png'
+            'Total SCTP Throughput Comparison Across Traces',
+            output_path / 'sctp_throughput_comparison.png'
         )
 
         # 4. Prompt delivery time comparison
@@ -516,7 +539,7 @@ class ExperimentAnalyzer:
                 print()
 
             print(f"{'Trace':<15} {'Net BW (Mbps)':<16} {'Bitrate (Mbps)':<16} {'FPS (avg±std)':<16} "
-                  f"{'FPS Tail':<18} {'KVCache Tput':<18} {'Prompt Lat (ms)':<20}")
+                  f"{'FPS Tail':<18} {'SCTP Tput':<18} {'Prompt Lat (ms)':<20}")
             print(f"{'':15} {'':16} {'':16} {'':16} {'(p5/p1/p0.1)':<18} {'(Mbps)':<18} {'(avg±std)':<20}")
             print("-"*140)
 
@@ -528,18 +551,18 @@ class ExperimentAnalyzer:
                 bitrate_mean, bitrate_std = self.calculate_average_bitrate(config_name, trace_name)
                 framerate_mean, framerate_std = self.calculate_average_framerate(config_name, trace_name)
                 fps_p05, fps_p01, fps_p0_1 = self.calculate_framerate_tail_percentiles(config_name, trace_name)
-                kvcache_mean, kvcache_std = self.calculate_kvcache_throughput(config_name, trace_name)
+                sctp_mean, sctp_std = self.calculate_total_sctp_throughput(config_name, trace_name)
                 prompt_mean, prompt_std = self.calculate_prompt_delivery_time(config_name, trace_name)
 
                 profile_bw_str = f"{profile_bw_mean:.1f}±{profile_bw_std:.1f}" if profile_bw_mean is not None else "N/A"
                 bitrate_str = f"{bitrate_mean:.2f}±{bitrate_std:.2f}" if bitrate_mean is not None else "N/A"
                 framerate_str = f"{framerate_mean:.1f}±{framerate_std:.1f}" if framerate_mean is not None else "N/A"
                 fps_tail_str = f"{fps_p05:.1f}/{fps_p01:.1f}/{fps_p0_1:.1f}" if fps_p0_1 is not None else "N/A"
-                kvcache_str = f"{kvcache_mean:.1f}±{kvcache_std:.1f}" if kvcache_mean is not None else "N/A"
+                sctp_str = f"{sctp_mean:.1f}±{sctp_std:.1f}" if sctp_mean is not None else "N/A"
                 prompt_str = f"{prompt_mean:.1f}±{prompt_std:.1f}" if prompt_mean is not None else "N/A"
 
                 print(f"{trace_name:<15} {profile_bw_str:<16} {bitrate_str:<16} {framerate_str:<16} "
-                      f"{fps_tail_str:<18} {kvcache_str:<18} {prompt_str:<20}")
+                      f"{fps_tail_str:<18} {sctp_str:<18} {prompt_str:<20}")
 
         print("="*140)
 
