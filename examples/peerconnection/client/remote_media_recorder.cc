@@ -18,6 +18,7 @@
 #include <utility>
 #include <vector>
 
+#include "api/environment/environment_factory.h"
 #include "api/video/i420_buffer.h"
 #include "api/video_codecs/builtin_video_encoder_factory.h"
 #include "api/video_codecs/sdp_video_format.h"
@@ -804,7 +805,7 @@ void RemoteMediaRecorder::HandleEncodedImage(
     }
   }
   std::vector<uint8_t> converted = ConvertToLengthPrefixed(nalus);
-  uint64_t pts = static_cast<uint64_t>(image.Timestamp());
+  uint64_t pts = static_cast<uint64_t>(image.RtpTimestamp());
   sample_pts_.push_back(pts);
   bool keyframe = image._frameType == webrtc::VideoFrameType::kVideoFrameKey;
   writer_->WriteSample(converted.data(), converted.size(), pts, keyframe);
@@ -866,9 +867,10 @@ std::unique_ptr<RemoteMediaRecorder> CreateRemoteRecorder(
   }
   auto writer = std::make_unique<Mp4FileWriter>(file, timescale);
   auto encoder_factory = webrtc::CreateBuiltinVideoEncoderFactory();
+  webrtc::Environment env = webrtc::CreateEnvironment();
   webrtc::SdpVideoFormat format("H264");
   std::unique_ptr<webrtc::VideoEncoder> encoder =
-      encoder_factory->CreateVideoEncoder(format);
+      encoder_factory->Create(env, format);
   if (!encoder) {
     RTC_LOG(LS_ERROR) << "No H264 encoder available for recorder.";
     return nullptr;
