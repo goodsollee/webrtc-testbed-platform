@@ -11,6 +11,16 @@ import numpy as np
 from pathlib import Path
 from collections import defaultdict
 
+try:
+    from analysis.plotting_ext.style_acm import apply_acm_style
+    from analysis.plotting_ext.presets import FIGSIZE
+    from analysis.plotting_ext.loader import load_figure_spec
+    from analysis.plotting_ext.renderers import PlotRegistry
+    from analysis.plotting_ext.spec_types import FigureDefaults, FigureEntry, FigureSpec
+    HAS_EXT = True
+except Exception:
+    HAS_EXT = False
+
 class ExperimentAnalyzer:
     def __init__(self, results_dir):
         """
@@ -517,6 +527,106 @@ class ExperimentAnalyzer:
 
         print("\nAll plots generated successfully!")
 
+    def generate_all_plots_acm(self, output_dir="plots", size_preset=None, spec_path=None):
+        """Optional ACM-styled rendering with optional specification support."""
+
+        cli_style = getattr(self, "_acm_cli_style", False)
+        use_acm = cli_style or os.getenv("EXPR_PLOTS_STYLE", "").lower() == "acm"
+
+        include_configs = getattr(self, "_acm_include_configs", None)
+        include_traces = getattr(self, "_acm_include_traces", None)
+        exclude_traces = getattr(self, "_acm_exclude_traces", None)
+
+        if not HAS_EXT or not (
+            use_acm
+            or size_preset
+            or spec_path
+            or include_configs
+            or include_traces
+            or exclude_traces
+        ):
+            return self.generate_all_plots(output_dir)
+
+        spec = load_figure_spec(spec_path) if spec_path else None
+
+        valid_size = size_preset if size_preset in FIGSIZE else None
+        figsize = FIGSIZE.get(valid_size, None)
+
+        needs_filters = any([include_configs, include_traces, exclude_traces])
+
+        if spec is None and needs_filters:
+            defaults = FigureDefaults(
+                size=valid_size,
+                output_dir=output_dir,
+            )
+            spec = FigureSpec(
+                defaults=defaults,
+                figures=[
+                    FigureEntry(
+                        id="bitrate_comparison",
+                        kind="groupedbar",
+                        metric="average_bitrate",
+                        ylabel="Bitrate (Mbps)",
+                        xlabel="Trace",
+                        title="Average Bitrate Comparison Across Traces",
+                    ),
+                    FigureEntry(
+                        id="framerate_comparison",
+                        kind="groupedbar",
+                        metric="average_framerate",
+                        ylabel="Frame Rate (fps)",
+                        xlabel="Trace",
+                        title="Average Frame Rate Comparison Across Traces",
+                    ),
+                    FigureEntry(
+                        id="sctp_throughput_comparison",
+                        kind="groupedbar",
+                        metric="total_sctp_throughput",
+                        ylabel="Throughput (Mbps)",
+                        xlabel="Trace",
+                        title="Total SCTP Throughput Comparison Across Traces",
+                    ),
+                    FigureEntry(
+                        id="prompt_delivery_time_comparison",
+                        kind="groupedbar",
+                        metric="prompt_delivery_time",
+                        ylabel="Delivery Time (ms)",
+                        xlabel="Trace",
+                        title="Prompt Delivery Time Comparison Across Traces",
+                    ),
+                    FigureEntry(
+                        id="framerate_cdf_overall",
+                        kind="cdf",
+                        metric="framerate_cdf",
+                        xlabel="Frame rate (fps) [capped at 30]",
+                        ylabel="ECDF",
+                        title="Frame Rate CDF — Overall (All Traces)",
+                    ),
+                    FigureEntry(
+                        id="throughput_timeline",
+                        kind="timeline",
+                    ),
+                ],
+            )
+
+        render_legacy_first = bool(spec_path and spec)
+        if render_legacy_first:
+            self.generate_all_plots(output_dir)
+
+        with apply_acm_style():
+            if spec:
+                PlotRegistry.render_from_spec(
+                    analyzer=self,
+                    spec=spec,
+                    default_output_dir=output_dir,
+                    default_figsize=figsize,
+                    include_configs=include_configs,
+                    include_traces=include_traces,
+                    exclude_traces=exclude_traces,
+                )
+            else:
+                self.generate_all_plots(output_dir)
+
     def print_summary(self):
         """Print summary statistics."""
         print("\n" + "="*140)
@@ -576,6 +686,17 @@ def main():
                        help='Path to results directory (default: results/poc101)')
     parser.add_argument('--output-dir', type=str, default='plots',
                        help='Output directory for plots (default: plots)')
+    parser.add_argument('--acm-style', action='store_true', help='Enable ACM rcParams styling')
+    parser.add_argument('--figsize-preset', choices=['quarter', 'half'],
+                        help='Apply a predefined ACM figure size preset')
+    parser.add_argument('--spec', type=str,
+                        help='Optional YAML/JSON figure specification for ACM rendering')
+    parser.add_argument('--include-configs', type=str,
+                        help='Comma-separated list of configs to include (ACM path only)')
+    parser.add_argument('--include-traces', type=str,
+                        help='Comma-separated list of traces to include (ACM path only)')
+    parser.add_argument('--exclude-traces', type=str,
+                        help='Comma-separated list of traces to exclude (ACM path only)')
     args = parser.parse_args()
 
     # Create analyzer
@@ -588,7 +709,34 @@ def main():
     analyzer.print_summary()
 
     # Generate plots
-    analyzer.generate_all_plots(args.output_dir)
+    def _parse_csv(value):
+        if not value:
+            return None
+        return [item.strip() for item in value.split(',') if item.strip()]
+
+    analyzer._acm_cli_style = bool(args.acm_style)
+    analyzer._acm_include_configs = _parse_csv(args.include_configs)
+    analyzer._acm_include_traces = _parse_csv(args.include_traces)
+    analyzer._acm_exclude_traces = _parse_csv(args.exclude_traces)
+
+    acm_requested = any([
+        args.acm_style,
+        args.figsize_preset,
+        args.spec,
+        args.include_configs,
+        args.include_traces,
+        args.exclude_traces,
+        os.getenv("EXPR_PLOTS_STYLE", "").lower() == "acm",
+    ])
+
+    if acm_requested:
+        analyzer.generate_all_plots_acm(
+            output_dir=args.output_dir,
+            size_preset=args.figsize_preset,
+            spec_path=args.spec,
+        )
+    else:
+        analyzer.generate_all_plots(args.output_dir)
 
 
 if __name__ == "__main__":
