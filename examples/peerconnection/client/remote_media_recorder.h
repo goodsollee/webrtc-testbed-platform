@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "api/video/video_frame.h"
+#include "api/video/video_sink_interface.h"
 #include "api/video_codecs/video_encoder.h"
 #include "api/video_codecs/video_encoder_factory.h"
 #include "rtc_base/synchronization/mutex.h"
@@ -28,7 +29,8 @@ namespace webrtc_example {
 
 class Mp4FileWriter;
 
-class RemoteMediaRecorder : public rtc::VideoSinkInterface<webrtc::VideoFrame> {
+class RemoteMediaRecorder
+    : public rtc::VideoSinkInterface<webrtc::VideoFrame> {
  public:
   RemoteMediaRecorder(std::unique_ptr<webrtc::VideoEncoder> encoder,
                       std::unique_ptr<Mp4FileWriter> writer,
@@ -59,7 +61,7 @@ class RemoteMediaRecorder : public rtc::VideoSinkInterface<webrtc::VideoFrame> {
       RTC_EXCLUSIVE_LOCKS_REQUIRED(lock_);
   void FinalizeLocked() RTC_EXCLUSIVE_LOCKS_REQUIRED(lock_);
 
-  rtc::Mutex lock_;
+  webrtc::Mutex lock_;
   std::unique_ptr<webrtc::VideoEncoder> encoder_ RTC_GUARDED_BY(lock_);
   std::unique_ptr<Mp4FileWriter> writer_ RTC_GUARDED_BY(lock_);
   EncoderCallback encoder_callback_;
