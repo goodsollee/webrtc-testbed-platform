@@ -10,6 +10,7 @@
 
 #include "examples/peerconnection/client/conductor.h"
 #include "examples/peerconnection/client/websocket_client.h"
+#include "examples/peerconnection/client/remote_media_recorder.h"
 
 #include <stddef.h>
 #include <algorithm>
@@ -53,6 +54,7 @@
 #include "api/task_queue/task_queue_factory.h"
 #include "api/test/create_frame_generator.h"
 #include "api/video/video_frame.h"
+#include "api/video/video_sink_interface.h"
 #include "api/video/video_source_interface.h"
 #include "api/video_codecs/video_decoder_factory_template.h"
 #include "api/video_codecs/video_decoder_factory_template_dav1d_adapter.h"
@@ -575,6 +577,15 @@ bool Conductor::CreatePeerConnection() {
 void Conductor::DeletePeerConnection() {
   stats_collector_->Stop();
 
+  if (recorded_track_) {
+    recorded_track_->RemoveSink(remote_recorder_.get());
+    recorded_track_ = nullptr;
+  }
+  if (remote_recorder_) {
+    remote_recorder_->Stop();
+    remote_recorder_.reset();
+  }
+
   if (bulk_sender_)
     bulk_sender_->Stop();
   if (bulk_receiver_)
@@ -624,40 +635,70 @@ void Conductor::EnsureStreamingUI() {
 void Conductor::OnAddTrack(
     rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver,
     const std::vector<rtc::scoped_refptr<webrtc::MediaStreamInterface>>& streams) {
-    
-    RTC_LOG(LS_INFO) << __FUNCTION__ << " " << receiver->id();
-    main_wnd_->QueueUIThreadCallback(NEW_TRACK_ADDED,
-                                   receiver->track().release());
+  RTC_LOG(LS_INFO) << __FUNCTION__ << " " << receiver->id();
 
-    // If this is a video track, start stats collection
-    if (receiver->track() &&
-        receiver->track()->kind() == webrtc::MediaStreamTrackInterface::kVideoKind) {
-        GetReceiverVideoStats();
+  rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> track = receiver->track();
+  rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> track_copy = track;
+  main_wnd_->QueueUIThreadCallback(NEW_TRACK_ADDED, track.release());
+
+  if (!track_copy) {
+    return;
+  }
+
+  if (track_copy->kind() == webrtc::MediaStreamTrackInterface::kVideoKind) {
+    GetReceiverVideoStats();
+    if (record_remote_video_ && !record_file_path_.empty()) {
+      auto* video_track = static_cast<webrtc::VideoTrackInterface*>(track_copy.get());
+      if (video_track) {
+        if (!remote_recorder_) {
+          remote_recorder_ =
+              webrtc_example::CreateRemoteRecorder(record_file_path_);
+          if (!remote_recorder_) {
+            RTC_LOG(LS_ERROR)
+                << "Failed to create remote recorder for file "
+                << record_file_path_;
+          } else {
+            recorded_track_ = video_track;
+            recorded_track_->AddOrUpdateSink(remote_recorder_.get(),
+                                             rtc::VideoSinkWants());
+            RTC_LOG(LS_INFO) << "Recording remote video to " << record_file_path_;
+          }
+        }
+      }
     }
+  }
 }
 
 void Conductor::OnRemoveTrack(
     rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver) {
-    
-    RTC_LOG(LS_INFO) << __FUNCTION__ << " " << receiver->id();
-    main_wnd_->QueueUIThreadCallback(TRACK_REMOVED, receiver->track().release());
+  RTC_LOG(LS_INFO) << __FUNCTION__ << " " << receiver->id();
+  rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> track = receiver->track();
+  main_wnd_->QueueUIThreadCallback(TRACK_REMOVED, track.release());
 
-    // If this was the last video track, stop stats
-    bool has_video_tracks = false;
-    if (peer_connection_) {
-        auto receivers = peer_connection_->GetReceivers();
-        for (const auto& r : receivers) {
-            if (r->track() && 
-                r->track()->kind() == webrtc::MediaStreamTrackInterface::kVideoKind) {
-                has_video_tracks = true;
-                break;
-            }
-        }
+  if (track && recorded_track_ && track.get() == recorded_track_.get()) {
+    recorded_track_->RemoveSink(remote_recorder_.get());
+    if (remote_recorder_) {
+      remote_recorder_->Stop();
     }
+    remote_recorder_.reset();
+    recorded_track_ = nullptr;
+  }
 
-    if (!has_video_tracks) {  
-      //stats_collector_->Stop();
+  bool has_video_tracks = false;
+  if (peer_connection_) {
+    auto receivers = peer_connection_->GetReceivers();
+    for (const auto& r : receivers) {
+      if (r->track() &&
+          r->track()->kind() == webrtc::MediaStreamTrackInterface::kVideoKind) {
+        has_video_tracks = true;
+        break;
+      }
     }
+  }
+
+  if (!has_video_tracks) {
+    //stats_collector_->Stop();
+  }
 }
 
 void Conductor::OnDataChannel(
@@ -1575,6 +1616,14 @@ void Conductor::SetEmulationMode(bool is_emulation, bool is_sender) {
 
 void Conductor::SetNetInterface(std::string interface_name) {
   net_interface_ = interface_name;
+}
+
+void Conductor::SetRecordingPath(const std::string& path) {
+  record_file_path_ = path;
+}
+
+void Conductor::EnableRecording(bool enable) {
+  record_remote_video_ = enable;
 }
 
 void Conductor::UIThreadCallback(int msg_id, void* data) {

@@ -12,6 +12,7 @@
 #include <gtk/gtk.h>
 #include <stdio.h>
 #include <filesystem>
+#include <system_error>
 
 #include "absl/flags/parse.h"
 #include "absl/flags/usage.h"
@@ -35,13 +36,17 @@ ABSL_FLAG(bool, is_sender, true,
     "Whether this peer is sender (true) or receiver (false)");
 ABSL_FLAG(std::string, network_interface, "",
     "Network interface to use (empty for default)");
-ABSL_FLAG(std::string, y4m_path, "", 
+ABSL_FLAG(std::string, y4m_path, "",
     "Path to Y4M file to use as video source (empty for test pattern)");
 ABSL_FLAG(std::string, log_date, "", "Date for log folder (YYYY-MM-DD)");
 ABSL_FLAG(std::string,
           log_root,
           "webrtc_logs",
           "Root directory used to store experiment logs");
+ABSL_FLAG(bool, record_remote, false,
+    "Record remote video track to an MP4 file");
+ABSL_FLAG(std::string, record_path, "remote.mp4",
+    "Destination path for remote MP4 recording");
 
 ABSL_FLAG(bool, headless, false, 
     "Whether to run in headless or not");
@@ -106,6 +111,10 @@ Experiment Mode Options:
 Video Source Options:
   --y4m_path=<path>         Path to Y4M file to use as video source
                             If not specified, uses test pattern
+
+Recording Options:
+  --record_remote=<bool>    Enable remote video recording (default: false)
+  --record_path=<path>      MP4 output path for remote recording (default: remote.mp4)
 
 SCTP Traffic Options:
   --sctp_csv=<path>         Path to SCTP traffic CSV to drive traffic
@@ -189,6 +198,29 @@ Example Commands:
   rtc::InitializeSSL();
   PeerConnectionClient client;
   auto conductor = rtc::make_ref_counted<Conductor>(&client, &wnd, absl::GetFlag(FLAGS_headless));
+
+  if (absl::GetFlag(FLAGS_record_remote)) {
+    std::string record_path = absl::GetFlag(FLAGS_record_path);
+    bool enable_recording = true;
+    if (record_path.empty()) {
+      printf("Remote recording enabled but no output path provided. Disabling.\n");
+      enable_recording = false;
+    } else {
+      std::filesystem::path output_path(record_path);
+      std::error_code ec;
+      if (output_path.has_parent_path()) {
+        std::filesystem::create_directories(output_path.parent_path(), ec);
+      }
+      if (ec) {
+        printf("Failed to create directories for %s: %s. Recording disabled.\n",
+               record_path.c_str(), ec.message().c_str());
+        enable_recording = false;
+      } else {
+        conductor->SetRecordingPath(record_path);
+      }
+    }
+    conductor->EnableRecording(enable_recording);
+  }
 
   std::string sctp_csv = absl::GetFlag(FLAGS_sctp_csv);
   if (sctp_csv.empty()) {

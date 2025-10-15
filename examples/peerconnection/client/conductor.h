@@ -52,6 +52,10 @@ namespace cricket {
 class VideoRenderer;
 }  // namespace cricket
 
+namespace webrtc_example {
+class RemoteMediaRecorder;
+}  // namespace webrtc_example
+
 class MyDataObserver;
 
 class Conductor : public webrtc::PeerConnectionObserver,
@@ -103,6 +107,8 @@ class Conductor : public webrtc::PeerConnectionObserver,
   void SetTrafficProfile(const std::string& path) { SetSctpTrafficProfile(path); }
   void SetSctpTrafficProfile(const std::string& path) { sctp_csv_path_ = path; }
   void SetRtpTrafficProfile(const std::string& path) { rtp_csv_path_ = path; }
+  void SetRecordingPath(const std::string& path);
+  void EnableRecording(bool enable);
 
   enum class TrafficKind {kKv, kMesh, kBulkTest, kControl};
   using PayloadHandler = std::function<void(absl::Span<const uint8_t>)>;
@@ -276,8 +282,12 @@ class Conductor : public webrtc::PeerConnectionObserver,
    std::string net_interface_;
    bool is_emulation_ = false;
    bool is_sender_ = true;
-   std::string y4m_path_;
+  std::string y4m_path_;
   std::string log_dir_;
+  bool record_remote_video_ = false;
+  std::string record_file_path_;
+  rtc::scoped_refptr<webrtc::VideoTrackInterface> recorded_track_;
+  std::unique_ptr<webrtc_example::RemoteMediaRecorder> remote_recorder_;
 
   std::string sctp_csv_path_;
   std::string rtp_csv_path_;
