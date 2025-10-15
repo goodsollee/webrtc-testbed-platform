@@ -61,7 +61,6 @@ std::vector<std::vector<uint8_t>> ParseAnnexBNalus(const uint8_t* data,
   std::vector<std::vector<uint8_t>> nalus;
   size_t offset = 0;
   while (offset + 3 < size) {
-    size_t start = offset;
     while (offset < size && data[offset] == 0) {
       ++offset;
     }
@@ -101,6 +100,8 @@ std::vector<uint8_t> ConvertToLengthPrefixed(
   }
   return output;
 }
+
+}  // namespace
 
 class Mp4FileWriter {
  public:
@@ -689,8 +690,6 @@ class Mp4FileWriter {
   std::vector<Sample> samples_;
 };
 
-}  // namespace
-
 RemoteMediaRecorder::RemoteMediaRecorder(
     std::unique_ptr<webrtc::VideoEncoder> encoder,
     std::unique_ptr<Mp4FileWriter> writer,
@@ -705,12 +704,12 @@ RemoteMediaRecorder::~RemoteMediaRecorder() {
 }
 
 void RemoteMediaRecorder::Stop() {
-  rtc::MutexLock l(&lock_);
+  webrtc::MutexLock l(&lock_);
   FinalizeLocked();
 }
 
 void RemoteMediaRecorder::OnFrame(const webrtc::VideoFrame& frame) {
-  rtc::MutexLock l(&lock_);
+  webrtc::MutexLock l(&lock_);
   if (closed_) {
     return;
   }
@@ -728,16 +727,10 @@ void RemoteMediaRecorder::OnFrame(const webrtc::VideoFrame& frame) {
       webrtc::VideoFrame::Builder()
           .set_video_frame_buffer(buffer)
           .set_timestamp_us(frame.timestamp_us())
-          .set_timestamp_rtp(frame.timestamp())
+          .set_timestamp_rtp(frame.rtp_timestamp())
           .set_rotation(frame.rotation())
           .build();
   frame_to_encode.set_ntp_time_ms(frame.ntp_time_ms());
-
-  webrtc::VideoEncoder::EncodeInfo info;
-  info.encode_deadline = webrtc::Timestamp::PlusInfinity();
-  webrtc::VideoEncoder::FrameType frame_type =
-      webrtc::VideoEncoder::kVideoFrameDelta;
-  info.frame_types.push_back(frame_type);
 
   if (encoder_->Encode(frame_to_encode, nullptr) != WEBRTC_VIDEO_CODEC_OK) {
     RTC_LOG(LS_WARNING) << "Failed to encode frame for recorder.";
@@ -852,7 +845,7 @@ RemoteMediaRecorder::EncoderCallback::OnEncodedImage(
     return webrtc::EncodedImageCallback::Result(
         webrtc::EncodedImageCallback::Result::OK);
   }
-  rtc::MutexLock l(&owner->lock_);
+  webrtc::MutexLock l(&owner->lock_);
   if (owner->closed_) {
     return webrtc::EncodedImageCallback::Result(
         webrtc::EncodedImageCallback::Result::OK);
