@@ -5,13 +5,14 @@ set -euo pipefail
 # Usage & defaults
 ################################################################################
 usage() {
-    echo "Usage: $0 <room_id> <is_sender> [--min N] [--max N] [--y4m PATH] [--sctp PATH]"
+    echo "Usage: $0 <room_id> <is_sender> [--min N] [--max N] [--y4m PATH] [--sctp PATH] [--headless true|false]"
     echo "  room_id   : Room identifier"
     echo "  is_sender : true | false"
     echo "  --min N   : (optional) playout-delay min in ms   [default: 0]"
     echo "  --max N   : (optional) playout-delay max in ms   [default: 10]"
     echo "  --y4m PATH: (optional) path to *.y4m file to send"
     echo "  --sctp PATH: (optional) path to sctp_traffic CSV (sent as --sctp_csv=PATH)"
+    echo "  --headless true|false : (optional) force headless mode [sender defaults to true]"
     exit 1
 }
 
@@ -20,6 +21,7 @@ min_delay=0
 max_delay=10
 y4m_path=""
 sctp_csv=""
+headless_override=""
 
 ################################################################################
 # Positional args (room_id, is_sender) + option parsing
@@ -27,11 +29,12 @@ sctp_csv=""
 positional=()
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --min)   min_delay="$2"; shift 2 ;;
-        --max)   max_delay="$2"; shift 2 ;;
-        --y4m)   y4m_path="$2"; shift 2 ;;
-        --sctp)  sctp_csv="$2"; shift 2 ;;
-        -h|--help) usage ;;
+        --min)      min_delay="$2"; shift 2 ;;
+        --max)      max_delay="$2"; shift 2 ;;
+        --y4m)      y4m_path="$2"; shift 2 ;;
+        --sctp)     sctp_csv="$2"; shift 2 ;;
+        --headless) headless_override="$2"; shift 2 ;;
+        -h|--help)  usage ;;
         *) positional+=("$1"); shift ;;
     esac
 done
@@ -59,20 +62,23 @@ is_sender="$2"
 [[ -n "$sctp_csv" && ! -f "$sctp_csv" ]] && {
     echo "Error: sctp CSV file does not exist: $sctp_csv"; exit 1; }
 
-# Optional light sanity on extensions (non-fatal warnings)
-if [[ -n "$y4m_path" && ! "$y4m_path" =~ \.y4m$ ]]; then
-    echo "Warning: --y4m provided but file does not end with .y4m: $y4m_path"
+if [[ -n "$headless_override" && "$headless_override" != "true" && "$headless_override" != "false" ]]; then
+    echo "Error: --headless must be 'true' or 'false'"; exit 1;
 fi
-if [[ -n "$sctp_csv" && ! "$sctp_csv" =~ \.csv$ ]]; then
-    echo "Warning: --sctp provided but file does not end with .csv: $sctp_csv"
+
+################################################################################
+# Determine headless mode
+################################################################################
+if [[ "$is_sender" == "true" ]]; then
+    headless="true"
+else
+    headless="${headless_override:-false}"
 fi
 
 ################################################################################
 # Build and run peerconnection_client
 ################################################################################
-headless=$([[ "$is_sender" == "true" ]] && echo "true" || echo "false")
-
-cmd="./out/Default/peerconnection_client \
+cmd="./out/Release/peerconnection_client \
       --server=goodsol.overlinkapp.org \
       --is_sender=${is_sender} \
       --room_id=${room_id} \
@@ -80,7 +86,6 @@ cmd="./out/Default/peerconnection_client \
       --force_fieldtrials=\"WebRTC-ForcePlayoutDelay/min_ms:${min_delay},max_ms:${max_delay}/\""
 
 [[ -n "$y4m_path" ]] && cmd+=" --y4m_path=${y4m_path}"
-[[ -n "$sctp_csv" ]] && cmd+=" --sctp_csv=${sctp_csv}"  
+[[ -n "$sctp_csv" ]] && cmd+=" --sctp_csv=${sctp_csv}"
 
-#pulseaudio --start
 eval "${cmd}"

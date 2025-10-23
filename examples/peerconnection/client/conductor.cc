@@ -1536,7 +1536,7 @@ int Conductor::EncoderMaxBitrateBps() const {
   if (rtp_config_ && rtp_config_->max_bitrate > 0) {
     return rtp_config_->max_bitrate;
   }
-  return 10000000;
+  return 25000000;
 }
 
 int Conductor::PeerConnectionMaxBitrateBps() const {
@@ -1550,7 +1550,7 @@ int Conductor::TargetFrameRateFps() const {
   if (rtp_config_ && rtp_config_->frame_rate > 0) {
     return rtp_config_->frame_rate;
   }
-  return 30;
+  return 60;
 }
 
 void Conductor::OnIceConnectionChange(
