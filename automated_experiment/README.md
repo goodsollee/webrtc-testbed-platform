@@ -63,18 +63,26 @@ avoids the brief disconnects caused by tearing the queue down and recreating it.
 
 ### Traffic configurations
 
-A traffic-config *set* is a subdirectory of `config/` holding `rtp.csv` and/or
-`sctp.csv`. Each CSV has a header row and one line per flow:
+A traffic-config *set* is a subdirectory of `config/`. The main file is
+`rtp.csv`, describing the video stream (one line per flow, with a header):
 
 ```csv
 Traffic name,Protocol,Pattern,File size,Periodicity,Custom traces,Max bitrate,Frame rate,Video file,SLO (ms)
-KVCacheVideo,RTP,Video,,,,8000000,30,,
+Video,RTP,Video,,,,8000000,30,,
 ```
 
-These are passed to the sender as `--rtp_csv` / `--sctp_csv`. Provided sets:
-`kvcache`, `prompt`, `custom_pattern`. The optional `SLO (ms)` column sets the
-maximum acceptable end-to-end delivery delay for SCTP transfers; the client
-records the observed delay and the running satisfaction ratio.
+`Max bitrate` is in bps, `Frame rate` in fps. Provided sets:
+
+| Set | Video |
+|-----|-------|
+| `video_high` | 8 Mbps, 30 fps |
+| `video_low` | 2.5 Mbps, 30 fps |
+| `video_with_data` | 5 Mbps video + a background data channel (`sctp.csv`) |
+
+A set may also include an `sctp.csv` to send data-channel traffic alongside the
+video; these are passed to the sender as `--rtp_csv` / `--sctp_csv`. For SCTP
+flows the optional `SLO (ms)` column sets the maximum acceptable delivery delay,
+and the client records the observed delay and running satisfaction ratio.
 
 ## Output layout
 
@@ -94,5 +102,6 @@ results/<experiment-id>/<traffic-set>/<trace>/
 python3 analyze_results.py --results-dir results/my_batch --output-dir plots
 ```
 
-This reads the per-run logs and writes comparison plots (frame rate, bitrate,
-latency, …). Pass `--acm-style` for paper-ready figures.
+For each run it reads the receiver's `average_stats.csv` and `frame_metrics.csv`
+and writes `summary.csv` plus comparison plots: frame rate, bitrate, dropped
+frames, and per-frame transport-latency / jitter CDFs across traces and configs.

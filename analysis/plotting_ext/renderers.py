@@ -36,8 +36,6 @@ class PlotRegistry:
     _legacy_outputs: Dict[str, str] = {
         "bitrate_comparison": "bitrate_comparison.png",
         "framerate_comparison": "framerate_comparison.png",
-        "sctp_throughput_comparison": "sctp_throughput_comparison.png",
-        "prompt_delivery_time_comparison": "prompt_delivery_time_comparison.png",
         "framerate_cdf_overall": "framerate_cdf_overall.png",
     }
 

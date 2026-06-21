@@ -139,16 +139,24 @@ turns it into an emulator profile CSV.
 
 ### Traffic configurations
 
-A traffic-config *set* is a directory under `config/` containing `rtp.csv` and/or
-`sctp.csv`. Each CSV has a header row and one line per flow, e.g.:
+A traffic-config *set* is a directory under `config/`. The main file is
+`rtp.csv`, which describes the video stream; one line per flow with a header row:
 
 ```csv
 Traffic name,Protocol,Pattern,File size,Periodicity,Custom traces,Max bitrate,Frame rate,Video file,SLO (ms)
-KVCacheVideo,RTP,Video,,,,8000000,30,,
+Video,RTP,Video,,,,8000000,30,,
 ```
 
-The sender receives these as `--rtp_csv` / `--sctp_csv`. Provided sets:
-`kvcache`, `prompt`, `custom_pattern`.
+Here `Max bitrate` is in bps and `Frame rate` in fps. Provided sets:
+
+| Set | Video |
+|-----|-------|
+| `video_high` | 8 Mbps, 30 fps |
+| `video_low` | 2.5 Mbps, 30 fps |
+| `video_with_data` | 5 Mbps video + an optional background data channel (`sctp.csv`) |
+
+A set may also include an `sctp.csv` to send data-channel traffic alongside the
+video; the sender receives these as `--rtp_csv` / `--sctp_csv`.
 
 ## Analyzing results
 
@@ -157,9 +165,10 @@ cd automated_experiment
 python3 analyze_results.py --results-dir results/my_batch --output-dir plots
 ```
 
-This reads the per-run logs and writes comparison plots (frame rate, bitrate,
-latency, …) to `plots/`. The helpers in `../analysis/` operate on individual
-log files.
+This reads each run's receiver logs (`average_stats.csv`, `frame_metrics.csv`)
+and writes a `summary.csv` plus comparison plots to `plots/`: frame rate,
+bitrate, dropped frames, and per-frame transport-latency / jitter CDFs. The
+helpers in `../analysis/` operate on individual log files.
 
 ## Notes
 
