@@ -1,1 +1,0 @@
-timestamp_ms,data_bytes,total_data_bytes,sequence,send_time_ms,transmit_start_time_ms,transmit_end_time_ms,delivery_delay_ms,slo_ms,slo_satisfied,slo_satisfaction_ratio

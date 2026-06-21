@@ -78,3 +78,18 @@
 webrtc_logs/*
 *.txt
 automated_experiment/webrtc_logs/*
+# --- webrtc-testbed-platform: generated artifacts (do not commit) ---
+# libwebsockets is built locally during setup (see README)
+/libwebsockets/build/
+/libwebsockets/out/
+# network emulator build outputs (rebuild with `make`)
+/automated_experiment/network_emulation/network_emulator
+/automated_experiment/network_emulation/*.o
+/automated_experiment/network_emulation/*.log
+# experiment run outputs and generated plots
+/automated_experiment/webrtc_logs/
+/automated_experiment/plots/
+/automated_experiment/example_results/
+/automated_experiment/results.zip
+/analysis/*.png
+/logger/*.o
