@@ -15,7 +15,7 @@ def print_keyframe_intervals(frame_df):
         print(f"[Keyframe] Column '{col}' not found.")
         return
 
-    # 1) 키프레임 필터링
+    # 1) Filter keyframes
     if 'is_keyframe' in frame_df.columns:
         kf_df = frame_df[frame_df['is_keyframe'] == 1].copy()
     elif 'frame_type' in frame_df.columns:
@@ -29,12 +29,12 @@ def print_keyframe_intervals(frame_df):
         print("[Keyframe] Not enough key-frames to compute intervals.")
         return
 
-    # 2) 시간 정렬 및 간격(ms) 계산
+    # 2) Sort by time and compute inter-frame gap (ms)
     kf_df = kf_df.sort_values(col)
     times = kf_df[col].astype(np.int64).to_numpy()
     intervals = np.diff(times)
 
-    # 3) 출력
+    # 3) Output
     print(f"\n=== Key-frame {col} values (ms) ===")
     for t in times:
         print(t)
@@ -43,7 +43,7 @@ def print_keyframe_intervals(frame_df):
     for i, d in enumerate(intervals, 1):
         print(f"{i}: {d} ms")
 
-    # 4) 통계
+    # 4) Statistics
     print("\nKey-frame interval stats (ms):")
     print(f"count   : {len(intervals)}")
     print(f"mean    : {np.mean(intervals):.2f}")

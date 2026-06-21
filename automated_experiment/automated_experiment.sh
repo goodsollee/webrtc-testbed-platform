@@ -13,7 +13,7 @@ Required arguments:
 
 Optional arguments:
   --traces-dir DIR             Directory containing *.pitree-trace files
-                               [default: <repo>/automated_experiment/traces]
+                               [default: <repo>/automated_experiment/poc_traces]
   --traffic-dir DIR            Directory containing traffic config sets (subdirectories)
                                [default: <repo>/automated_experiment/config]
   --traffic-config PATH        Single traffic config set directory (overrides --traffic-dir)
@@ -23,7 +23,7 @@ Optional arguments:
   --interface NAME             Physical interface to shape (auto-detected if omitted)
   --namespace NAME             Network namespace created by the emulator [default: ns1]
   --ns-interface NAME          Interface name inside the namespace [default: veth_ns]
-  --server HOST                Signalling server host [default: goodsol.overlinkapp.org]
+  --server HOST                Signalling server host [default: localhost]
   --port PORT                  Signalling server port [default: 8888]
   --sender-headless BOOL       Run sender headless? [default: true]
   --receiver-headless BOOL     Run receiver headless? [default: false]
@@ -46,19 +46,19 @@ REPO_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
 RUN_START_TS="$(date +%Y%m%dT%H%M%S)"
 
 TRACES_DIR="$SCRIPT_DIR/poc_traces"
-TRAFFIC_DIR="$SCRIPT_DIR/test_config"
+TRAFFIC_DIR="$SCRIPT_DIR/config"
 TRAFFIC_CONFIG=""
 OUTPUT_DIR="$SCRIPT_DIR/results"
 LATENCY_MS=30
 INTERFACE_NAME=""
 NS_NAME="ns1"
 NS_INTERFACE="veth_ns"
-SERVER_HOST="goodsol.overlinkapp.org"
+SERVER_HOST="localhost"
 SERVER_PORT=8888
 SENDER_HEADLESS="true"
 RECEIVER_HEADLESS="true"
 EXPERIMENT_ID=""
-Y4M_PATH="/home/home/goodsol/workspace/QCON/webrtc/dataset/1080_test.y4m"
+Y4M_PATH=""
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -243,20 +243,20 @@ run_single_trace() {
     local emulator_stdout="$run_stdout_dir/network_emulator.log"
     local bandwidth_csv="$EMULATOR_LOG_DIR/${trace_name}_bandwidth.csv"
 
-    # ===== 시그널 파일 먼저 삭제 =====
+    # ===== Remove the signal file first =====
     local signal_file="/tmp/emulator_ready.signal"
     rm -f "$signal_file"
     # ============================
 
-    # FIFO 생성
+    # Create FIFO
     local fifo_path="$run_stdout_dir/emulator.fifo"
     [[ -p "$fifo_path" ]] || mkfifo "$fifo_path"
     sudo chmod 666 "$fifo_path"
 
-    # FIFO를 fd 3으로 열기
+    # Open FIFO on fd 3
     exec 3<>"$fifo_path"
 
-    # Emulator 명령
+    # Emulator command
     local emulator_cmd=(
         sudo "$NETWORK_EMULATOR_BIN"
         "--profile_path=$profile_csv"
@@ -269,13 +269,13 @@ run_single_trace() {
 
     echo "Starting emulator..."
     
-    # Emulator 실행
+    # Run emulator
     "${emulator_cmd[@]}" <&3 >"$emulator_stdout" 2>&1 &
     local emulator_pid=$!
 
     sleep 1
     
-    # 프로세스 확인
+    # Check process
     if ! kill -0 "$emulator_pid" 2>/dev/null; then
         echo "ERROR: Emulator died!" >&2
         exec 3>&-
@@ -285,11 +285,11 @@ run_single_trace() {
 
     echo "$emulator_pid" > "$run_stdout_dir/emulator.pid"
 
-    # 시그널 파일 대기 (rm 제거!)
+    # Wait for the signal file (do not remove!)
     echo "Waiting for emulator initialization..."
     local wait_seconds=0
     while [[ ! -f "$signal_file" ]]; do
-        # 디버깅: 파일 존재 확인
+        # Debug: check file existence
         if [[ $((wait_seconds % 5)) -eq 0 ]]; then
             ls -la "$signal_file" 2>&1 | sed 's/^/  DEBUG: /'
         fi
@@ -317,11 +317,11 @@ run_single_trace() {
     done
 
     echo "✓ Emulator ready! (${wait_seconds}s)"
-    rm -f "$signal_file"  # ← 사용 후 삭제
+    rm -f "$signal_file"  # remove after use
 
-    echo "start" >&3  # fd 3으로 쓰기
+    echo "start" >&3  # write to fd 3
 
-    # Sender/Receiver 설정
+    # Sender/Receiver setup
     local sender_log="$run_stdout_dir/sender.log"
     local receiver_log="$run_stdout_dir/receiver.log"
 
@@ -356,7 +356,7 @@ run_single_trace() {
         --headless="$RECEIVER_HEADLESS"
     )
 
-    # PulseAudio 시작 및 클라이언트 실행
+    # Start PulseAudio and launch clients
     echo "Starting sender and receiver..."
 
     # Start PulseAudio with a clean state
@@ -405,7 +405,7 @@ run_single_trace() {
     local receiver_pid=$!
     echo "  Receiver PID: $receiver_pid"
 
-    # Receiver에서 트래픽 감지 대기 (RTP or SCTP)
+    # Wait for traffic detection on the receiver (RTP or SCTP)
     echo "Waiting for traffic in receiver.log..."
     local traffic_wait=0
     # Check for either RTP video traffic OR SCTP data channel traffic
@@ -458,22 +458,22 @@ run_single_trace() {
     done
     echo "✓ Traffic detected! (${traffic_wait}s)"
 
-    # 트래픽이 시작된 후 emulator에 start 명령 전송
+    # Send the start command to the emulator after traffic begins
     echo -e "\n=== STARTING BANDWIDTH EMULATION ==="
     #sleep 1
-    #echo "start" >&3  # fd 3으로 쓰기
+    #echo "start" >&3  # write to fd 3
     echo "✓ Start signal sent to emulator for trace: $trace_name"
 
-    # Emulator 완료 대기
+    # Wait for the emulator to finish
     echo "Waiting for network emulator to complete..."
     local exit_code=0
     wait "$emulator_pid" || exit_code=$?
     echo "✓ Network emulator finished (exit code: $exit_code)"
 
-    # fd 닫기
+    # Close fd
     exec 3>&-
 
-    # Sender/Receiver 정리
+    # Clean up sender/receiver
     echo -e "\n=== CLEANING UP ==="
     echo "Stopping sender and receiver..."
 
@@ -487,7 +487,7 @@ run_single_trace() {
         sudo kill -TERM "$receiver_pid" 2>/dev/null || true
     fi
 
-    # 5초간 graceful shutdown 대기
+    # Wait up to 5s for graceful shutdown
     local cleanup_wait=0
     while [[ $cleanup_wait -lt 5 ]]; do
         local sender_alive=0
@@ -505,7 +505,7 @@ run_single_trace() {
         cleanup_wait=$((cleanup_wait + 1))
     done
 
-    # 강제 종료
+    # Force kill
     if kill -0 "$sender_pid" 2>/dev/null; then
         echo "  Sender did not exit gracefully, sending SIGKILL"
         sudo kill -9 "$sender_pid" 2>/dev/null || true
@@ -516,7 +516,7 @@ run_single_trace() {
         sudo kill -9 "$receiver_pid" 2>/dev/null || true
     fi
 
-    # 프로세스 종료 대기
+    # Wait for processes to terminate
     wait "$sender_pid" 2>/dev/null || true
     wait "$receiver_pid" 2>/dev/null || true
 
@@ -553,7 +553,7 @@ run_single_trace() {
     sudo ip netns exec "$NS_NAME" pulseaudio --kill >/dev/null 2>&1 || true
     sudo pulseaudio --kill >/dev/null 2>&1 || true
 
-    # Emulator 로그 복사
+    # Copy emulator log
     if [[ -f "$emulator_stdout" ]]; then
         cp "$emulator_stdout" "$EMULATOR_LOG_DIR/${trace_name}.log"
     fi

@@ -73,7 +73,7 @@ fi
 headless=$([[ "$is_sender" == "true" ]] && echo "true" || echo "false")
 
 cmd="../out/Default/peerconnection_client \
-      --server=goodsol.overlinkapp.org \
+      --server=localhost \
       --is_sender=${is_sender} \
       --room_id=${room_id} \
       --headless=${headless} \

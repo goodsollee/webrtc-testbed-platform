@@ -121,7 +121,7 @@ bool WebSocketClient::Connect(const std::string& url) {
   info.port = port_;
   info.path = path_.c_str();
   info.host = info.address;
-  info.origin = "https://goodsol.overlinkapp.org";
+  info.origin = "http://localhost";
   info.protocol = "apprtc";
   info.local_protocol_name = "apprtc";
   

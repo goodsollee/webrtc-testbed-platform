@@ -86,9 +86,9 @@ struct PersistentStats {
     int64_t period_start_bytes_ = 0;
     int64_t period_start_time_ms_ = 0;
 
-    int64_t last_remote_bytes_sent_      = 0;   // 최신 remote-outbound bytesSent
-    int64_t first_remote_stats_time_ms_  = -1;  // 최초 도착 시각
-    int64_t period_remote_start_bytes_   = 0;   // 직전 구간 시작 값
+    int64_t last_remote_bytes_sent_      = 0;   // Latest remote-outbound bytesSent
+    int64_t first_remote_stats_time_ms_  = -1;  // First arrival timestamp
+    int64_t period_remote_start_bytes_   = 0;   // Value at the start of the previous interval
 
     // Freeze statistics
     int64_t last_freeze_count_ = -1;

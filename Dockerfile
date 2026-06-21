@@ -26,7 +26,7 @@ ENV PATH="/opt/depot_tools:${PATH}"
 RUN /opt/depot_tools/update_depot_tools && gclient --version
 
 # Project
-RUN git clone https://github.com/goodsollee/native-webrtc-project.git /src
+RUN git clone https://github.com/goodsollee/webrtc-testbed-platform.git /src
 WORKDIR /src
 
 # Build

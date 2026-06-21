@@ -1408,14 +1408,14 @@ void Conductor::AddTracks() {
         if (!parameters.encodings.empty()) {
           for (auto& e : parameters.encodings) {
             if (!e.scalability_mode.has_value()) {
-              e.scalability_mode = "L1T1";  // 또는 "L3T3_KEY" 등 원하는 모드
+              e.scalability_mode = "L1T1";  // or "L3T3_KEY", etc. as desired
             }
             e.max_bitrate_bps = encoder_max_bitrate_bps;
             e.max_framerate = target_frame_rate;
             e.scale_resolution_down_by = 1.0;
           }
         } else {
-          // 부득이 새로 만들 경우에도 scalability_mode 반드시 설정
+          // Always set scalability_mode even when creating a new one
           webrtc::RtpEncodingParameters e;
           e.scalability_mode = "L1T1";
           e.max_bitrate_bps = encoder_max_bitrate_bps;
