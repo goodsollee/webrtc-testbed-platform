@@ -37,9 +37,12 @@ Experiments target **Linux** (the emulator uses network namespaces and `tc`).
 - [`depot_tools`](https://commondatastorage.googleapis.com/chrome-infra-docs/flat/depot_tools/docs/html/depot_tools_tutorial.html) on your `PATH`
 - Build/runtime packages:
   ```bash
-  sudo apt install cmake libssl-dev libcurl4-openssl-dev iproute2 pulseaudio python3 python3-pip
+  sudo apt install cmake pkg-config libssl-dev libcurl4-openssl-dev \
+                   libabsl-dev iproute2 pulseaudio python3 python3-pip
   pip3 install pandas numpy matplotlib
   ```
+  (`libabsl-dev` + `pkg-config` are needed to build the network emulator;
+  `cmake`/`libssl-dev`/`libcurl4-openssl-dev` to build libwebsockets.)
 
 ## Build
 
