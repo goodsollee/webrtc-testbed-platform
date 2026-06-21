@@ -126,8 +126,10 @@ bool WebSocketClient::Connect(const std::string& url) {
   info.local_protocol_name = "apprtc";
   
   if (protocol_ == "wss") {
-    info.ssl_connection = LCCSCF_USE_SSL | 
-                         LCCSCF_ALLOW_SELFSIGNED | 
+    info.ssl_connection = LCCSCF_USE_SSL |
+                         LCCSCF_ALLOW_SELFSIGNED |
+                         LCCSCF_ALLOW_EXPIRED |
+                         LCCSCF_ALLOW_INSECURE |
                          LCCSCF_SKIP_SERVER_CERT_HOSTNAME_CHECK;
   }
 

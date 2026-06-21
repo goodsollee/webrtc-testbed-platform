@@ -72,15 +72,27 @@ fi
 ################################################################################
 headless=$([[ "$is_sender" == "true" ]] && echo "true" || echo "false")
 
-cmd="../out/Default/peerconnection_client \
-      --server=localhost \
+# Start the bundled signalling server first, in another shell:
+#   python3 signaling_server.py --host 0.0.0.0 --port 8888
+# The sender (initiator) uses --autocall so it offers as soon as the peer joins.
+autocall=$([[ "$is_sender" == "true" ]] && echo "true" || echo "false")
+
+# headless still calls gtk_init, which needs an X display; use a virtual one.
+xvfb=""
+if [[ -z "${DISPLAY:-}" ]] && command -v xvfb-run >/dev/null 2>&1; then
+    xvfb="xvfb-run -a"
+fi
+
+cmd="${xvfb} ../out/Default/peerconnection_client \
+      --server=localhost --port=8888 --server_scheme=http \
+      --autoconnect=true --autocall=${autocall} \
       --is_sender=${is_sender} \
       --room_id=${room_id} \
       --headless=${headless} \
       --force_fieldtrials=\"WebRTC-ForcePlayoutDelay/min_ms:${min_delay},max_ms:${max_delay}/\""
 
 [[ -n "$y4m_path" ]] && cmd+=" --y4m_path=${y4m_path}"
-[[ -n "$sctp_csv" ]] && cmd+=" --sctp_csv=${sctp_csv}"  
+[[ -n "$sctp_csv" ]] && cmd+=" --sctp_csv=${sctp_csv}"
 
 #pulseaudio --start
 eval "${cmd}"

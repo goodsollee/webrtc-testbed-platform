@@ -23,8 +23,12 @@ Optional arguments:
   --interface NAME             Physical interface to shape (auto-detected if omitted)
   --namespace NAME             Network namespace created by the emulator [default: ns1]
   --ns-interface NAME          Interface name inside the namespace [default: veth_ns]
-  --server HOST                Signalling server host [default: localhost]
+  --server HOST                Signalling server host [default: 192.168.100.1,
+                               the veth host IP reachable from the sender's netns]
   --port PORT                  Signalling server port [default: 8888]
+  --signaling-scheme SCHEME    http (bundled local server) or https [default: http]
+  --no-local-signaling         Do not auto-start the bundled signalling server
+                               (point --server at an external server instead)
   --sender-headless BOOL       Run sender headless? [default: true]
   --receiver-headless BOOL     Run receiver headless? [default: false]
   --y4m PATH                   Optional Y4M file for the sender
@@ -43,6 +47,14 @@ fi
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 REPO_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
 
+# peerconnection_client always calls gtk_init (even in --headless), which needs an
+# X display. On a headless host, run it under a virtual display via xvfb-run.
+if [[ -z "${DISPLAY:-}" ]] && command -v xvfb-run >/dev/null 2>&1; then
+    XVFB=(xvfb-run -a)
+else
+    XVFB=()
+fi
+
 RUN_START_TS="$(date +%Y%m%dT%H%M%S)"
 
 TRACES_DIR="$SCRIPT_DIR/poc_traces"
@@ -53,8 +65,10 @@ LATENCY_MS=30
 INTERFACE_NAME=""
 NS_NAME="ns1"
 NS_INTERFACE="veth_ns"
-SERVER_HOST="localhost"
+SERVER_HOST="192.168.100.1"
 SERVER_PORT=8888
+SIGNALING_SCHEME="http"
+START_LOCAL_SIGNALING="true"
 SENDER_HEADLESS="true"
 RECEIVER_HEADLESS="true"
 EXPERIMENT_ID=""
@@ -73,6 +87,8 @@ while [[ $# -gt 0 ]]; do
         --ns-interface) NS_INTERFACE="$2"; shift 2 ;;
         --server) SERVER_HOST="$2"; shift 2 ;;
         --port) SERVER_PORT="$2"; shift 2 ;;
+        --signaling-scheme) SIGNALING_SCHEME="$2"; shift 2 ;;
+        --no-local-signaling) START_LOCAL_SIGNALING="false"; shift ;;
         --sender-headless) SENDER_HEADLESS="$2"; shift 2 ;;
         --receiver-headless) RECEIVER_HEADLESS="$2"; shift 2 ;;
         --y4m) Y4M_PATH="$2"; shift 2 ;;
@@ -330,6 +346,8 @@ run_single_trace() {
         --log_root="$LOG_ROOT"
         --server="$SERVER_HOST"
         --port="$SERVER_PORT"
+        --server_scheme="$SIGNALING_SCHEME"
+        --autoconnect=true
     )
 
     if [[ -n "$sctp_config" ]]; then
@@ -340,9 +358,10 @@ run_single_trace() {
     fi
 
     local sender_args=(
-        sudo ip netns exec "$NS_NAME" "$REPO_ROOT/out/Default/peerconnection_client"
+        sudo ip netns exec "$NS_NAME" "${XVFB[@]}" "$REPO_ROOT/out/Default/peerconnection_client"
         "${common_args[@]}"
         --is_sender=true
+        --autocall=true
         --headless="$SENDER_HEADLESS"
     )
     if [[ -n "$Y4M_PATH" ]]; then
@@ -350,7 +369,7 @@ run_single_trace() {
     fi
 
     local receiver_args=(
-        sudo "$REPO_ROOT/out/Default/peerconnection_client"
+        sudo "${XVFB[@]}" "$REPO_ROOT/out/Default/peerconnection_client"
         "${common_args[@]}"
         --is_sender=false
         --headless="$RECEIVER_HEADLESS"
@@ -637,6 +656,64 @@ run_single_trace() {
     sleep 3
     return 0
 }
+
+# ---- Bundled local signalling server ----------------------------------------
+# The sender runs inside netns "$NS_NAME" and reaches the host via 192.168.100.1
+# (veth_host); the receiver runs on the host. A server bound to 0.0.0.0:$SERVER_PORT
+# is reachable from both, so --server defaults to 192.168.100.1.
+SIGNALING_PID=""
+SIGNALING_STARTED_BY_US="false"
+
+# True if a signalling server is already answering on the local port.
+signaling_is_up() {
+    curl -s -m 2 -o /dev/null "http://127.0.0.1:$SERVER_PORT/healthz"
+}
+
+stop_local_signaling() {
+    # Only stop a server we started ourselves; leave a pre-existing one running.
+    if [[ "$SIGNALING_STARTED_BY_US" == "true" && -n "$SIGNALING_PID" ]] \
+         && kill -0 "$SIGNALING_PID" 2>/dev/null; then
+        echo "Stopping local signalling server (PID $SIGNALING_PID)..."
+        kill "$SIGNALING_PID" 2>/dev/null || true
+        for _ in $(seq 1 10); do
+            kill -0 "$SIGNALING_PID" 2>/dev/null || break
+            sleep 0.3
+        done
+        kill -9 "$SIGNALING_PID" 2>/dev/null || true
+        wait "$SIGNALING_PID" 2>/dev/null || true
+    fi
+}
+trap stop_local_signaling EXIT
+
+if [[ "$START_LOCAL_SIGNALING" == "true" ]]; then
+    if signaling_is_up; then
+        # Reuse a server someone already started (e.g. left running across runs).
+        echo "✓ Signalling server already running on port $SERVER_PORT — reusing it (won't stop it)."
+    else
+        SIGNALING_LOG="$SCRIPT_DIR/signaling_server.log"
+        echo "Starting bundled signalling server on 0.0.0.0:$SERVER_PORT (log: $SIGNALING_LOG)"
+        python3 "$SCRIPT_DIR/signaling_server.py" --host 0.0.0.0 --port "$SERVER_PORT" \
+            > "$SIGNALING_LOG" 2>&1 &
+        SIGNALING_PID=$!
+        SIGNALING_STARTED_BY_US="true"
+        signaling_ready="false"
+        for _ in $(seq 1 20); do
+            if ! kill -0 "$SIGNALING_PID" 2>/dev/null; then
+                echo "ERROR: signalling server exited during startup; see $SIGNALING_LOG" >&2
+                tail -n 20 "$SIGNALING_LOG" >&2 || true
+                exit 1
+            fi
+            if signaling_is_up; then signaling_ready="true"; break; fi
+            sleep 0.5
+        done
+        if [[ "$signaling_ready" != "true" ]]; then
+            echo "ERROR: signalling server did not become ready; see $SIGNALING_LOG" >&2
+            exit 1
+        fi
+        echo "  ✓ signalling server ready (PID $SIGNALING_PID)"
+    fi
+    echo "  clients use ${SIGNALING_SCHEME}://${SERVER_HOST}:${SERVER_PORT}"
+fi
 
 # Create main experiment root
 MAIN_EXPERIMENT_ROOT=$(mkdir -p "$OUTPUT_DIR" && cd "$OUTPUT_DIR" && pwd)/"$EXPERIMENT_ID"

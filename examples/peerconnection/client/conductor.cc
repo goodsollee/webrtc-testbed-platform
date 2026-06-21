@@ -1028,8 +1028,20 @@ void Conductor::StartLogin(const std::string& server, int port) {
     RTC_LOG(LS_INFO) << "Generated room number is "<<room_id_;
   } 
 
+  server_ = server;
+
+  // Build the signalling base URL. "https" keeps the original behaviour (no port
+  // in the URL, e.g. an external AppRTC server on 443). "http" targets a local
+  // server and appends the port, since headless mode passes port 0 to StartLogin.
+  std::string base_url;
+  if (server_scheme_ == "http") {
+    base_url = "http://" + server + ":" + std::to_string(signaling_port_);
+  } else {
+    base_url = "https://" + server;
+  }
+
   // Perform HTTP POST to /join/{room_id}
-  std::string join_url = "https://" + server + "/join/" + room_id_;
+  std::string join_url = base_url + "/join/" + room_id_;
 
   if (!InitializeCurl()) {
     RTC_LOG(LS_ERROR) << "Failed to initialize CURL";
@@ -1059,6 +1071,11 @@ void Conductor::StartLogin(const std::string& server, int port) {
 
     curl_easy_setopt(curl_, CURLOPT_TIMEOUT, 10L);
     curl_easy_setopt(curl_, CURLOPT_VERBOSE, 1L);
+
+    // Skip TLS verification on the join request, mirroring the message POST
+    // below. The signalling server may use a self-signed or expired cert.
+    curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYPEER, 0L);
+    curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYHOST, 0L);
 
     RTC_LOG(LS_INFO) << "Server Response: " << read_buffer;
 
@@ -1096,7 +1113,7 @@ void Conductor::StartLogin(const std::string& server, int port) {
   client_id_ = params["client_id"].asString();
   room_id_ = params["room_id"].asString();
 
-  post_url_ = "https://" + server + "/message/" + room_id_ + "/" + client_id_;
+  post_url_ = base_url + "/message/" + room_id_ + "/" + client_id_;
   
   // Store initial messages if any
   if (params.isMember("messages") && params["messages"].isArray()) {

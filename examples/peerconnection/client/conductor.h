@@ -102,6 +102,14 @@ class Conductor : public webrtc::PeerConnectionObserver,
   // juheon added
   void SetHeadless(bool headless) { headless_ = headless; }
 
+  // Signalling transport: scheme is "https" (default, no port in URL) or "http"
+  // (local server; port is appended). Used to build the /join and /message URLs.
+  void SetSignaling(const std::string& scheme, int port) {
+    if (!scheme.empty())
+      server_scheme_ = scheme;
+    signaling_port_ = port;
+  }
+
   void SetLogDirectory(const std::string& log_dir) { log_dir_ = log_dir; }
 
   void SetTrafficProfile(const std::string& path) { SetSctpTrafficProfile(path); }
@@ -265,6 +273,8 @@ class Conductor : public webrtc::PeerConnectionObserver,
    std::string client_id_;
    std::string room_id_;
    std::string server_;
+   std::string server_scheme_ = "https";
+   int signaling_port_ = 0;
    Json::Value initial_messages_;
 
    std::string post_url_;  // For HTTP POST when initiator

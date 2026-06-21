@@ -39,7 +39,7 @@ Experiments target **Linux** (the emulator uses network namespaces and `tc`).
   ```bash
   sudo apt install cmake pkg-config libssl-dev libcurl4-openssl-dev \
                    libabsl-dev iproute2 pulseaudio python3 python3-pip
-  pip3 install pandas numpy matplotlib
+  pip3 install pandas numpy matplotlib aiohttp
   ```
   (`libabsl-dev` + `pkg-config` are needed to build the network emulator;
   `cmake`/`libssl-dev`/`libcurl4-openssl-dev` to build libwebsockets.)
@@ -69,11 +69,28 @@ Experiments target **Linux** (the emulator uses network namespaces and `tc`).
 The client uses an AppRTC-style signalling flow: an HTTP `POST /join/<room>` and
 `POST /message/<room>/<client>`, plus a WebSocket connection to receive messages.
 Point the client at a server with `--server` and `--port` (defaults
-`localhost` / `8888`).
+`localhost` / `8888`), and pick the URL scheme with `--server_scheme`
+(`https`, the default, for an external server on 443; `http` for the bundled
+local server, which appends `--port` to the URL).
 
-> A bundled local signalling server is **not yet included** — you currently need
-> a compatible server reachable at `--server`/`--port`. This is planned; until
-> then, supply your own.
+A **bundled signalling server** now ships at
+`automated_experiment/signaling_server.py` (single-file `aiohttp` server; serves
+`/join`, `/message`, and the `/ws` WebSocket on one port). `automated_experiment.sh`
+manages it automatically: on startup it probes `/healthz` on the chosen port and
+**reuses a server that is already running** (and leaves it running on exit);
+otherwise it starts one and stops it when the run finishes. So the whole testbed
+runs from this repo alone, and you can also leave a server up across many runs.
+Pass `--no-local-signaling` to opt out entirely (e.g. to use an external server).
+To run it by hand:
+
+```bash
+python3 automated_experiment/signaling_server.py --host 0.0.0.0 --port 8888
+# then point clients at it with: --server=localhost --port=8888 --server_scheme=http
+```
+
+> Note: the separately-built `peerconnection_server` is the *legacy* WebRTC HTTP
+> signalling sample and is **not** compatible with this client; use
+> `signaling_server.py`.
 
 ## Video input
 

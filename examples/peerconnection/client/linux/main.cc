@@ -48,8 +48,12 @@ ABSL_FLAG(bool, record_remote, false,
 ABSL_FLAG(std::string, record_path, "remote.mp4",
     "Destination path for remote MP4 recording");
 
-ABSL_FLAG(bool, headless, false, 
+ABSL_FLAG(bool, headless, false,
     "Whether to run in headless or not");
+
+ABSL_FLAG(std::string, server_scheme, "https",
+    "Signalling URL scheme: 'https' (external server, no port in URL) or "
+    "'http' (local signalling_server.py; --port is appended to the URL)");
 
 class CustomSocketServer : public rtc::PhysicalSocketServer {
  public:
@@ -198,6 +202,7 @@ Example Commands:
   rtc::InitializeSSL();
   PeerConnectionClient client;
   auto conductor = rtc::make_ref_counted<Conductor>(&client, &wnd, absl::GetFlag(FLAGS_headless));
+  conductor->SetSignaling(absl::GetFlag(FLAGS_server_scheme), absl::GetFlag(FLAGS_port));
 
   if (absl::GetFlag(FLAGS_record_remote)) {
     std::string record_path = absl::GetFlag(FLAGS_record_path);
