@@ -1,90 +1,166 @@
-# WebRTC Native Project
+# WebRTC Testbed Platform
 
-WebRTC is a free, open software project that provides browsers and mobile applications with Real-Time Communications (RTC) capabilities via simple APIs. The WebRTC components have been optimized to best serve this purpose.
+A WebRTC testbed for **reproducible, automated media-streaming experiments over
+emulated networks**. It is built on the native (C++) WebRTC stack and ships a
+`peerconnection_client` example extended for headless operation, metric logging,
+and trace-driven network emulation, plus scripts that run full sender/receiver
+sessions automatically and analyze the results.
 
-## Mission
-To enable rich, high-quality RTC applications to be developed for the browser, mobile platforms, and IoT devices, and allow them all to communicate via a common set of protocols.
+> This repository is a fork of [WebRTC](https://webrtc.googlesource.com/src).
+> The upstream stack is unchanged; the additions live in `examples/`,
+> `automated_experiment/`, and `analysis/`. See `LICENSE`, `PATENTS`, and
+> `AUTHORS` for the upstream license and attribution.
 
-The WebRTC initiative is a project supported by Google, Mozilla, and Opera, amongst others.
+## What you can do with it
 
-## Development
-See [here][native-dev] for instructions on how to get started developing with the native code.
+- Stream real video (Y4M) between a sender and a receiver over a peer connection.
+- Shape the network with a **trace-driven emulator** (`tc`/`netem`) so each run
+  replays a recorded bandwidth profile.
+- Run **batch experiments** across many network traces and traffic configurations
+  with a single command, headless.
+- Collect per-frame and aggregate metrics (frame rate, bitrate, latency, …) and
+  generate comparison plots.
 
-For a detailed list of directories containing the native API header files, refer to the [authoritative list](native-api.md).
+## Repository layout
 
-## More Info
+| Path | Purpose |
+|------|---------|
+| `examples/peerconnection/client/` | Extended `peerconnection_client` (Y4M source, headless mode, MP4 recording, stats logging, WebSocket signalling) |
+| `automated_experiment/` | Experiment drivers, network emulator, traces, traffic configs, analysis |
+| `analysis/` | Standalone log-analysis and plotting helpers |
+| `tools_webrtc/build_libwebsockets.sh` | Builds the libwebsockets dependency (run by a gclient hook) |
 
-- Official website: [WebRTC.org](http://www.webrtc.org)
-- Master source code repo: [WebRTC Source](https://webrtc.googlesource.com/src)
-- Samples and reference apps: [GitHub Repository](https://github.com/webrtc)
-- Mailing list: [Discuss WebRTC](http://groups.google.com/group/discuss-webrtc)
-- Continuous build: [Build Console](https://ci.chromium.org/p/webrtc/g/ci/console)
-- [Coding style guide](g3doc/style-guide.md)
-- [Code of conduct](CODE_OF_CONDUCT.md)
-- [Reporting bugs](docs/bug-reporting.md)
-- [Documentation](g3doc/sitemap.md)
+## Prerequisites
 
-[native-dev]: https://webrtc.googlesource.com/src/+/main/docs/native-code/
+Experiments target **Linux** (the emulator uses network namespaces and `tc`).
 
----
+- [`depot_tools`](https://commondatastorage.googleapis.com/chrome-infra-docs/flat/depot_tools/docs/html/depot_tools_tutorial.html) on your `PATH`
+- Build/runtime packages:
+  ```bash
+  sudo apt install cmake libssl-dev libcurl4-openssl-dev iproute2 pulseaudio python3 python3-pip
+  pip3 install pandas numpy matplotlib
+  ```
 
-## Testing Frameworks and Tools
+## Build
 
-### Automated WebRTC Testbed (Native C++)
-A complete testing framework for WebRTC applications built using native C++ code. This testbed enables:
-- Automated peer connection testing between multiple endpoints
-- Network condition simulation and testing
-- Performance benchmarking and metrics collection
+1. Sync dependencies. `gclient sync` fetches everything, including
+   `third_party/libwebsockets`, and the `build_libwebsockets` hook compiles it
+   automatically:
+   ```bash
+   gclient sync
+   ```
+   If the hook was skipped (e.g. `cmake` was missing), build it manually later:
+   ```bash
+   bash tools_webrtc/build_libwebsockets.sh
+   ```
 
-### Building from Source
+2. Generate the build directory and build the client:
+   ```bash
+   gn gen out/Default
+   ninja -C out/Default peerconnection_client
+   ```
+   The binary is produced at `out/Default/peerconnection_client`.
 
-1. Install depot tools ([Linux setup guide](https://commondatastorage.googleapis.com/chrome-infra-docs/flat/depot_tools/docs/html/depot_tools_tutorial.html#_setting_up))
+## Signalling server
 
-2. Create `.gclient` file in your root directory:
-    ```python
-    solutions = [
-      {
-        "url": "https://github.com/lgs96/native-webrtc-project.git",
-        "managed": False,
-        "name": "src",
-        "deps_file": "DEPS",
-        "custom_deps": {},
-        "custom_vars": {},
-      },
-    ]
-    target_os = ["linux"]  # Adjust based on your target platform
-    ```
+The client uses an AppRTC-style signalling flow: an HTTP `POST /join/<room>` and
+`POST /message/<room>/<client>`, plus a WebSocket connection to receive messages.
+Point the client at a server with `--server` and `--port` (defaults
+`localhost` / `8888`).
 
-3. Sync dependencies:
-    ```bash
-    gclient sync
-    ```
+> A bundled local signalling server is **not yet included** — you currently need
+> a compatible server reachable at `--server`/`--port`. This is planned; until
+> then, supply your own.
 
-4. Generate build files:
-    ```bash
-    gn gen out/Default
-    ```
+## Video input
 
-5. Install additioanl dependencies
-    ```bash
-    sudo apt-get install libwebsocket-dev
-    ```
-
-
-5. Build peer connection client:
-    ```bash
-    ninja -C out/Default peerconnection_client
-    ```
-
-### Running Tests
+The sender streams a `.y4m` file given via `--y4m_path`. Sample clip:
 
 ```bash
-# Basic connection test
-./out/Default/peerconnection_client --server={signaling_server} --room_id={room_id} --experiment_mode=real (or emulation), --y4m_path={your_file.y4m}
+mkdir -p automated_experiment/dataset
+curl -L -o automated_experiment/dataset/talking_head.y4m \
+  "https://www.dropbox.com/scl/fi/73p7xl1pnkh2terwda14i/youtube_walking_talking_head.y4m?rlkey=zrh8bftem90smyzh55b59gee9&dl=1"
 ```
 
-#### Common Options
-- `--server`: Signaling server address (default: localhost)
-- `--room_id`: Room identifier (default: auto-generated)
-- `--experiment_mode`: Real environment or emulation (default: real)
-- `--y4m_path`: Test video path (should be a y4m file) (default: square test video)
+## Running a single session
+
+Start the **sender first**, then the receiver in another shell, using the same
+`room_id`:
+
+```bash
+cd automated_experiment
+./run_experiment.sh myroom true  --y4m ./dataset/talking_head.y4m   # sender
+./run_experiment.sh myroom false                                    # receiver
+```
+
+`run_experiment.sh` wraps `peerconnection_client`. Useful flags:
+`--min/--max` (playout delay ms), `--y4m PATH`, `--sctp PATH`.
+
+## Running automated experiments (the main workflow)
+
+`automated_experiment/automated_experiment.sh` is the batch driver. For every
+network trace × traffic configuration it: converts the trace to an emulator
+profile, starts the emulator, launches the sender inside an emulated namespace
+and the receiver on the host, waits for the run to finish, and archives the logs.
+
+```bash
+cd automated_experiment
+sudo ./automated_experiment.sh \
+  --experiment-id my_batch \
+  --traces-dir ./poc_traces \
+  --traffic-dir ./config \
+  --y4m ./dataset/talking_head.y4m \
+  --server localhost --port 8888
+```
+
+Key options (run with `--help` for the full list):
+
+| Option | Meaning | Default |
+|--------|---------|---------|
+| `--experiment-id ID` | Groups output under `results/ID` | (required) |
+| `--traces-dir DIR` | Directory of `*.pitree-trace` files | `poc_traces` |
+| `--traffic-dir DIR` | Directory of traffic-config sets | `config` |
+| `--interface NAME` | Host interface to shape | auto-detected |
+| `--latency-ms N` | Fixed latency applied to traces | `30` |
+| `--server` / `--port` | Signalling server | `localhost` / `8888` |
+| `--y4m PATH` | Video file for the sender | (none) |
+
+`sudo` is required because the emulator manipulates network namespaces and `tc`.
+The network emulator is compiled on demand (`make` in `network_emulation/`).
+
+### Traces
+
+`poc_traces/` holds a few sample bandwidth traces; `traces/` holds the full set.
+Each `*.pitree-trace` line is `<time_s> <bandwidth_mbps>`; `convert_trace.py`
+turns it into an emulator profile CSV.
+
+### Traffic configurations
+
+A traffic-config *set* is a directory under `config/` containing `rtp.csv` and/or
+`sctp.csv`. Each CSV has a header row and one line per flow, e.g.:
+
+```csv
+Traffic name,Protocol,Pattern,File size,Periodicity,Custom traces,Max bitrate,Frame rate,Video file,SLO (ms)
+KVCacheVideo,RTP,Video,,,,8000000,30,,
+```
+
+The sender receives these as `--rtp_csv` / `--sctp_csv`. Provided sets:
+`kvcache`, `prompt`, `custom_pattern`.
+
+## Analyzing results
+
+```bash
+cd automated_experiment
+python3 analyze_results.py --results-dir results/my_batch --output-dir plots
+```
+
+This reads the per-run logs and writes comparison plots (frame rate, bitrate,
+latency, …) to `plots/`. The helpers in `../analysis/` operate on individual
+log files.
+
+## Notes
+
+- Generated artifacts (build outputs, run logs, plots, `third_party/libwebsockets`)
+  are git-ignored; only sources and input data are tracked.
+- `peerconnection_client` also exposes flags such as `--headless`, `--is_sender`,
+  `--record_remote`/`--record_path` (MP4 capture), and `--force_fieldtrials`.
