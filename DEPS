@@ -400,6 +400,15 @@ deps = {
     'https://chromium.googlesource.com/webm/libvpx.git@906334ac1de2b0afa666472dce5545b82c1251fb',
   'src/third_party/libyuv':
     'https://chromium.googlesource.com/libyuv/libyuv.git@a8e59d207483f75b87dd5fc670e937672cdf5776',
+
+  # libwebsockets is used by the peerconnection_client example for WebSocket
+  # signalling. The source is fetched here and compiled by the
+  # 'build_libwebsockets' hook below (see tools_webrtc/build_libwebsockets.sh).
+  'src/third_party/libwebsockets': {
+    'url': 'https://github.com/warmcat/libwebsockets.git@v4.4.0',
+    'condition': 'checkout_linux',
+  },
+
   'src/third_party/lss': {
     'url': 'https://chromium.googlesource.com/linux-syscall-support.git@ce877209e11aa69dcfffbd53ef90ea1d07136521',
     'condition': 'checkout_android or checkout_linux',
@@ -2132,6 +2141,18 @@ hooks = [
         'python3',
         'src/tools/remove_stale_files.py',
         'src/third_party/test_fonts/test_fonts.tar.gz', # Remove after 20240901
+    ],
+  },
+
+  {
+    # Build libwebsockets (fetched above) so the peerconnection_client example
+    # can link against it. Produces third_party/libwebsockets/build/{lib,include}.
+    'name': 'build_libwebsockets',
+    'pattern': '.',
+    'condition': 'checkout_linux',
+    'action': [
+        'bash',
+        'src/tools_webrtc/build_libwebsockets.sh',
     ],
   },
 ]
